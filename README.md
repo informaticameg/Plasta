@@ -23,11 +23,18 @@ Not implemented yet
 
 Requirements
 -----------
-Plasta requires Python 2.5 or higher, and the Qt version 4.7 to run.
+Plasta requires 
+* Python 2.5 or higher, 
+* Storm 0.19, 
+* and the Qt version 4.7 to run.
 
 Base Package Structure
 -----------
-Here an empty structure for an object, download [here](http://db.tt/XS9tLCn3).
+Here an empty structure for an object, download [here](http://db.tt/7ibbSG6b).
+
+Documentation
+-----------
+Here a first version of documentation, available in [English](http://db.tt/cJV6y87O) or [Spanish](http://db.tt/R6S796E9).
 
 Licence
 -----------
