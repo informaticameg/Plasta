@@ -8,14 +8,15 @@ Is designed with the MVC pattern and technique development DRY.
 Usage
 -----------
 Clone the repository. In the same plasta/ folder level, copy the Storm version that you want to work with. Rename the folder to your project name and have fun!
+
 e.g. if your folder project is in /home/project/plasta, Storm needs to be in /home/project/storm.
 
-Features
+Technical features
 -----------
 - [Storm](https://storm.canonical.com/ ) in the persistence. Download [here](https://launchpad.net/storm/+download).
 - PyQt4 in GUIs. Download [here](http://www.riverbankcomputing.co.uk/software/pyqt/download).
 
-Features not implemented
+Not implemented yet
 -----------
 - Support for cross references.
 - Support for more types of data.
