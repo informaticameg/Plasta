@@ -25,6 +25,10 @@ Requirements
 -----------
 Plasta requires Python 2.5 or higher, and the Qt version 4.7 to run.
 
+Examples
+----------
+See and download examples into branch download here https://github.com/informaticameg/Plasta/tree/examples.
+
 Licence
 -----------
 Copyright 2012 Informática MEG
