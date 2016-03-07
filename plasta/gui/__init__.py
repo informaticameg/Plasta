@@ -20,21 +20,21 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from os.path import join, abspath, dirname 
+from os.path import join, abspath, dirname
 from PyQt4 import QtCore, QtGui, uic
 from plasta.gui.mytablewidget import MyTableWidget
 from plasta.tools import pathtools
-import uis.images_rc 
+import uis.images_rc
 
 class BaseGUI( QtGui.QMainWindow ):
     '''
-    Clase base para el manejo de las operaciones de la pantalla ABM      
+    Clase base para el manejo de las operaciones de la pantalla ABM
     '''
-    
-    def __init__(self, manager, managers = []):
-        QtGui.QMainWindow.__init__(self)
+
+    def __init__(self, manager, managers = None, parent = None):
+        QtGui.QMainWindow.__init__(self, parent)
         # nombre del archivo ui de la interfaz
-        self.FILENAME = join(abspath(dirname(__file__)),'uis/admin.ui')
+        self.FILENAME = join(abspath(dirname(__file__)),'uis/list.ui')
         # nombre del archivo del icono para la ventana
         ICONFILE = ''
 
@@ -53,13 +53,16 @@ class BaseGUI( QtGui.QMainWindow ):
         self.ATRIBUTOSLISTA = None
         # ATRI_COMBO_BUSQUEDA: lista de diccionarios donde puedes indicar el orden de como
         # quieres que se muestren y vean los atributos en el combo de los filtros
-        # El formato es el mismo que <ATRIBUTOSLISTA>  
-        self.ATRI_COMBO_BUSQUEDA = []#
-        # DialogAddClass: referencia a la clase que se instanciara para manejar la 
+        # El formato es el mismo que <ATRIBUTOSLISTA>
+        self.ATRI_COMBO_BUSQUEDA = []#el orden y la cantidad de atributos en str que quieras
+
+        self.ALINEACIONLISTA = []#la alinecion de cada atributo en la fila
+        # DialogAddClass: referencia a la clase que se instanciara para manejar la
         # ventana del dialogo abrir/editar
         self.DialogAddClass = None
-        self.TITULO = "Administrador de %ss" % self.manager.getClassName()
-        
+        self.TITULO = self.manager.getClassName()
+        self.pluralTitle = self.manager.getClassName()
+
     def _start_operations( self ):
         u'''
         Operaciones necesarias para levantar las ventanas
@@ -75,6 +78,10 @@ class BaseGUI( QtGui.QMainWindow ):
         self.fullScreen = False
         
         self._centerOnScreen()
+        self.btEditar.setVisible(False)
+        self.btEliminar.setVisible(False)
+        self.lbTitulo.setText(self.pluralTitle)
+        self.setWindowTitle(self.pluralTitle)
 
     def _toogleFullScreen( self ):
         ''' '''
@@ -109,8 +116,8 @@ class BaseGUI( QtGui.QMainWindow ):
         else:
             self.ATRIBUTOSLISTA_CLASSNAMES = [ self.manager.getAttributeName( p.values()[0] ) for p in self.ATRIBUTOSLISTA]
             columnasTablas = [p.keys()[0] for p in self.ATRIBUTOSLISTA]
-            
-        self.MyTabla = MyTableWidget( self.twDatos, columnasTablas )
+
+        self.MyTabla = MyTableWidget( self.twDatos, columnasTablas, self.ALINEACIONLISTA)
         # conecta el menu contextual a la tabla
         self.connect( self.MyTabla.widget, QtCore.SIGNAL( 'customContextMenuRequested(const QPoint&)' ), self.on_context_menu )
  
@@ -139,7 +146,7 @@ class BaseGUI( QtGui.QMainWindow ):
         '''
         #MAGIC###################
         busqueda = self.manager.CLASS.__dict__[columnname]
-        if str( type( busqueda ) ) != "<class 'storm.references.Reference'>" :             
+        if str( type( busqueda ) ) != "<class 'storm.references.Reference'>" :
             try:
                 campo = self.manager.CLASS.__dict__['_storm_columns'][busqueda]
             except:
@@ -149,7 +156,7 @@ class BaseGUI( QtGui.QMainWindow ):
             campo = busqueda
         #END MAGIC###############
         return campo
-        
+
     def _find( self ):
         '''
         Reliza la busqueda y carga la tabla
@@ -158,22 +165,22 @@ class BaseGUI( QtGui.QMainWindow ):
         valor = unicode(self.leBusqueda.text().toUtf8(),'utf-8')
         # carga la lista segun el estado de la barra de busqueda
         self.reloadList() if valor != u'' else self.loadTable()
-    
+
     def _setSearchColor(self, widget, resultados_busqueda):
-        color_rojo = 'background-color: rgb(255, 178, 178);' 
+        color_rojo = 'background-color: rgb(255, 178, 178);'
         try:
-            if self.myStyleSheetBlanco == '' : 
+            if self.myStyleSheetBlanco == '' :
                 if not widget.styleSheet().isEmpty() :
                     style = widget.styleSheet()
-                    self.myStyleSheetBlanco = widget.styleSheet()        
-                                
+                    self.myStyleSheetBlanco = widget.styleSheet()
+
                     pos1 = style.indexOf( 'QLineEdit' )
                     pos2 = style.indexOf( '}', pos1 )
                     style = style.replace( pos2, 1, color_rojo + '}' )
                     self.myStyleSheetRojo = style
                 else:
                     self.myStyleSheetRojo = color_rojo
-                        
+
             if not widget.text().isEmpty() :
                 if len( resultados_busqueda ) == 0 :
                     widget.setStyleSheet( self.myStyleSheetRojo )
@@ -304,6 +311,7 @@ class BaseGUI( QtGui.QMainWindow ):
     @QtCore.pyqtSlot()
     def on_btAgregar_clicked( self ):
         wAgregar = self.add()
+        wAgregar.setWindowIcon(self.windowIcon())
         wAgregar.postSaveMethod = self.reloadList
         wAgregar.exec_()
     
@@ -313,7 +321,8 @@ class BaseGUI( QtGui.QMainWindow ):
         if listadeobjetosseleccionados:
             for obj in listadeobjetosseleccionados:
                 wEditar = self.edit( obj )
-                wEditar.postSaveMethod = self.reloadList 
+                wEditar.setWindowIcon(self.windowIcon())
+                wEditar.postSaveMethod = self.reloadList
                 wEditar.exec_()
 
     @QtCore.pyqtSlot()
@@ -321,16 +330,21 @@ class BaseGUI( QtGui.QMainWindow ):
         listadeobjetosseleccionados = self.actual_rows_to_objects()
         if listadeobjetosseleccionados:
             for obj in listadeobjetosseleccionados:
-                result = QtGui.QMessageBox.warning( self, u"Eliminar " + self.manager.getClassName(),
-                    u"¿Esta seguro que desea delete?.\n\n",
+                result = QtGui.QMessageBox.warning( self, u"Eliminar",
+                    u"¿Esta seguro que desea eliminar?.\n\n",
                     QtGui.QMessageBox.Yes, QtGui.QMessageBox.No )
                 if result == QtGui.QMessageBox.Yes:
                     self.delete( obj )
                     self._find()
 
-    def on_twDatos_doubleClicked( self , index ):
-        pass    
-        
+    def on_twDatos_itemSelectionChanged(self):
+        self.btEditar.setVisible(False)
+        self.btEliminar.setVisible(False)
+        items = self.MyTabla.getListSelectedRows()
+        if items  :
+            self.btEditar.setVisible(True)
+            self.btEliminar.setVisible(True)
+
 #########
 # OTROS #
 #########
