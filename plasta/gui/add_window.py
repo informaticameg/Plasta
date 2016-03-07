@@ -3,7 +3,7 @@
 #
 # Copyright (c) 2012 Informática MEG <contacto@informaticameg.com>
 #
-# Written by 
+# Written by
 #       Copyright 2012 Fernandez, Emiliano <emilianohfernandez@gmail.com>
 #       Copyright 2012 Ferreyra, Jonathan <jalejandroferreyra@gmail.com>
 #
@@ -27,18 +27,39 @@ class BaseAddWindow(QtGui.QDialog):
     '''
     Clase base para el manejo de la pantalla para dar de alta/modificar un registro.
     '''
-    
-    def __init__(self,unManager, itemaeditar = False, managers = []):
-        QtGui.QDialog.__init__(self)        
+
+    def __init__(self, unManager, itemaeditar = False, managers = []):
+        QtGui.QDialog.__init__(self)
         self.manager = unManager
         self.managers = managers
         self.EDITITEM = itemaeditar
-        
-        self.ITEMLIST = []        
+
+        self.ITEMLIST = []
+        self.FILENAME = 'add.ui'
         self.dict_referencias = {} # diccionario que contiene la instancia seleccionada en el buscador
-        self.postSaveMethod = None # metodo que BaseGUI que se ejecuta luego de save() 
+        self.postSaveMethod = None # metodo que BaseGUI que se ejecuta luego de save()
         self._dictWidgetReferencias = {} # diccionario que contiene los widget boton y la referencia a la cual pertenece
-    
+
+        # agregar aqui los validadores a ejecutar antes de guardar/editar
+        # validadores disponibles: unique | presence
+        # sintaxis: {'nombreCampo':'nombreValidador', ...}
+        # ej: {'codigo':'precenceOf'}
+        self.validators = {}
+
+        # self.validatorCustom = {'myattr':myFnCustom}
+        # la funcion recibe como parametros ({str} attr, {dict} allObjectValues)
+        # debe retornar {bool} result, {str} errorMessage
+        self.validatorCustom = {}
+
+        self.messages = {
+        'newSuccefullSave':u" agregado con éxito.",
+        'editSuccefullSave':u" editado con éxito.",
+        'newErrorSave':u"No se pudo agregar el ",
+        'editErrorSave':u"No se pudo editar el ",
+        'validateUnique':u'Ya existe un elemento con el mismo nombre',
+        'validatePresence':u'{field} no puede dejarse vacío'
+        }
+
 ##########################
 # METODOS DE LOS EVENTOS #
 ##########################    
@@ -46,47 +67,48 @@ class BaseAddWindow(QtGui.QDialog):
     @QtCore.pyqtSlot()
     def on_btGuardar_clicked(self):
         resultado = False
+        datos = self.getDataOfWidgets()
         if self.validateConstraintsFields() :
-            datos = self.getDataOfWidgets()
-            resultado = self.save(datos) if not self.EDITITEM else self.edit(datos)
-            if self.postSaveMethod :
-                self.postSaveMethod()        
-            self._showResultMessage(resultado)
-            self.close()
+            if self.validateCustomConstraints(datos):
+                resultado = self.save(datos) if not self.EDITITEM else self.edit(datos)
+                if self.postSaveMethod :
+                    self.postSaveMethod()
+                self._showResultMessage(resultado)
+                self.close()
         return resultado
-    
+
     def _showResultMessage(self, resultado):
         if not self.EDITITEM:
-            if resultado :            
-                QtGui.QMessageBox.information(self, "Agregar "+self.getClassName(),self.getClassName()+u" agregado con éxito.")
+            if resultado :
+                QtGui.QMessageBox.information(self, "Nuevo " + self.getClassName(), self.getClassName().capitalize() + self.messages['newSuccefullSave'])
             else:
-                QtGui.QMessageBox.warning(self, "Agregar "+self.getClassName(),"No se pudo agregar el "+self.getClassName())
+                QtGui.QMessageBox.warning(self, "Nuevo " + self.getClassName(), self.messages['newErrorSave'] + self.getClassName())
         else:
             if resultado :
-                QtGui.QMessageBox.information(self, "Editar " +self.getClassName(),self.getClassName()+" editado con exito.")
+                QtGui.QMessageBox.information(self, "Editar " + self.getClassName(), self.getClassName().capitalize() + self.messages['editSuccefullSave'])
             else:
-                QtGui.QMessageBox.warning(self, "Editar "+self.getClassName(),"No se pudo edit el "+self.getClassName())        
-        
+                QtGui.QMessageBox.warning(self, "Editar " + self.getClassName(), self.messages['editErrorSave'] + self.getClassName())
+
     @QtCore.pyqtSlot()
     def on_btSalir_clicked(self):
         self.close()
-        
+
 ######################
 # METODOS AUXILIARES #
-######################  
+######################
 
     def setValidators(self):
         '''
-        A partir de las restricciones de la clase, valida antes de ser guardado el 
+        A partir de las restricciones de la clase, valida antes de ser guardado el
         nuevo registro, que cumplan con esas restricciones.
         '''
-        
+
         infoclase = self.manager.getClassAttributesInfo()
         for dato in self.ITEMLIST:
             widget = dato.keys()[0]
             atributo_clase = dato.values()[0]
-            nombrecolumnalabel = "lb"+[k for k, v in self.__dict__.iteritems() if v == widget][0][2:]  
-            if str(type(atributo_clase)) == "<class 'storm.references.Reference'>" : 
+            nombrecolumnalabel = "lb"+[k for k, v in self.__dict__.iteritems() if v == widget][0][2:]
+            if str(type(atributo_clase)) == "<class 'storm.references.Reference'>" :
                 try:
                     widget.setReadOnly(True)
                     # conecta el evento al boton de una referencia
@@ -94,7 +116,7 @@ class BaseAddWindow(QtGui.QDialog):
                     widgetboton = self.__dict__[nombreboton]
                     self._dictWidgetReferencias[ widgetboton ] = atributo_clase
                     self.connect(widgetboton, QtCore.SIGNAL('clicked ()'),self.mostrarBuscador)
-                except KeyError, msg:
+                except Exception, msg:
                     print 'KeyError: Posiblemente no has agregado el boton para elegir una referencia.\nMensaje del error: ' + str(msg)
             else:
                 columnastorm = self.manager.propertyToColumn(atributo_clase)
@@ -148,32 +170,74 @@ class BaseAddWindow(QtGui.QDialog):
         attributes = filerAttributes( self.manager.getClassAttributesInfo() ) 
         # obtiene los widgets y ya setea el color en cas
         for atributo in attributes :
-            for item in self.ITEMLIST :                
-                if self.manager.propertyToColumn(item.values()[0]) == atributo :
-                    widget = item.keys()[0]
-        
-                    if type(widget) is QtGui.QLineEdit :
-                        if widget.text().isEmpty() :
-                            valido = False
+            for item in self.ITEMLIST :
+                if not str(type(item.values()[0])) == "<class 'storm.references.Reference'>" :
+                    if self.manager.propertyToColumn(item.values()[0]) == atributo :
+                        widget = item.keys()[0]
+
+                        if type(widget) is QtGui.QLineEdit :
+                            if widget.text().isEmpty() :
+                                valido = False
+                        elif type(widget) is QtGui.QTextEdit :
+                            if widget.toPlainText().isEmpty() :
+                                valido = False
+                        elif type(widget) is QtGui.QDoubleSpinBox :
+                            if widget.value() <= 0.0 :
+                                valido = False
+                        if not valido :
                             widget.setStyleSheet( color_rojo )
-                    elif type(widget) is QtGui.QTextEdit :
-                        if widget.toPlainText().isEmpty() :
-                            valido = False
-                            widget.setStyleSheet( color_rojo )
+
         return valido
-        
+
+    def validateCustomConstraints(self, datos):
+        # {list} datos = valores cargados en los widgets
+        # validadores establecidos por el usuario
+        validatorsFns = {
+        'presence':self._validatesPresenceOf,
+        'unique':self._validatesUniquenessOf,
+        }
+        value = None
+        if len(self.validators.keys()) > 0:
+
+            attributesNames = []
+            for item in self.ITEMLIST:
+                attrName = self.manager._getPropertyName(item.values()[0])
+                attributesNames.append(attrName)
+
+            for attr in self.validators.keys():
+                #try:
+                nameValidators = self.validators[attr]
+                if str(type(self.validators[attr])) == "<type 'str'>":
+                    nameValidators = [self.validators[attr]]
+                for validator in nameValidators:
+                    if validator != 'custom':
+                        if validator == 'unique':
+                            idxValue = attributesNames.index(attr)
+                            value = datos[idxValue]
+
+                        result, msg = validatorsFns[validator](attr, value)
+                    else:
+                        result, msg = self.validatorCustom[attr](attr, datos)
+                    if result is False:
+                        msg = msg + u'\n\nCompruebe la situación indicada para continuar'
+                        QtGui.QMessageBox.warning(self, "Error", msg)
+                        return False
+                #except KeyError, e:
+                #    raise Exception("No existe un validador llamado: ", self.validators[attr])
+        return True
+
     def getKeyDictionary(self, dic, val):
         """return the key of dictionary dic given the value"""
         return [k for k, v in dic.iteritems() if v == val][0]
-    
-    def getDataOfWidgets(self):
+
+    def getDataOfWidgets(self, widgets = None, remoteId = True):
         '''
         Obtiene los datos de las widget contenidos
          en las claves de ITEMLIST
         @return: lista de valores
         '''
-        from PyQt4.QtGui import QIntValidator,QLineEdit,QComboBox,QLabel,QDateEdit,QTextEdit,QSpinBox,QCheckBox
-        
+        from PyQt4.QtGui import QIntValidator,QLineEdit,QComboBox,QLabel,QDateEdit,QTextEdit,QSpinBox,QDoubleSpinBox,QCheckBox
+
         def textToUnicode(dato):
             return unicode(dato.toUtf8(),'utf-8')
         
@@ -207,16 +271,37 @@ class BaseAddWindow(QtGui.QDialog):
         
         funcionwidget = {QLineEdit:isLineedit,QComboBox:isCombobox,QLabel:isLabel,
                         QDateEdit:isDateEdit,QTextEdit:isTextEdit,QSpinBox:isSpinBox,
-                        QCheckBox:isCheckBox}
+                        QDoubleSpinBox:isSpinBox,QCheckBox:isCheckBox}
 
         values = []
+        if widgets :
+            for widget in widgets:
+                valor = funcionwidget[type(widget)](widget)
+                values.append(valor)
+            return values
+
         for dicci in self.ITEMLIST:
             widget = dicci.keys()[0]
-            if not(widget in self.dict_referencias):
-                valor = funcionwidget[type(widget)](widget)
+            attribute = dicci.values()[0]
+
+            if not str(type(attribute)) == "<class 'storm.references.Reference'>":
+                if not(widget in self.dict_referencias):
+                    valor = funcionwidget[type(widget)](widget)
+                else:
+                    valor = self.dict_referencias[widget]
             else:
-                valor = self.dict_referencias[widget]
-            
+                #TODO: hacer que se obtenga el valor x.ide del objeto referencia
+                try:
+                    referenceClass = attribute.__dict__['_remote_key'].__dict__['cls']
+                except AttributeError, e:
+                    referenceClass = attribute.__dict__['_remote_key'][0].__dict__['cls']
+                strValue = funcionwidget[type(widget)](widget)
+                columAttr = referenceClass.__dict__['_storm_columns'][referenceClass.__dict__['nombre']]
+                res = self.manager.almacen.find(referenceClass, columAttr == strValue)
+                res = [obj for obj in res]
+
+                if res:
+                    valor = res[0]
             values.append(valor) if valor != u'' else values.append(None) #@NoEffect
         return values
     
@@ -243,7 +328,7 @@ class BaseAddWindow(QtGui.QDialog):
         @requires: usar storm
         @return: el nombre de la clase que maneja el manager
         '''
-        return self.manager.getClassName()
+        return self.manager.getClassName().lower()
 
     def editProperties(self):
         '''
@@ -291,26 +376,35 @@ class BaseAddWindow(QtGui.QDialog):
         self.btGuardar.setDefault(True)
         if self.EDITITEM:
             self.btGuardar.setText('Editar')
-            self.setWindowTitle(u'Editar ' + self.manager.getClassName())
+            self.setWindowTitle(u'Editar ' + self.getClassName())
             self._loadDataInWidgets()
         else:
-            self.setWindowTitle(u"Agregar " + self.manager.getClassName())
-    
+            self.setWindowTitle(u"Nuevo " + self.getClassName())
+
+        QtGui.QShortcut( QtGui.QKeySequence( "F9" ), self, self.on_btGuardar_clicked )
+        QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.Key_Escape ), self, self.close )
+
     def _loadDataInWidgets(self):
         '''
         carga los datos de el obj EDITITEM en sus correspondientes
         widgets marcados por ITEMLIST
         '''
         import PyQt4
-        for propnombre,propvalue in enumerate(self.getDataInstance()):
+        for propnombre, propvalue in enumerate(self.getDataInstance()):
             widget = self.ITEMLIST[propnombre].keys()[0]
             dato = propvalue.values()[0]
             if not dato is  None :
-                tipo = type(widget)            
+                tipo = type(widget)
                 if tipo is PyQt4.QtGui.QLineEdit :
-                    widget.setText(unicode(str(dato),'utf-8'))
+                    try:
+                        widget.setText(unicode(dato,'utf-8'))
+                    except TypeError, e:
+                        widget.setText(dato)
                 elif tipo is PyQt4.QtGui.QComboBox:
-                    widget.addItem(dato)
+                    try:
+                        widget.addItem(dato)
+                    except TypeError, e:
+                        widget.addItem(dato.__str__())
                 elif tipo is PyQt4.QtGui.QLabel:
                     widget.setText(dato)
                 elif tipo is PyQt4.QtGui.QTextEdit:
@@ -363,3 +457,58 @@ class BaseAddWindow(QtGui.QDialog):
         for dicti in self.ITEMLIST:
             if dicti.values()[0] is referencia :
                 return dicti.keys()[0]
+
+#############################################
+### Validadores a la hora de guardar/editar
+#############################################
+
+    def _validatesPresenceOf(self, field, value = None):
+        '''Valida que el campo indicado haya sido rellenado.
+        {str} field = nombre del campo'''
+
+        widget = None
+        # get the widget
+        for item in self.ITEMLIST:
+            if self.manager._getPropertyName(item.values()[0]) == field:
+                widget = item.keys()[0]
+
+        value = self.getDataOfWidgets([widget])[0]
+        infoClass = self.manager.getClassAttributesInfo()
+        infoAttr = None
+        for stormAttr in infoClass:
+            if infoClass[stormAttr]['name'] == field:
+                infoAttr = infoClass[stormAttr]
+                pass
+        checkByType = {
+        'str':lambda value: len(value) > 0,
+        'int':lambda value: True,
+        'float':lambda value: True,
+        'date':lambda value: True,
+        }
+        message = self.messages['validatePresence'].replace('{field}', field.capitalize())
+        return checkByType[infoAttr['type']](value), message
+
+
+    def _validatesUniquenessOf(self, field, value):
+        '''Valida que no exista otro elemento en el modelo
+        con el mismo valor asignado al campo <field>
+        {str} field = nombre del campo
+        {str} value = valor actual'''
+
+        classInfo = self.manager.getClassAttributesInfo()
+        idx_classInfo_by_name = {}
+        for k in classInfo.keys():
+            v = classInfo[k]
+            idx_classInfo_by_name[v['name']] = v
+
+        infoAttr = idx_classInfo_by_name[field]
+        dataValues = [item.__getattribute__(field) for item in self.manager.getall()]
+        if infoAttr['type'] == 'str':
+            dataValues = [dataValue.lower() for dataValue in dataValues]
+            value = value.lower()
+        dataValues = list(set(dataValues))
+
+        if self.EDITITEM:
+            if value in dataValues:
+                del dataValues[dataValues.index(value)]
+        return not value in dataValues, self.messages['validateUnique']
