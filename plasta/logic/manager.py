@@ -108,16 +108,16 @@ class BaseManager( object ):
     def getClassAttributesValues( self, obj ):
         '''
         obtiene los valores de el obj
-        @param obj:a obj de type 
+        @param obj:a obj de type
         @return: a list of values
         '''
         if isinstance( obj, self.CLASS ):
             return [obj.__getattribute__( p ) for p in self.getClassAttributes()]
         else:
             raise Exception( "no se pudo obtener los valores" )
-        
+
 #=======================================================================
-# Generic Methods  
+# Generic Methods
 #=======================================================================
 
     def add( self, *params ):
@@ -135,7 +135,7 @@ class BaseManager( object ):
         except Exception, e:
             print e
             return False
-        
+
     def delete( self, obj ):
         '''
         borra un objeto de la bd y de la ram

@@ -62,8 +62,8 @@ class BaseAddWindow(QtGui.QDialog):
 
 ##########################
 # METODOS DE LOS EVENTOS #
-##########################    
-    
+##########################
+
     @QtCore.pyqtSlot()
     def on_btGuardar_clicked(self):
         resultado = False
@@ -125,7 +125,7 @@ class BaseAddWindow(QtGui.QDialog):
                 elif infoclase[columnastorm]["type"] == 'int':
                     if type(widget) is QtGui.QLineEdit :
                         widget.setValidator(QtGui.QIntValidator())
-                
+
                 if infoclase[columnastorm]["null"] == False:
                     try:
                         label = self.__dict__[nombrecolumnalabel]
@@ -136,11 +136,11 @@ class BaseAddWindow(QtGui.QDialog):
                         print 'ERROR al intentar validar las restricciones para <%s>' % nombrecolumnalabel
                         print 'KeyError: Posiblemente el widget QLabel se llama de otra manera.'
                         print 'SOLUCION: Debe llamarce de la misma manera que el atributo de la clase.'
-                    
+
                 if infoclase[columnastorm]["default"] != None:
                     #NEXT:poner valor por defecto
                     pass
-                
+
                 if infoclase[columnastorm]["primary"] == True:
                     label = self.__dict__[nombrecolumnalabel]
                     label.setText(label.text()+u'*')
@@ -150,24 +150,24 @@ class BaseAddWindow(QtGui.QDialog):
 
     def validateConstraintsFields(self):
         """
-        Comprueba que los campos que son <primary key> y <allow none = False>, 
-        no esten vacios a la hora de save(). 
+        Comprueba que los campos que son <primary key> y <allow none = False>,
+        no esten vacios a la hora de save().
         """
-        
-        valido = True 
+
+        valido = True
         color_rojo = 'background-color: rgb(255, 178, 178);'
-        
+
         # 1° obtener la informacion de los atributos
-        # 2° obtener a partir de los atributos, los properties 
+        # 2° obtener a partir de los atributos, los properties
         # 3° a partir de los properties obtener los widgets
         def filerAttributes(informacion):
-            info_que_necesito = filter( 
+            info_que_necesito = filter(
                     lambda atributo : True if ((atributo['primary'] == True) or (atributo['null'] == False)) else False,
                     informacion.values())
             return map(lambda atri : self.getKeyDictionary(informacion, atri), info_que_necesito)
-            
+
         # obtiene los atributos que poseen restricciones
-        attributes = filerAttributes( self.manager.getClassAttributesInfo() ) 
+        attributes = filerAttributes( self.manager.getClassAttributesInfo() )
         # obtiene los widgets y ya setea el color en cas
         for atributo in attributes :
             for item in self.ITEMLIST :
@@ -240,19 +240,19 @@ class BaseAddWindow(QtGui.QDialog):
 
         def textToUnicode(dato):
             return unicode(dato.toUtf8(),'utf-8')
-        
+
         def isCheckBox(widget):
             return widget.isChecked()
-            
+
         def isSpinBox(widget):
             return widget.value()
-            
+
         def isTextEdit(widget):
             return textToUnicode( widget.toPlainText() )
-        
+
         def isLineedit(widget):
             if type(widget.validator()) == QIntValidator:
-                if not widget.text().isEmpty() :                    
+                if not widget.text().isEmpty() :
                     value = int(isLabel(widget))
                 else:
                     value = None
@@ -265,10 +265,10 @@ class BaseAddWindow(QtGui.QDialog):
 
         def isCombobox(widget):
             return textToUnicode(widget.itemText(widget.currentIndex()))
-                
+
         def isLabel(widget):
             return textToUnicode(widget.text())
-        
+
         funcionwidget = {QLineEdit:isLineedit,QComboBox:isCombobox,QLabel:isLabel,
                         QDateEdit:isDateEdit,QTextEdit:isTextEdit,QSpinBox:isSpinBox,
                         QDoubleSpinBox:isSpinBox,QCheckBox:isCheckBox}
@@ -304,7 +304,7 @@ class BaseAddWindow(QtGui.QDialog):
                     valor = res[0]
             values.append(valor) if valor != u'' else values.append(None) #@NoEffect
         return values
-    
+
     def getDataInstance(self):
         '''
         Obtiene los datos de los atributos contenidos
@@ -322,7 +322,7 @@ class BaseAddWindow(QtGui.QDialog):
                     self.manager._getReferenceName(v.values()[0]))
             listcolumns.append(v.values()[0])
         return self.manager.getDataObject(self.EDITITEM,listcolumns)
-        
+
     def getClassName(self):
         '''
         @requires: usar storm
@@ -341,8 +341,8 @@ class BaseAddWindow(QtGui.QDialog):
             nombrepropiedad = propiedadesvalues[i].keys()[0]
             valor = propiedadesvalues[i].values()[0]
             if valor != dato:
-                self.EDITITEM.__setattr__(nombrepropiedad,dato) 
-        return True       
+                self.EDITITEM.__setattr__(nombrepropiedad,dato)
+        return True
 
     def save(self, listadedatos):
         '''
@@ -351,7 +351,7 @@ class BaseAddWindow(QtGui.QDialog):
         '''
         #REIMPLEMENT
         return self.manager.add(*listadedatos)
-    
+
     def edit(self, listadedatos):
         '''
         Metodo que automatiza el edit de los datos.
@@ -365,7 +365,7 @@ class BaseAddWindow(QtGui.QDialog):
         except Exception,e:
             print e
             return False
- 
+
     def _start_operations(self):
         '''
         operaciones que se requieren para iniciar la ventana
@@ -414,13 +414,13 @@ class BaseAddWindow(QtGui.QDialog):
                 elif tipo is PyQt4.QtGui.QDateEdit:
                     widget.setDate(QtCore.QDate(dato.year, dato.month, dato.day))
         return True
-            
+
     def _centerOnScreen (self):
         '''Centers the window on the screen.'''
         resolution = QtGui.QDesktopWidget().screenGeometry()
         self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
                   (resolution.height() / 2) - (self.frameSize().height() / 2))
-                  
+
     def _toUnicode(self, MyQString):
         '''
         convierte un string a unicode
@@ -428,28 +428,28 @@ class BaseAddWindow(QtGui.QDialog):
         @return: unicode value
         '''
         return unicode(MyQString.toUtf8(),'utf-8')
-        
+
     def showSearch(self):
-        """        
+        """
         """
         atributo = self._dictWidgetReferencias[self.sender()]
         # obtener el atributo remoto al que pertenece <atributo>
         all_info = self.manager.getClassAttributesInfo()
-        for info_atributo in all_info :            
-            if all_info[info_atributo]['reference'] != False :  #@attention: DON'T TOUCH 
+        for info_atributo in all_info :
+            if all_info[info_atributo]['reference'] != False :  #@attention: DON'T TOUCH
                 if all_info[info_atributo]['reference']['reference_instance'] is atributo :
                     atributo_remoto = all_info[info_atributo]['reference']['remote_key']
         # obtener el manager al que pertenece <atributo_remoto>
         manager_que_busco = None
-        for unmanager in self.managers:        
+        for unmanager in self.managers:
             if atributo_remoto.__dict__['cls'] == unmanager.CLASS:
                 manager_que_busco = unmanager
-        # llamar a la ventana del buscador, pasandole el manager        
+        # llamar a la ventana del buscador, pasandole el manager
         from buscador import BaseBuscador
         self.dict_referencias[ self.referenceToWidget(atributo) ] = None
         search = BaseBuscador(manager_que_busco, self.dict_referencias)
-        search.exec_()        
-         
+        search.exec_()
+
     def referenceToWidget(self, referencia):
         """
         A partir de una referencia, obtiene el widget correspondiente que es usado por esa referencia.

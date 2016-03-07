@@ -3,7 +3,7 @@
 #
 # Copyright (c) 2012 Informática MEG <contacto@informaticameg.com>
 #
-# Written by 
+# Written by
 #       Copyright 2012 Fernandez, Emiliano <emilianohfernandez@gmail.com>
 #       Copyright 2012 Ferreyra, Jonathan <jalejandroferreyra@gmail.com>
 #
@@ -35,11 +35,11 @@ class MyTableWidget():
         self.__widget.horizontalHeader().setResizeMode(0)#maximiza los campos en la tabla
         self.__widget.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
         self.__widget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        
+
         self.__widget.setContextMenuPolicy( QtCore.Qt.CustomContextMenu )
 
         self.__columns = listadecolumnas
-        
+
         if listadealineaciones :
             alineaciones = {
                 'L':QtCore.Qt.AlignLeft,
@@ -53,7 +53,7 @@ class MyTableWidget():
         self.__widget.setColumnCount(len(self.__columns))
         for i in xrange(self.__widget.columnCount()):  # set horizontal headers
             item = QtGui.QTableWidgetItem(self.__columns[i].capitalize())# the text
-            item.setTextAlignment(QtCore.Qt.AlignCenter)# the alignment                
+            item.setTextAlignment(QtCore.Qt.AlignCenter)# the alignment
             self.__widget.setHorizontalHeaderItem(i, item)
 
     def appendItem(self,listadedatos):
@@ -63,7 +63,7 @@ class MyTableWidget():
             #~ print item.flags(QtCore.QAbstractTableModel.flags( self, index ))
             item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable )
             item.setTextAlignment( alineaciones[x] )# the alignment
-            widget.setItem(y, x, item)        
+            widget.setItem(y, x, item)
         widget = self.__widget
         y = widget.rowCount()
         if listadedatos != None:
@@ -81,10 +81,10 @@ class MyTableWidget():
                 item = QtGui.QTableWidgetItem(unicode(cell))# the text
                 item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable )
                 item.setTextAlignment( alineaciones[x] )# the alignment
-                widget.setItem(y, x, item)                      
+                widget.setItem(y, x, item)
             listadedatos = ['' if dato is None else dato for dato in listadedatos ]
             [ aux(x, cell) for x,cell in enumerate(listadedatos)]
-                
+
         if DATA != None:
             widget = self.__widget
             self.fullClear()
@@ -100,7 +100,7 @@ class MyTableWidget():
             if item != 'null':
                 x = item
             else:
-                x = tablewidget.currentItem().row()  
+                x = tablewidget.currentItem().row()
             datos=[]
             for num in range(tamano):
                 qs = tablewidget.item(x,num).text()
@@ -108,10 +108,10 @@ class MyTableWidget():
             return tuple(datos)
         except Exception :
             return None
-    
-    def getListSelectedRows(self):         
+
+    def getListSelectedRows(self):
         seleccionados = self.__widget.selectionModel().selectedRows()
-        rows = [self.getRowString(idx.row()) for idx in  seleccionados]        
+        rows = [self.getRowString(idx.row()) for idx in  seleccionados]
         return rows
 
     def getAllItems(self):
@@ -119,21 +119,21 @@ class MyTableWidget():
         allitemstring = [self.getRowString(y) for y in range(tamano)]
         return allitemstring
 
-    def fullClear(self):        
+    def fullClear(self):
         self.widget.setRowCount(0)
 #        [self.__widget.removeRow(i) for i in range( self.__widget.rowCount() )[::-1]]
-        
+
     def __get_widget(self):
         return self.__widget
 
     def __set_widget(self, value):
-        self.__widget = value 
+        self.__widget = value
 
     widget = property(__get_widget, __set_widget, "widget's docstring")
 
-    
-    
-        
+
+
+
 def main():
 
     return 0

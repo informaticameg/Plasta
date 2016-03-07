@@ -21,24 +21,24 @@
 
 import os
 from sys import argv
-        
+
 def getPathProgramFolder():
     ''' Obtiene la ruta de la carpeta del programa. '''
     program_folder = convertPath(os.path.abspath(os.path.dirname(argv[0])) + "/")
     return program_folder
-    
+
 def getPathDataFolder():
     ''' Obtiene la ruta del directorio data. '''
     program_folder = convertPath(os.path.abspath(os.path.dirname(argv[0])) + "/")
     data_folder = convertPath(os.path.dirname(program_folder[:-4])+'/data/')
     return data_folder
-    
+
 def getPathRootFolder():
     ''' Obtiene la ruta del directorio de la aplicacion. '''
     program_folder = convertPath(os.path.abspath(os.path.dirname(argv[0])) + "/")
     root_folder = convertPath(os.path.dirname(program_folder[:-4])+'/')
     return root_folder
-    
+
 def convertPath(path):
     """Convierte el path a el específico de la plataforma (separador)"""
     if os.name == 'posix':
@@ -48,6 +48,6 @@ def convertPath(path):
 
 if __name__ == '__main__':
 
-    
+
     data = getPathDataFolder()
     print data

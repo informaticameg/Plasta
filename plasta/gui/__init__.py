@@ -3,7 +3,7 @@
 #
 # Copyright (c) 2012 Informática MEG <contacto@informaticameg.com>
 #
-# Written by 
+# Written by
 #       Copyright 2012 Fernandez, Emiliano <emilianohfernandez@gmail.com>
 #       Copyright 2012 Ferreyra, Jonathan <jalejandroferreyra@gmail.com>
 #
@@ -41,15 +41,15 @@ class BaseGUI( QtGui.QMainWindow ):
         self.setWindowIcon( QtGui.QIcon( QtGui.QPixmap( join( abspath( dirname( __file__ ) ), ICONFILE ) ) ) )#
         self.manager = manager
         self.managers = managers
-        
+
         # ATRIBUTOSLISTA: lista de diccionarios donde puedes indicar el orden y formato
-        # en que se deben mostrar los atributos en la lista. Siendo la clave del diccionario, 
+        # en que se deben mostrar los atributos en la lista. Siendo la clave del diccionario,
         # el texto en Unicode del texto que tendra la cabecera de la columna. Y el valor contenido
         # en el mismo elemento, el atributo de la clase que se mostrara en esa columna
         # Ejemplo:
         # self.ATRIBUTOSLISTA = [
-        #    {u'Nombres':Cliente.Nombres},                    
-        #    {u'Domicilio':Cliente.Domicilio}] 
+        #    {u'Nombres':Cliente.Nombres},
+        #    {u'Domicilio':Cliente.Domicilio}]
         self.ATRIBUTOSLISTA = None
         # ATRI_COMBO_BUSQUEDA: lista de diccionarios donde puedes indicar el orden de como
         # quieres que se muestren y vean los atributos en el combo de los filtros
@@ -71,12 +71,12 @@ class BaseGUI( QtGui.QMainWindow ):
         self.setWindowTitle( self.TITULO )
         self.lbTitulo.setText( self.manager.getClassName() )
         self._makeTable()
-        
+
         self.loadCombobox()
         self.loadTable()
         self._loadAppShortcuts()
         self.fullScreen = False
-        
+
         self._centerOnScreen()
         self.btEditar.setVisible(False)
         self.btEliminar.setVisible(False)
@@ -96,17 +96,17 @@ class BaseGUI( QtGui.QMainWindow ):
         self._atajo_salir = QtGui.QShortcut( QtGui.QKeySequence( "Ctrl+Q" ), self, self.close )
         self._atajo_fullscreen = QtGui.QShortcut( QtGui.QKeySequence( "F11" ), self, self._toogleFullScreen )
         QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.Key_Escape ), self, self.close )
-        
+
         QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_N ), self, self.on_btAgregar_clicked )
         QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_M ), self, self.on_btEditar_clicked )
         QtGui.QShortcut( QtGui.QKeySequence( "Del" ), self, self.on_btEliminar_clicked )
-        
+
     def _get_attributes_names( self ):
         '''
         Obtiene los atributos de la clase que maneja self.manager
         '''
         return self.ATRIBUTOSLISTA_CLASSNAMES if self.ATRIBUTOSLISTA else self.manager.getClassAttributes()
-        
+
     def _makeTable( self ):
         '''
         Crea la estructura de la tabla ( columnas )
@@ -120,16 +120,16 @@ class BaseGUI( QtGui.QMainWindow ):
         self.MyTabla = MyTableWidget( self.twDatos, columnasTablas, self.ALINEACIONLISTA)
         # conecta el menu contextual a la tabla
         self.connect( self.MyTabla.widget, QtCore.SIGNAL( 'customContextMenuRequested(const QPoint&)' ), self.on_context_menu )
- 
+
     def _getAttributesValues( self, obj ):
         '''
-        Devuelve en una lista los atributos de un objetos, ordenados 
+        Devuelve en una lista los atributos de un objetos, ordenados
         segun lo indicado en self.ATRIBUTOSLISTA
         '''
-        
+
         resultado = []
         atributos_objeto = self.manager.getClassAttributesValues( obj )
-        if not self.ATRIBUTOSLISTA :            
+        if not self.ATRIBUTOSLISTA :
             return atributos_objeto
         else:
             atributos_clase = self.manager.getClassAttributes()
@@ -137,12 +137,12 @@ class BaseGUI( QtGui.QMainWindow ):
             for atributo in atributos_ordenados:
                 resultado.append( atributos_objeto[ atributos_clase.index( atributo ) ] )
             return resultado
-    
+
     def _obtainColumnForName(self, columnname):
         '''
         A partir de un string obtiene la columna de storm
         @param columnname:nombre del atributo en str
-        @return: 
+        @return:
         '''
         #MAGIC###################
         busqueda = self.manager.CLASS.__dict__[columnname]
@@ -195,20 +195,20 @@ class BaseGUI( QtGui.QMainWindow ):
 
     def reloadList( self ):
         '''
-        Vuelve a cargar la lista a partir de los valores actuales en 
+        Vuelve a cargar la lista a partir de los valores actuales en
         la barra de busqueda y el filtro seleccionado.
-        '''        
+        '''
         valor = unicode( self.leBusqueda.text().toUtf8(), 'utf-8' )
-        campo = unicode( self.cbCampos.itemText( 
-                    self.cbCampos.currentIndex() ).toUtf8() )    
+        campo = unicode( self.cbCampos.itemText(
+                    self.cbCampos.currentIndex() ).toUtf8() )
         if self.ATRI_COMBO_BUSQUEDA :
             campo = [p[campo] for p in self.ATRI_COMBO_BUSQUEDA if campo in p ][0]
         else:
-            campo = self._obtainColumnForName( campo )     
+            campo = self._obtainColumnForName( campo )
         resultado = self.search( campo, valor )
         self.loadTable( resultado )
         self._setSearchColor( self.leBusqueda, resultado )
-        
+
     def loadCombobox( self ):
         '''
         Carga el combobox de campos
@@ -219,18 +219,18 @@ class BaseGUI( QtGui.QMainWindow ):
             for atributo in atributos:
                 self.ATRI_COMBO_BUSQUEDA.append( {atributo:self._obtainColumnForName( atributo )} )
         map( self.cbCampos.addItem, [p.keys()[0] for p in self.ATRI_COMBO_BUSQUEDA] )
-            
+
     def loadTable( self, listadeobj = None ):
         '''
         Carga la lista de objetos en la tabla
         @param listadeobj:if none carga todos, sino lo de la lista
-        '''        
-        if listadeobj == None:            
+        '''
+        if listadeobj == None:
             listadeobj = self.manager.getall()
         listadefilas = [self._getAttributesValues( obj ) for obj in listadeobj]
         self.MyTabla.addItems( listadefilas )
         self.setItemsCount( len( listadeobj ) )
-        
+
     def search( self, camponame, valor ):
         '''
         @param camponame:el nombre del campo en string
@@ -245,9 +245,9 @@ class BaseGUI( QtGui.QMainWindow ):
         self.popMenu.addAction("Nuevo",self.on_btAgregar_clicked ,QtGui.QKeySequence("Ctrl+N"))
         self.popMenu.addAction("Modificar",self.on_btEditar_clicked ,QtGui.QKeySequence("Ctrl+M"))
         self.popMenu.addAction("Eliminar",self.on_btEliminar_clicked ,QtGui.QKeySequence("Del"))
-        
+
         self.popMenu.exec_(self.MyTabla.widget.mapToGlobal(mypoint) )
- 
+
     def actual_rows_to_objects( self ):
         '''
         Obtiene los objetos seleccionados en la tabla
@@ -261,19 +261,19 @@ class BaseGUI( QtGui.QMainWindow ):
             # obtiene el tipo de dato de la clave del objeto
             for value in self.manager.getClassAttributesInfo().values() :
                 if value['primary'] == True :
-                    primary_type = value['type'] 
-            
+                    primary_type = value['type']
+
             for lista in listadelistastring:
                 posicion_ide = atributos_names.index( classid )
                 if primary_type is 'int' :
                     valor_ide = int( lista[posicion_ide] )
                 else:
-                    valor_ide = lista[posicion_ide]   
-                                      
+                    valor_ide = lista[posicion_ide]
+
                 listadeobjetos.append( self.manager.searchBy( self._obtainColumnForName( self.manager.CLASSid ), valor_ide )[0] )
             return listadeobjetos
         return None
-    
+
 ##############################
 # METODOS PARA REIMPLEMENTAR #
 ##############################
@@ -281,7 +281,7 @@ class BaseGUI( QtGui.QMainWindow ):
     def add( self ):
         #REIMPLEMENT
         return self.DialogAddClass( self.manager, itemaeditar = False, managers = self.managers )
-    
+
     def edit( self, obj ):
         #REIMPLEMENT
         return self.DialogAddClass( self.manager, itemaeditar = obj, managers = self.managers )
@@ -292,29 +292,29 @@ class BaseGUI( QtGui.QMainWindow ):
 
 ##########################
 # METODOS DE LOS EVENTOS #
-########################## 
+##########################
 
     def setItemsCount( self, valor ):
         '''
         Establece en el label la cantidad de elementos listados.
         '''
         self.lbCantidadItems.setText( str( valor ) + ' items(s) seleccionado(s)' )
-        
+
     def on_leBusqueda_textChanged( self, cadena ):
         self._find()
-        
+
     @QtCore.pyqtSlot( int )
     def on_cbCampos_currentIndexChanged ( self, entero ):
         if not self.leBusqueda.text().isEmpty() :
             self._find()
-    
+
     @QtCore.pyqtSlot()
     def on_btAgregar_clicked( self ):
         wAgregar = self.add()
         wAgregar.setWindowIcon(self.windowIcon())
         wAgregar.postSaveMethod = self.reloadList
         wAgregar.exec_()
-    
+
     @QtCore.pyqtSlot()
     def on_btEditar_clicked( self ):
         listadeobjetosseleccionados = self.actual_rows_to_objects()
