@@ -383,9 +383,12 @@ class BaseAddWindow(QtGui.QDialog):
                         widget.setText(dato)
                 elif tipo is PyQt4.QtGui.QComboBox:
                     try:
-                        widget.addItem(dato)
-                    except TypeError, e:
-                        widget.addItem(dato.__str__())
+                        idx = widget.findText(dato)
+                    except Exception, e:
+                        idx = widget.findText(dato.__str__())
+                    finally:
+                        if idx != -1:
+                            widget.setCurrentIndex(idx)
                 elif tipo is PyQt4.QtGui.QLabel:
                     widget.setText(dato)
                 elif tipo is PyQt4.QtGui.QTextEdit:
