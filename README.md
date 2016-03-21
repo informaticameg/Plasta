@@ -1,43 +1,94 @@
-Plasta
-======
+# Plasta
 
-Plasta is a micro-framework written in Python for rapid deployment of [CRUD](http://en.wikipedia.org/wiki/Create,_read,_update_and_delete) simply, in a few steps and in a few lines of code.
-Is designed with the MVC pattern and technique development DRY.
+<img src="https://raw.github.com/informaticameg/plasta/master/resources/plasta.png" />
+
+Plasta is a framework written in Python for rapid deployment of [CRUDs]((http://en.wikipedia.org/wiki/Create,_read,_update_and_delete)) in a simple way, in a few steps and in few lines of code.
+
+Is designed with the MVC pattern and the DRY (Don't Repeat Yourself) development
+technique.
+
+## Features
+
+Plasta uses the Storm ORM on data persistence, and the graphic library Qt on graphic interfaces.
+
+It focuses on both deployment and maintenanceof an aplication is minimized, for this the core of Plasta is designed so that at any time, if necessary, you can reimplement any
+method that does not meet our interests. Leaving it open to the possibility of a more comfortable development.
+
+Has a number of Qt's .ui files by default ready for use.
 
 
-Usage
------------
-Clone the repository. In the same plasta/ folder level, copy the Storm version that you want to work with. Rename the folder to your project name and have fun!
+## Database Support
 
-e.g. if your folder project is in /home/project/plasta, Storm needs to be in /home/project/storm.
+Using [Storm ORM](https://storm.canonical.com/), Plasta is conditioned by the support that offers this technology on databases.
 
-Technical features
------------
-- [Storm](https://storm.canonical.com/ ) in the persistence. Download [here](https://launchpad.net/storm/+download).
-- PyQt4 in GUIs. Download [here](http://www.riverbankcomputing.co.uk/software/pyqt/download).
+For more info see the official [documentation](https://storm.canonical.com/Manual) of Storm.
 
-Not implemented yet
------------
-- Support for cross references.
-- Support for more types of data.
 
-Requirements
------------
-Plasta requires 
-* Python 2.5 or higher, 
-* Storm 0.19, 
-* and the Qt version 4.7 to run.
+## Resuming technical features
 
-Base Package Structure
------------
-Here an empty structure for an object, download [here](http://db.tt/7ibbSG6b).
+- [Storm](https://storm.canonical.com/) in the persistence.
 
-Documentation
------------
-Here a first version of documentation, available in [English](http://db.tt/cJV6y87O) or [Spanish](http://db.tt/R6S796E9).
+- PyQt4 in GUIs.
 
-Licence
------------
-Copyright 2012 Informática MEG
+## Structure of a CRUD
 
-Released under the GPL License.
+Each CRUD is made up of a Python package, that contains the follow structure:
+* Object Class (e.g.: Client).
+* Manager Class (e.g.: ClientsManager)
+* Main Class of the CRUD (e.g.: ClientsGUI)
+* Adding a Record Class (e.g.: AddClient)
+* Qt's .ui File for <add client> screen.
+
+Then the resulting package would be something like this:
+```
++ /client
+|--- __init__.py
+|--- manager.py
+|--- gui.py
+|--- add.py
+|--- add.ui
+```
+
+**With this structure we're ready to manage Client objects and working with them.**
+
+## Not implemented yet
+
+* Support for cross object references.
+
+## Requirements
+
+Plasta requires:
+* Python 2.5 or higher.
+* Storm 0.19. Download [here](https://launchpad.net/storm/+download).
+* PyQt 4.7. Download [here](http://www.riverbankcomputing.co.uk/software/pyqt/download).
+
+## Wiki
+
+Check the Plasta wiki [here](https://github.com/informaticameg/Plasta/wiki).
+
+## MIT License
+
+
+    Copyright (C) 2012 by Informática MEG <contacto@informaticameg.com>
+	
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+
+**Plasta is maintained by:**
+* Jonathan Ferreyra <jalejandroferreyra@gmail.com> [@jonathanferreyra](https://github.com/jonathanferreyra)
+* Emiliano Fernandez emilianohfernandez@gmail.com [@emilianox](https://github.com/emilianox)
