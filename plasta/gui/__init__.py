@@ -1,24 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-# Copyright (c) 2012 Informática MEG <contacto@informaticameg.com>
-#
-# Written by
-#       Copyright 2012 Fernandez, Emiliano <emilianohfernandez@gmail.com>
-#       Copyright 2012 Ferreyra, Jonathan <jalejandroferreyra@gmail.com>
-#
-# Plasta is free software; you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as
-# published by the Free Software Foundation; either version 2.1 of
-# the License, or (at your option) any later version.
-#
-# Plasta is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from os.path import join, abspath, dirname
 from PyQt4 import QtCore, QtGui, uic
@@ -33,13 +14,13 @@ class BaseGUI( QtGui.QMainWindow ):
 
     def __init__(self, manager, managers = None, parent = None):
         QtGui.QMainWindow.__init__(self, parent)
-        # nombre del archivo ui de la interfaz
-        self.FILENAME = join(abspath(dirname(__file__)),'uis/list.ui')
-        # nombre del archivo del icono para la ventana
-        ICONFILE = ''
-
-        self.setWindowIcon( QtGui.QIcon( QtGui.QPixmap( join( abspath( dirname( __file__ ) ), ICONFILE ) ) ) )#
+        # Name file of ui for gui
+        self.FILENAME = join(abspath(dirname(__file__)), 'uis/en_list.ui')
+        # Name file of icon window
+        self.ICONFILE = ''
+        #
         self.manager = manager
+        #
         self.managers = managers
 
         # ATRIBUTOSLISTA: lista de diccionarios donde puedes indicar el orden y formato
@@ -47,43 +28,50 @@ class BaseGUI( QtGui.QMainWindow ):
         # el texto en Unicode del texto que tendra la cabecera de la columna. Y el valor contenido
         # en el mismo elemento, el atributo de la clase que se mostrara en esa columna
         # Ejemplo:
-        # self.ATRIBUTOSLISTA = [
-        #    {u'Nombres':Cliente.Nombres},
-        #    {u'Domicilio':Cliente.Domicilio}]
+        # self.ATRIBUTOSLISTA = [ {u'Nombres':Cliente.Nombres}, {u'Domicilio':Cliente.Domicilio}]
         self.ATRIBUTOSLISTA = None
         # ATRI_COMBO_BUSQUEDA: lista de diccionarios donde puedes indicar el orden de como
         # quieres que se muestren y vean los atributos en el combo de los filtros
         # El formato es el mismo que <ATRIBUTOSLISTA>
         self.ATRI_COMBO_BUSQUEDA = []#el orden y la cantidad de atributos en str que quieras
 
-        self.ALINEACIONLISTA = []#la alinecion de cada atributo en la fila
+        # Use this if you need parse attributes in list
+        # Format {listOfList}: [[index, function], ...]
+        # Params function: fn(row, currentValue)
+        # Use: [[0, lambda (row, value): value.uppper()], ...]
+        self.fnsParseListAttrs = []
+
+        # Alignment of each atttribute in the list
+        # Possible values: C = CENTER, L = LEFT, R = RIGHT
+        # Use: self.ALINEACIONLISTA = ['C', 'L', 'R', 'L']
+        self.ALINEACIONLISTA = []
         # DialogAddClass: referencia a la clase que se instanciara para manejar la
         # ventana del dialogo abrir/editar
         self.DialogAddClass = None
-        self.TITULO = self.manager.getClassName()
+        # Single title to show in gui
+        self.singleTitle = self.manager.getClassName()
+        # Plural title to show in gui
         self.pluralTitle = self.manager.getClassName()
 
-    def _start_operations( self ):
-        u'''
-        Operaciones necesarias para levantar las ventanas
-        '''
+    def start_operations( self ):
+        u'''Operations necessary to display the window'''
+        self.fullScreen = False
         uic.loadUi( self.FILENAME, self )
-        self.setWindowTitle( self.TITULO )
-        self.lbTitulo.setText( self.manager.getClassName() )
-        self._makeTable()
 
+        self.makeTable()
         self.loadCombobox()
         self.loadTable()
-        self._loadAppShortcuts()
-        self.fullScreen = False
+        self.loadShortcuts()
+        self.centerOnScreen()
 
-        self._centerOnScreen()
         self.btEditar.setVisible(False)
         self.btEliminar.setVisible(False)
+
+        self.setWindowIcon( QtGui.QIcon( QtGui.QPixmap( join( abspath( dirname( __file__ ) ), ICONFILE ) ) ) )
         self.lbTitulo.setText(self.pluralTitle)
         self.setWindowTitle(self.pluralTitle)
 
-    def _toogleFullScreen( self ):
+    def toogleFullScreen( self ):
         ''' '''
         if not self.fullScreen :
             self.showFullScreen()
@@ -91,10 +79,10 @@ class BaseGUI( QtGui.QMainWindow ):
             self.showNormal()
         self.fullScreen = not self.fullScreen
 
-    def _loadAppShortcuts( self ):
+    def loadShortcuts( self ):
         u""" Load shortcuts used in the application. """
         self._atajo_salir = QtGui.QShortcut( QtGui.QKeySequence( "Ctrl+Q" ), self, self.close )
-        self._atajo_fullscreen = QtGui.QShortcut( QtGui.QKeySequence( "F11" ), self, self._toogleFullScreen )
+        self._atajo_fullscreen = QtGui.QShortcut( QtGui.QKeySequence( "F11" ), self, self.toogleFullScreen )
         QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.Key_Escape ), self, self.close )
 
         QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_N ), self, self.on_btAgregar_clicked )
@@ -107,10 +95,8 @@ class BaseGUI( QtGui.QMainWindow ):
         '''
         return self.ATRIBUTOSLISTA_CLASSNAMES if self.ATRIBUTOSLISTA else self.manager.getClassAttributes()
 
-    def _makeTable( self ):
-        '''
-        Crea la estructura de la tabla ( columnas )
-        '''
+    def makeTable( self ):
+        '''Create the structure of table (columns)'''
         if not self.ATRIBUTOSLISTA :
             columnasTablas = [p.capitalize() for p in self._get_attributes_names()]
         else:
@@ -136,6 +122,11 @@ class BaseGUI( QtGui.QMainWindow ):
             atributos_ordenados = self.ATRIBUTOSLISTA_CLASSNAMES
             for atributo in atributos_ordenados:
                 resultado.append( atributos_objeto[ atributos_clase.index( atributo ) ] )
+            if self.fnsParseListAttrs:
+                for item in self.fnsParseListAttrs:
+                    idx = item[0]
+                    fn = item[1]
+                    resultado[idx] = fn(resultado, resultado[idx])
             return resultado
 
     def _obtainColumnForName(self, columnname):
@@ -290,9 +281,9 @@ class BaseGUI( QtGui.QMainWindow ):
         #REIMPLEMENT
         self.manager.delete( obj )
 
-##########################
-# METODOS DE LOS EVENTOS #
-##########################
+###################
+# EVENT FUNCTIONS #
+###################
 
     def setItemsCount( self, valor ):
         '''
@@ -349,7 +340,7 @@ class BaseGUI( QtGui.QMainWindow ):
 # OTROS #
 #########
 
-    def _centerOnScreen ( self ):
+    def centerOnScreen ( self ):
         '''Centers the window on the screen.'''
         resolution = QtGui.QDesktopWidget().screenGeometry()
         self.move( ( resolution.width() / 2 ) - ( self.frameSize().width() / 2 ),

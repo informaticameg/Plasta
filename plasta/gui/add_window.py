@@ -1,38 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-# Copyright (c) 2012 Informática MEG <contacto@informaticameg.com>
-#
-# Written by
-#       Copyright 2012 Fernandez, Emiliano <emilianohfernandez@gmail.com>
-#       Copyright 2012 Ferreyra, Jonathan <jalejandroferreyra@gmail.com>
-#
-# Plasta is free software; you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as
-# published by the Free Software Foundation; either version 2.1 of
-# the License, or (at your option) any later version.
-#
-# Plasta is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtCore, QtGui
 
 
 class BaseAddWindow(QtGui.QDialog):
-    '''
+    '''Base class to handle
     Clase base para el manejo de la pantalla para dar de alta/modificar un registro.
     '''
 
-    def __init__(self, unManager, itemaeditar = False, managers = []):
+    def __init__(self, manager, itemToEdit = False, managers = []):
         QtGui.QDialog.__init__(self)
-        self.manager = unManager
+        self.manager = manager
         self.managers = managers
-        self.EDITITEM = itemaeditar
+        self.itemToEdit = itemToEdit
 
         self.ITEMLIST = []
         self.FILENAME = 'add.ui'
@@ -70,7 +51,7 @@ class BaseAddWindow(QtGui.QDialog):
         datos = self.getDataOfWidgets()
         if self.validateConstraintsFields() :
             if self.validateCustomConstraints(datos):
-                resultado = self.save(datos) if not self.EDITITEM else self.edit(datos)
+                resultado = self.save(datos) if not self.itemToEdit else self.edit(datos)
                 if self.postSaveMethod :
                     self.postSaveMethod()
                 self._showResultMessage(resultado)
@@ -78,7 +59,7 @@ class BaseAddWindow(QtGui.QDialog):
         return resultado
 
     def _showResultMessage(self, resultado):
-        if not self.EDITITEM:
+        if not self.itemToEdit:
             if resultado :
                 QtGui.QMessageBox.information(self, "Nuevo " + self.getClassName(), self.getClassName().capitalize() + self.messages['newSuccefullSave'])
             else:
@@ -312,16 +293,16 @@ class BaseAddWindow(QtGui.QDialog):
         @requires: usar storm
         @return: lista de datos [{nombreatributo,valor}] o false(si no hay EDITITEM)
         '''
-        if not self.EDITITEM:
+        if not self.itemToEdit:
             return False
         listcolumns = []
         import storm
         for v in self.ITEMLIST:
             if type(v.values()[0]) == storm.references.Reference:
-                self.dict_referencias[v.keys()[0]] = self.EDITITEM.__getattribute__(
+                self.dict_referencias[v.keys()[0]] = self.itemToEdit.__getattribute__(
                     self.manager._getReferenceName(v.values()[0]))
             listcolumns.append(v.values()[0])
-        return self.manager.getDataObject(self.EDITITEM,listcolumns)
+        return self.manager.getDataObject(self.itemToEdit,listcolumns)
 
     def getClassName(self):
         '''
@@ -341,7 +322,7 @@ class BaseAddWindow(QtGui.QDialog):
             nombrepropiedad = propiedadesvalues[i].keys()[0]
             valor = propiedadesvalues[i].values()[0]
             if valor != dato:
-                self.EDITITEM.__setattr__(nombrepropiedad,dato)
+                self.itemToEdit.__setattr__(nombrepropiedad,dato)
         return True
 
     def save(self, listadedatos):
@@ -374,7 +355,7 @@ class BaseAddWindow(QtGui.QDialog):
         self._centerOnScreen()
         self.setValidators()
         self.btGuardar.setDefault(True)
-        if self.EDITITEM:
+        if self.itemToEdit:
             self.btGuardar.setText('Editar')
             self.setWindowTitle(u'Editar ' + self.getClassName())
             self._loadDataInWidgets()
@@ -508,7 +489,7 @@ class BaseAddWindow(QtGui.QDialog):
             value = value.lower()
         dataValues = list(set(dataValues))
 
-        if self.EDITITEM:
+        if self.itemToEdit:
             if value in dataValues:
                 del dataValues[dataValues.index(value)]
         return not value in dataValues, self.messages['validateUnique']

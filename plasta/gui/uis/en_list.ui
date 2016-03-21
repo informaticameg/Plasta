@@ -29,7 +29,7 @@ border-bottom-left-radius: 6px 6px;
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QLabel" name="lbTitulo">
+       <widget class="QLabel" name="lbTitle">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
           <horstretch>0</horstretch>
@@ -50,7 +50,7 @@ font-family: Ubuntu, Helvetica, sans-serif;
 }</string>
         </property>
         <property name="text">
-         <string>&lt;Nombre lista&gt;</string>
+         <string>&lt;List name&gt;</string>
         </property>
        </widget>
       </item>
@@ -79,7 +79,7 @@ font-family: Ubuntu, Helvetica, sans-serif;
 }</string>
           </property>
           <property name="text">
-           <string>Buscar</string>
+           <string>Search</string>
           </property>
          </widget>
         </item>
@@ -92,7 +92,7 @@ font-family: Ubuntu, Helvetica, sans-serif;
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
           <item>
-           <widget class="QLineEdit" name="leBusqueda">
+           <widget class="QLineEdit" name="leSearch">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -184,12 +184,12 @@ font-family: Ubuntu, Helvetica, sans-serif;
 }</string>
           </property>
           <property name="text">
-           <string>Filtros</string>
+           <string>Filters</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="cbCampos">
+         <widget class="QComboBox" name="cbFilters">
           <property name="styleSheet">
            <string notr="true">QComboBox {
 border: 1px solid #999999; 
@@ -217,7 +217,7 @@ QComboBox::drop-down { border-style: none}</string>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QPushButton" name="btAgregar">
+       <widget class="QPushButton" name="btNew">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -240,53 +240,18 @@ QComboBox::drop-down { border-style: none}</string>
         <property name="cursor">
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton{
-color: rgb(255, 255, 255);
-background-color: qlineargradient(spread:pad, x1:0.005, y1:0.006, x2:0.990476, y2:1, stop:0.0047619  rgba(10, 134, 2, 255), stop:1 rgba(6, 84, 0, 255));
-border: 1px solid #505050;
-border-radius: 3px;
-padding:3px 15px;
-}
-QPushButton:pressed{	
-	border: 3px solid #505050;
-}</string>
-        </property>
         <property name="text">
-         <string>Nuevo</string>
+         <string>New</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btEditar">
+       <widget class="QPushButton" name="btEdit">
         <property name="cursor">
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
-        <property name="styleSheet">
-         <string notr="true"> QPushButton {
-     border: 1px solid #8f8f91;
-     border-radius: 5px;
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #f6f7fa, stop: 1 #dadbde);
-padding: 3px 15px;
- }
-
- QPushButton:pressed {
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #dadbde, stop: 1 #f6f7fa);
- }
-
- QPushButton:flat {
-     border: none; /* no border for a flat push button */
- }
-
- QPushButton:default {
-     border-color: navy; /* make the default button prominent */
- }
-</string>
-        </property>
         <property name="text">
-         <string>Editar</string>
+         <string>Edit</string>
         </property>
         <property name="flat">
          <bool>true</bool>
@@ -294,35 +259,12 @@ padding: 3px 15px;
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btEliminar">
+       <widget class="QPushButton" name="btDelete">
         <property name="cursor">
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
-        <property name="styleSheet">
-         <string notr="true"> QPushButton {
-     border: 1px solid #8f8f91;
-     border-radius: 5px;
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #f6f7fa, stop: 1 #dadbde);
-padding: 3px 15px;
- }
-
- QPushButton:pressed {
-     background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                       stop: 0 #dadbde, stop: 1 #f6f7fa);
- }
-
- QPushButton:flat {
-     border: none; /* no border for a flat push button */
- }
-
- QPushButton:default {
-     border-color: navy; /* make the default button prominent */
- }
-</string>
-        </property>
         <property name="text">
-         <string>Eliminar</string>
+         <string>Delete</string>
         </property>
         <property name="flat">
          <bool>true</bool>
@@ -343,7 +285,7 @@ padding: 3px 15px;
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="lbCantidadItems">
+       <widget class="QLabel" name="lbItemsCount">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -364,14 +306,14 @@ font-family: Ubuntu, Helvetica, sans-serif;
 }</string>
         </property>
         <property name="text">
-         <string>0 items(s) listado(s)</string>
+         <string>0 items(s) listed</string>
         </property>
        </widget>
       </item>
      </layout>
     </item>
     <item>
-     <widget class="QTableWidget" name="twDatos">
+     <widget class="QTableWidget" name="twItems">
       <property name="font">
        <font>
         <family>Ubuntu,Helvetica,sans-serif</family>
