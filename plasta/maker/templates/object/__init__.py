@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from storm.locals import *
+
+
+class %Object_name%(object):
+
+    __storm_table__ = "%object_name%"
+
+    {attributes}
+
+    {init_method}
+
+    def __str__(self):
+        return ''

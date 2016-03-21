@@ -1,0 +1,152 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2012 Informática MEG <contacto@informaticameg.com>
+#
+# Written by
+#       Copyright 2012 Fernandez, Emiliano <emilianohfernandez@gmail.com>
+#       Copyright 2012 Ferreyra, Jonathan <jalejandroferreyra@gmail.com>
+#
+# MIT Licence
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+import os, sys, optparse
+from plasta.tools import pathtools
+
+def pprint(to_show):
+  import pprint
+  pp = pprint.PrettyPrinter(indent=4)
+  pp.pprint(to_show)
+
+def __parseAttrs(attrs):
+  _types = {'unicode':'lineEdit', 'int':'spinBox',
+    'float':'doubleSpinBox', 'date':'dateEdit',
+    'datetime':'dateTimeEdit', 'bool':'checkBox'
+  }
+  _attrs, _widgets = [], {}
+  for attr in attrs:
+    if attr.find(':') != -1:
+      _attr, _type = attr.split(':')
+      _type = _type.lower()
+      if _type in _types:
+        _widgets[_attr] = _types[_type]
+        parsedType = _type.capitalize()
+        if parsedType == 'Datetime':
+          parsedType = 'DateTime'
+        _attrs.append({'name':_attr,'type':parsedType})
+      else:
+        print 'error: unknown type in %s attribute' % _attr
+        return
+    else: #default
+      _widgets[attr] = 'lineEdit'
+      _attrs.append({'name':attr,'type':'Unicode'})
+  return _attrs, _widgets
+
+def generate_crud(options, args):
+  if len(args) >= 2:
+    outputFolder = pathtools.getPathProgramFolder()
+    checkDir = pathtools.convertPath(outputFolder + '/' + args[0].lower())
+    if os.path.exists(checkDir):
+      print "error: already exists '%s' folder" % args[0].lower()
+      return
+    from plasta.maker import gen_crud
+    options = options.__dict__
+    #print options, args
+    namemodel = args[0]
+    attrs = args[1:]
+    _class = {'storm':True,'manager':True,'gui':True,'add':True}
+    _attrs, _widgets = __parseAttrs(attrs)
+    # fill class
+    countOfFalses = 0
+    for c in ['storm', 'manager', 'gui', 'add']:
+      if not options[c]:
+        countOfFalses += 1
+    if countOfFalses < 4:
+      for c in ['storm', 'manager', 'gui', 'add']:
+        _class[c] = options[c]
+    data = {
+    'className':namemodel.capitalize(),
+    'addIdeAttr':True,
+    'attributes':_attrs,
+    'widgetToAttr':_widgets,
+    'classesToGenerate':_class,
+    'outputFolder':outputFolder
+    }
+    # pprint(data)
+    gen_crud.generatePackage(data)
+    # generate ui file
+    if options['ui']:
+      generate_ui(args[1:])
+
+def generate_ui(args):
+  if len(args) >= 1:
+    attrs = args
+    _attrs, _widgets = __parseAttrs(attrs)
+    fields = [] # {u'field1': u'QLineEdit'}
+    for attr in _attrs:
+      nameWidget = _widgets[attr['name']]
+      fields.append({attr['name']: 'Q%s%s' % (nameWidget[0].capitalize(), nameWidget[1:])})
+    from plasta.maker import gen_ui
+    outputFolder = pathtools.getPathProgramFolder()
+    from os.path import join,abspath,dirname
+    checkDir = join(abspath(dirname(__file__)), 'add.ui')
+    gen_ui.generateUI(
+      destino = checkDir,
+      campos = fields,
+      botones = {'bt_salir_guardar':True},
+      opciones = {'tipo': 'Dialog', 'generar_plantilla': False}
+    )
+
+def main(argv):
+  usage = '''
+  > plasta g crud [options] namemodel [attributes]
+
+  Options:
+    -s, --storm    generates storm file only
+    -m, --manager  generates manager file only
+    -g, --gui      generates gui file only
+    -a, --add      generates add file only
+    -u, --ui       along with the model generates the ui file
+
+  > plasta g ui [attributes]'''
+
+  oparser = optparse.OptionParser(usage=usage)
+  args = argv[1:]
+
+  if len(args) == 1 and args[0] in ['-h', '--help']:
+      oparser.parse_args(argv)
+
+  elif len(args) >= 3:
+    if args[0] == 'g':
+      op = args[1]
+      if op == 'crud':
+        oparser.add_option("-s", "--storm", action="store_true", dest="storm", default=False, help='generates storm file only')
+        oparser.add_option("-m", "--manager", action="store_true", dest="manager", default=False, help='generates manager file only')
+        oparser.add_option("-g", "--gui", action="store_true", dest="gui", default=False, help='generates gui file only')
+        oparser.add_option("-a", "--add", action="store_true", dest="add", default=False, help='generates add file only')
+        oparser.add_option("-u", "--ui", action="store_true", dest="ui", default=False, help='along with the model generates the ui file')
+        (options, args) = oparser.parse_args(argv[1:])
+        generate_crud(options, args[2:])
+      elif op == 'ui':
+        generate_ui(args[2:])
+        pass
+
+if __name__ == "__main__":
+  main(sys.argv)
