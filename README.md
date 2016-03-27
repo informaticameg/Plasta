@@ -86,7 +86,7 @@ $ python setup.py install
 
 ## Wiki
 
-Check the Plasta wiki in [English](https://github.com/informaticameg/Plasta/) or [Spanish](https://github.com/informaticameg/Plasta/) version.
+Check the Plasta wiki in [English](https://github.com/informaticameg/Plasta/blob/master/doc/en/index.md) or [Spanish](https://github.com/informaticameg/Plasta/blob/master/doc/es/index.md) version.
 
 ## License
 

@@ -32,7 +32,7 @@ This class has operations to handle the operations of the form add / edit.
 ## Terminologies
 
 | Term | Definition |
-|-|-|
+|------|------------|
 | Manager | controlling class of a model | 
 | Package | Plasta package composed of four classes |
 | UI | xml file from a Qt window |
@@ -45,7 +45,7 @@ For the correctly work of Plasta, must respect these conventions:
 #### Names of the classess
 
 | Base class | Example |
-|-|-|
+|------------|---------|
 | BaseManager     | ClientManager |
 | BaseGUI         | ClientGUI |
 | BaseAddWindow   | AddClient |
@@ -53,7 +53,7 @@ For the correctly work of Plasta, must respect these conventions:
 #### Widgets names in the main screen of a model
 
 | Widget name | Widget type |
-|-|-|
+|-------------|-------------|
 | lbTitle      | QLabel |
 | btNew        | QPushButton |
 | btEdit       | QPushButton |
@@ -66,9 +66,9 @@ For the correctly work of Plasta, must respect these conventions:
 #### Widget names in form add/edit
 
 | Widget name | Widget type |
-|-|-|
-| btSave        | QPushButton |
-| btCancel      | QPushButton |
+|-------------|-------------|
+| btSave      | QPushButton |
+| btCancel    | QPushButton |
 
 
 #### Widget prefixes
@@ -76,7 +76,7 @@ For the correctly work of Plasta, must respect these conventions:
 Plasta has adopted this prefixes to name widgets of GUI:
 
 | Widget | Prefix |
-|--------|---------|
+|--------|--------|
 | QLabel         | lb |
 | QLineEdit      | le |
 | QComboBox      | cb |
@@ -87,3 +87,5 @@ Plasta has adopted this prefixes to name widgets of GUI:
 | QDateTimeEdit  | dte |
 | QTimeEdit      | tme |
 | QCheckBox      | chk |
+
+[Go > Index](https://github.com/informaticameg/Plasta/blob/master/doc/en/index.md) | [Go > Install](https://github.com/informaticameg/Plasta/blob/master/doc/en/install.md) | [Go > Getting started](https://github.com/informaticameg/Plasta/blob/master/doc/en/getting_started.md) | [Go > Use cases](https://github.com/informaticameg/plasta/blob/master/doc/en/uses_cases.md) | [Go > Example Apps](https://github.com/informaticameg/plasta/blob/master/doc/en/example_apps.md)
