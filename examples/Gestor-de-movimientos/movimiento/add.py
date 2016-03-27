@@ -1,14 +1,14 @@
-from plasta.gui.add_window import BaseAddWindow
+from plasta.gui.add import BaseAdd
 from PyQt4 import uic, QtCore
 from os.path import join,abspath,dirname
 from movimiento import Movimiento
 from datetime import datetime
 from balance import Balance
 
-class AddMovimiento(BaseAddWindow):
+class AddMovimiento(BaseAdd):
 
     def __init__(self,manager, itemToEdit = False, managers = []):
-        BaseAddWindow.__init__(self, manager, itemToEdit, managers)
+        BaseAdd.__init__(self, manager, itemToEdit, managers)
         FILENAME = 'uis/add.ui'
         uic.loadUi(join(abspath(dirname(__file__)),FILENAME), self)
 
@@ -29,13 +29,13 @@ class AddMovimiento(BaseAddWindow):
         self._centerOnScreen()
         self.setValidators()
         self.btSave.setDefault(True)
-        if self.EDITITEM:
+        if self.itemToEdit:
             self.btSave.setText('Editar')
             self.setWindowTitle(u'Editar Ingreso')
             self._loadDataInWidgets()
         else:
             self.setWindowTitle(u"Agregar Ingreso")
-        self.lbTitulo.setText(self.windowTitle())
+        #self.lbTitle.setText(self.windowTitle())
 
         self.deFecha.setDate( datetime.today() )
 
@@ -65,7 +65,7 @@ class AddMovimiento(BaseAddWindow):
 
     @QtCore.pyqtSlot()
     def on_btSave_clicked(self):
-        BaseAddWindow.on_btSave_clicked(self)
+        BaseAdd.on_btSave_clicked(self)
         self.leRazonSocial.clear()
         self.dsbMonto.setValue(0)
         self.teDescripcion.clear()
@@ -74,14 +74,12 @@ class AddMovimiento(BaseAddWindow):
     # REIMPLEMENTED
     def save(self, listadedatos):
         # obtenemos el objeto cuenta
-        print listadedatos
         unaCuenta = listadedatos[0]
-        #listadedatos[0] = unaCuenta
         listadedatos[1] = unicode(str(listadedatos[1]),'utf-8')
         listadedatos.append( unaCuenta.tipo )
         self.balance.actualizar(float(listadedatos[1]), unaCuenta.tipo)
-        return BaseAddWindow.save(self, listadedatos)
+        return BaseAdd.save(self, listadedatos)
 
     def edit(self, listadedatos):
-        BaseAddWindow.edit(self, listadedatos)
+        BaseAdd.edit(self, listadedatos)
 

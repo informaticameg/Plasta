@@ -1,12 +1,12 @@
-from plasta.gui.add_window import BaseAddWindow
+from plasta.gui.add import BaseAdd
 from PyQt4 import uic, QtCore
 from os.path import join,abspath,dirname
 from cuenta import Cuenta
 
-class AddCuenta(BaseAddWindow):
+class AddCuenta(BaseAdd):
 
     def __init__(self, manager, itemToEdit = False, managers = []):
-        BaseAddWindow.__init__(self, manager, itemToEdit)
+        BaseAdd.__init__(self, manager, itemToEdit)
         uic.loadUi(join(abspath(dirname(__file__)),'add.ui'), self)
 
         self.ITEMLIST = [
@@ -21,6 +21,6 @@ class AddCuenta(BaseAddWindow):
 
     @QtCore.pyqtSlot()
     def on_btSave_clicked(self):
-        BaseAddWindow.on_btSave_clicked(self)
+        BaseAdd.on_btSave_clicked(self)
         self.leNombre.clear()
         self.teDescripcion.clear()

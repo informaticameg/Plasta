@@ -47,7 +47,7 @@ QLabel{color:rgb(85, 85, 85);font:bold;font-family: Ubuntu, Helvetica, sans-seri
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="btAgregar">
+       <widget class="QPushButton" name="btNew">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -200,7 +200,7 @@ QLabel{color:rgb(85, 85, 85);font:bold;font-family: Ubuntu, Helvetica, sans-seri
              <number>0</number>
             </property>
             <item>
-             <widget class="QLabel" name="lbTitulo">
+             <widget class="QLabel" name="lbTitle">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                 <horstretch>0</horstretch>
@@ -236,7 +236,7 @@ border-bottom-right-radius: 0px ;
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="lbCantidadItems">
+             <widget class="QLabel" name="lbItemsCount">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -276,7 +276,7 @@ border-bottom: 0px solid white;
          </layout>
         </item>
         <item>
-         <widget class="QTableWidget" name="twDatos">
+         <widget class="QTableWidget" name="twItems">
           <property name="font">
            <font>
             <family>Ubuntu,Helvetica,sans-serif</family>

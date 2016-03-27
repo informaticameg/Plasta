@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from plasta.gui.add_window import BaseAddWindow
+from plasta.gui.add import BaseAdd
 from PyQt4 import uic, QtCore
 from os.path import join,abspath,dirname
 from seccion import Seccion
 import GUI.images_rc
 
 
-class AddSeccion(BaseAddWindow):
+class AddSeccion(BaseAdd):
 
     def __init__(self,manager, itemToEdit = False, managers = []):
-        BaseAddWindow.__init__(self, manager, itemToEdit, managers)
+        BaseAdd.__init__(self, manager, itemToEdit, managers)
         FILENAME = 'agregar.ui'
         uic.loadUi(join(abspath(dirname(__file__)),FILENAME), self)
         self.cuentasManager = managers[0]
@@ -31,7 +31,7 @@ class AddSeccion(BaseAddWindow):
         self._centerOnScreen()
         self.agregarValidadores()
         self.btGuardar.setDefault(True)
-        if self.EDITITEM:
+        if self.itemToEdit:
             self.btGuardar.setText('Editar')
             self.setWindowTitle(u'Editar '+self.manager.getClassName())
             self._cargarDatosinWidgets()
@@ -41,8 +41,8 @@ class AddSeccion(BaseAddWindow):
         self.cargarListaCuentas()
 
     #REIMPLEMENTED
-    def guardar(self, listadedatos):
-        nuevaSeccion = BaseAddWindow.guardar(self, listadedatos)
+    def save(self, listadedatos):
+        nuevaSeccion = BaseAdd.save(self, listadedatos)
         nombres = self.obtenerNombresCuentas()
         self.manager.establecerSeccion(
                 self.obtenerObjetosCuenta( self.obtenerNombresCuentas() ),
@@ -55,7 +55,7 @@ class AddSeccion(BaseAddWindow):
         resultado = False
         if self.validarRestriccionesCampos() :
             datos = self.obtenerDatosWidgets()
-            resultado = self.guardar(datos) if not self.EDITITEM else self.editar(datos)
+            resultado = self.save(datos) if not self.itemToEdit else self.edit(datos)
             if self.postSaveMethod :
                 self.postSaveMethod()
             resultado = True if isinstance(resultado, Seccion) else False

@@ -25,9 +25,9 @@ class SeccionesCategoriasGUI(BaseGUI):
     def _start_operations(self):
         uic.loadUi(self.FILENAME, self)
         self.setWindowTitle(u"Categorías")
-        self._loadAppShortcuts()
+        self.loadShortcuts()
         self.fullScreen = False
-        self._centerOnScreen()
+        self.centerOnScreen()
 
         self.SeccionesGUI.DialogAddClass.postSaveMethod = self.recargarListaSecciones
 

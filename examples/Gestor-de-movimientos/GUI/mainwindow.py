@@ -43,6 +43,6 @@ class MainWindow(QtGui.QMainWindow):
                     managers = [
                                 SeccionesGUI(self.managers.secciones, managers = [self.managers.cuentas]),
                                 CuentasGUI(self.managers.cuentas)])
-        self.secciones.setWindowIcon( self.btSecciones.icon() )
+        self.secciones.setWindowIcon( self.btCuentas.icon() )
         self.secciones.show()
 

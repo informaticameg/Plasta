@@ -58,14 +58,13 @@ class LibroDiarioGUI(BaseGUI):
         operaciones necesarias para levantar las ventanas
         '''
         uic.loadUi(self.FILENAME, self)
-        self.setWindowTitle(self.TITULO)
-        self._makeTable()
-
+        self.setWindowTitle(self.pluralTitle)
+        self.makeTable()
         self.loadTable()
-        self._loadAppShortcuts()
+        self.loadShortcuts()
         self.fullScreen = False
 
-        self._centerOnScreen()
+        self.centerOnScreen()
 
         self.deFechaMostradaDesde.setDate( datetime.today() )
         self.deFechaMostradaHasta.setDate( datetime.today() )
