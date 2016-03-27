@@ -5,9 +5,7 @@ from PyQt4 import QtCore, QtGui
 
 
 class BaseAdd(QtGui.QDialog):
-    '''Base class to handle
-    Clase base para el manejo de la pantalla para dar de alta/modificar un registro.
-    '''
+    '''Base class to handle add/edit windows'''
 
     def __init__(self, manager, itemToEdit = False, managers = []):
         QtGui.QDialog.__init__(self)
@@ -19,26 +17,41 @@ class BaseAdd(QtGui.QDialog):
         self.FILENAME = 'add.ui'
         self.dict_referencias = {} # diccionario que contiene la instancia seleccionada en el buscador
         self.postSaveMethod = None # metodo que BaseGUI que se ejecuta luego de save()
-        self._dictWidgetReferencias = {} # diccionario que contiene los widget boton y la referencia a la cual pertenece
+        self._dictWidgetReferencias = {} # dictionary that contain the buttons widgets and the reference to wich belong
 
-        # agregar aqui los validadores a ejecutar antes de guardar/editar
-        # validadores disponibles: unique | presence
-        # sintaxis: {'nombreCampo':'nombreValidador', ...}
+        # add here the validators to execute before save/edit
+        # available validators: unique | presence
+        # sintax: {'nameField':'nameValidator', ...}
         # ej: {'codigo':'precenceOf'}
         self.validators = {}
 
         # self.validatorCustom = {'myattr':myFnCustom}
         # la funcion recibe como parametros ({str} attr, {dict} allObjectValues)
-        # debe retornar {bool} result, {str} errorMessage
+        # debe retornar una tupla {bool} result, {str} errorMessage
         self.validatorCustom = {}
 
+        self.lang = 'en'
         self.messages = {
-        'newSuccefullSave':u" agregado con éxito.",
-        'editSuccefullSave':u" editado con éxito.",
-        'newErrorSave':u"No se pudo agregar el ",
-        'editErrorSave':u"No se pudo editar el ",
-        'validateUnique':u'Ya existe un elemento con el mismo nombre',
-        'validatePresence':u'{field} no puede dejarse vacío'
+            'es':{
+                'newTitle':'Nuevo',
+                'editTitle':'Editar',
+                'newSuccefullSave':u" agregado con éxito.",
+                'editSuccefullSave':u" editado con éxito.",
+                'newErrorSave':u"No se pudo agregar el ",
+                'editErrorSave':u"No se pudo editar el ",
+                'validateUnique':u'Ya existe un elemento con el mismo nombre',
+                'validatePresence':u'{field} no puede dejarse vacío'
+            },
+            'en':{
+                'newTitle':'New',
+                'editTitle':'Edit',
+                'newSuccefullSave':u" added succefull.",
+                'editSuccefullSave':u" edited succefull.",
+                'newErrorSave':u"Can't be added ",
+                'editErrorSave':u"Can't be edited ",
+                'validateUnique':u'Already exists a element with the same name',
+                'validatePresence':u"{field} can't be empty value"
+            }
         }
 
 ##########################
@@ -46,7 +59,7 @@ class BaseAdd(QtGui.QDialog):
 ##########################
 
     @QtCore.pyqtSlot()
-    def on_btGuardar_clicked(self):
+    def on_btSave_clicked(self):
         resultado = False
         datos = self.getDataOfWidgets()
         if self.validateConstraintsFields() :
@@ -58,20 +71,27 @@ class BaseAdd(QtGui.QDialog):
                 self.close()
         return resultado
 
+    def getMsgCurLang(self, msg):
+        return self.messages[self.lang][msg]
+
     def _showResultMessage(self, resultado):
         if not self.itemToEdit:
             if resultado :
-                QtGui.QMessageBox.information(self, "Nuevo " + self.getClassName(), self.getClassName().capitalize() + self.messages['newSuccefullSave'])
+                QtGui.QMessageBox.information(
+                    self, self.getMsgCurLang('newTitle') + self.getClassName(), self.getClassName().capitalize() + self.getMsgCurLang('newSuccefullSave'))
             else:
-                QtGui.QMessageBox.warning(self, "Nuevo " + self.getClassName(), self.messages['newErrorSave'] + self.getClassName())
+                QtGui.QMessageBox.warning(
+                    self, self.getMsgCurLang('newTitle') + self.getClassName(), self.getMsgCurLang('newErrorSave') + self.getClassName())
         else:
             if resultado :
-                QtGui.QMessageBox.information(self, "Editar " + self.getClassName(), self.getClassName().capitalize() + self.messages['editSuccefullSave'])
+                QtGui.QMessageBox.information(
+                    self, self.getMsgCurLang('editTitle') + self.getClassName(), self.getClassName().capitalize() + self.getMsgCurLang('editSuccefullSave'))
             else:
-                QtGui.QMessageBox.warning(self, "Editar " + self.getClassName(), self.messages['editErrorSave'] + self.getClassName())
+                QtGui.QMessageBox.warning(
+                    self, self.getMsgCurLang('editTitle') + self.getClassName(), self.getMsgCurLang('editErrorSave') + self.getClassName())
 
     @QtCore.pyqtSlot()
-    def on_btSalir_clicked(self):
+    def on_btExit_clicked(self):
         self.close()
 
 ######################
@@ -114,9 +134,10 @@ class BaseAdd(QtGui.QDialog):
                         # setea el color de fondo indicando que es una campo obligatorio
                         widget.setStyleSheet('background-color: rgb(223, 221, 255);')
                     except KeyError, msg:
-                        print 'ERROR al intentar validar las restricciones para <%s>' % nombrecolumnalabel
-                        print 'KeyError: Posiblemente el widget QLabel se llama de otra manera.'
-                        print 'SOLUCION: Debe llamarce de la misma manera que el atributo de la clase.'
+                        #print 'ERROR al intentar validar las restricciones para <%s>' % nombrecolumnalabel
+                        #print 'KeyError: Posiblemente el widget QLabel se llama de otra manera.'
+                        #print 'SOLUCION: Debe llamarce de la misma manera que el atributo de la clase.'
+                        pass
 
                 if infoclase[columnastorm]["default"] != None:
                     #NEXT:poner valor por defecto
@@ -354,15 +375,15 @@ class BaseAdd(QtGui.QDialog):
 
         self._centerOnScreen()
         self.setValidators()
-        self.btGuardar.setDefault(True)
+        self.btSave.setDefault(True)
         if self.itemToEdit:
-            self.btGuardar.setText('Editar')
+            self.btSave.setText('Editar')
             self.setWindowTitle(u'Editar ' + self.getClassName())
             self._loadDataInWidgets()
         else:
             self.setWindowTitle(u"Nuevo " + self.getClassName())
 
-        QtGui.QShortcut( QtGui.QKeySequence( "F9" ), self, self.on_btGuardar_clicked )
+        QtGui.QShortcut( QtGui.QKeySequence( "F9" ), self, self.on_btSave_clicked )
         QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.Key_Escape ), self, self.close )
 
     def _loadDataInWidgets(self):
@@ -469,7 +490,7 @@ class BaseAdd(QtGui.QDialog):
         'float':lambda value: True,
         'date':lambda value: True,
         }
-        message = self.messages['validatePresence'].replace('{field}', field.capitalize())
+        message = self.getMsgCurLang('validatePresence').replace('{field}', field.capitalize())
         return checkByType[infoAttr['type']](value), message
 
 
@@ -495,4 +516,4 @@ class BaseAdd(QtGui.QDialog):
         if self.itemToEdit:
             if value in dataValues:
                 del dataValues[dataValues.index(value)]
-        return not value in dataValues, self.messages['validateUnique']
+        return not value in dataValues, self.getMsgCurLang('validateUnique')

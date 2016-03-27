@@ -8,9 +8,7 @@ from plasta.tools import pathtools
 import uis.images_rc
 
 class BaseGUI( QtGui.QMainWindow ):
-    '''
-    Clase base para el manejo de las operaciones de la pantalla ABM
-    '''
+    '''Base class to handle operations of CRUD screen'''
 
     def __init__(self, manager, managers = None, parent = None):
         QtGui.QMainWindow.__init__(self, parent)
@@ -30,6 +28,7 @@ class BaseGUI( QtGui.QMainWindow ):
         # Ejemplo:
         # self.ATRIBUTOSLISTA = [ {u'Nombres':Cliente.Nombres}, {u'Domicilio':Cliente.Domicilio}]
         self.ATRIBUTOSLISTA = None
+
         # ATRI_COMBO_BUSQUEDA: lista de diccionarios donde puedes indicar el orden de como
         # quieres que se muestren y vean los atributos en el combo de los filtros
         # El formato es el mismo que <ATRIBUTOSLISTA>
@@ -45,15 +44,17 @@ class BaseGUI( QtGui.QMainWindow ):
         # Possible values: C = CENTER, L = LEFT, R = RIGHT
         # Use: self.ALINEACIONLISTA = ['C', 'L', 'R', 'L']
         self.ALINEACIONLISTA = []
-        # DialogAddClass: referencia a la clase que se instanciara para manejar la
-        # ventana del dialogo abrir/editar
+
+        # DialogAddClass: reference to the class to instantiate to
+        # handle dialog window add / edit
         self.DialogAddClass = None
+
         # Single title to show in gui
         self.singleTitle = self.manager.getClassName()
         # Plural title to show in gui
         self.pluralTitle = self.manager.getClassName()
 
-    def start_operations( self ):
+    def _start_operations( self ):
         u'''Operations necessary to display the window'''
         self.fullScreen = False
         uic.loadUi( self.FILENAME, self )
@@ -67,7 +68,7 @@ class BaseGUI( QtGui.QMainWindow ):
         self.btEdit.setVisible(False)
         self.btDelete.setVisible(False)
 
-        self.setWindowIcon( QtGui.QIcon( QtGui.QPixmap( join( abspath( dirname( __file__ ) ), ICONFILE ) ) ) )
+        self.setWindowIcon( QtGui.QIcon( QtGui.QPixmap( join( abspath( dirname( __file__ ) ), self.ICONFILE ) ) ) )
         self.lbTitle.setText(self.pluralTitle)
         self.setWindowTitle(self.pluralTitle)
 
@@ -85,7 +86,7 @@ class BaseGUI( QtGui.QMainWindow ):
         self._atajo_fullscreen = QtGui.QShortcut( QtGui.QKeySequence( "F11" ), self, self.toogleFullScreen )
         QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.Key_Escape ), self, self.close )
 
-        QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_N ), self, self.on_btAdd_clicked )
+        QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_N ), self, self.on_btNew_clicked )
         QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_M ), self, self.on_btEdit_clicked )
         QtGui.QShortcut( QtGui.QKeySequence( "Del" ), self, self.on_btDelete_clicked )
 
@@ -190,8 +191,8 @@ class BaseGUI( QtGui.QMainWindow ):
         la barra de busqueda y el filtro seleccionado.
         '''
         valor = unicode( self.leSearch.text().toUtf8(), 'utf-8' )
-        campo = unicode( self.cbCampos.itemText(
-                    self.cbCampos.currentIndex() ).toUtf8() )
+        campo = unicode( self.cbFilters.itemText(
+                    self.cbFilters.currentIndex() ).toUtf8() )
         if self.ATRI_COMBO_BUSQUEDA :
             campo = [p[campo] for p in self.ATRI_COMBO_BUSQUEDA if campo in p ][0]
         else:
@@ -204,12 +205,12 @@ class BaseGUI( QtGui.QMainWindow ):
         '''
         Carga el combobox de campos
         '''
-        self.cbCampos.clear()
+        self.cbFilters.clear()
         if not self.ATRI_COMBO_BUSQUEDA :
             atributos = self.manager.getClassAttributes()
             for atributo in atributos:
                 self.ATRI_COMBO_BUSQUEDA.append( {atributo:self._obtainColumnForName( atributo )} )
-        map( self.cbFields.addItem, [p.keys()[0] for p in self.ATRI_COMBO_BUSQUEDA] )
+        map( self.cbFilters.addItem, [p.keys()[0] for p in self.ATRI_COMBO_BUSQUEDA] )
 
     def loadTable( self, listadeobj = None ):
         '''
@@ -233,7 +234,7 @@ class BaseGUI( QtGui.QMainWindow ):
     def on_context_menu( self, point ):
         mypoint = QtCore.QPoint( point.x() + 10, point.y() + 30 )
         self.popMenu = QtGui.QMenu( self )
-        self.popMenu.addAction("Nuevo",self.on_btAdd_clicked ,QtGui.QKeySequence("Ctrl+N"))
+        self.popMenu.addAction("Nuevo",self.on_btNew_clicked ,QtGui.QKeySequence("Ctrl+N"))
         self.popMenu.addAction("Modificar",self.on_btEdit_clicked ,QtGui.QKeySequence("Ctrl+M"))
         self.popMenu.addAction("Eliminar",self.on_btDelete_clicked ,QtGui.QKeySequence("Del"))
 
@@ -272,12 +273,12 @@ class BaseGUI( QtGui.QMainWindow ):
     def add( self ):
         'Call the add dialog window'
         #REIMPLEMENT
-        return self.DialogAddClass( self.manager, itemaeditar = False, managers = self.managers )
+        return self.DialogAddClass( self.manager, itemToEdit = False, managers = self.managers )
 
     def edit( self, obj ):
         'Call the edit dialog window'
         #REIMPLEMENT
-        return self.DialogAddClass( self.manager, itemaeditar = obj, managers = self.managers )
+        return self.DialogAddClass( self.manager, itemToEdit = obj, managers = self.managers )
 
     def delete( self, obj ):
         'Delete a determinated object'
@@ -292,16 +293,16 @@ class BaseGUI( QtGui.QMainWindow ):
         'Set the count items in the label of list'
         self.lbItemsCount.setText( str( valor ) + ' items(s) seleccionado(s)' )
 
-    def on_leBusqueda_textChanged( self, cadena ):
+    def on_leSearch_textChanged( self, cadena ):
         self._find()
 
     @QtCore.pyqtSlot( int )
-    def on_cbCampos_currentIndexChanged ( self, entero ):
+    def on_cbFilters_currentIndexChanged ( self, entero ):
         if not self.leSearch.text().isEmpty() :
             self._find()
 
     @QtCore.pyqtSlot()
-    def on_btAdd_clicked( self ):
+    def on_btNew_clicked( self ):
         wAgregar = self.add()
         wAgregar.setWindowIcon(self.windowIcon())
         wAgregar.postSaveMethod = self.reloadList
