@@ -1,0 +1,20 @@
+include README.md
+include setup.py
+include PKG-INFO
+include TODO.md
+include plastagen.py
+
+include plasta/*.py
+include plasta/gui/*.py
+include plasta/gui/uis/*.py
+include plasta/gui/uis/en_list.ui
+include plasta/gui/uis/es_list.ui
+include plasta/gui/uis/images_rc/*.py
+include plasta/logic/*.py
+include plasta/maker/*.py
+include plasta/maker/templates/object/*.py
+include plasta/tools/*.py
+recursive-include resources/mvc-struct-app *
+recursive-include resources/simple-struct-app *
+recursive-include examples *
+recursive-include doc *

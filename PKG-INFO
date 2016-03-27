@@ -1,0 +1,16 @@
+Metadata-Version: 1.0
+Name: plasta
+Version: 0.1.5
+Summary: Framework for rapid deployment of CRUDs
+Home-page: http://github.com/informaticameg/plasta
+Author: Jonathan Ferreyra & Emiliano Fernandez
+Author-email: plasta@informaticameg.com
+License: MIT
+Description: Plasta is a framework for rapid deployment of CRUDs in a simple way, in a few steps and in few lines of code.
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: License :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Database :: Front-Ends
+Classifier: Topic :: Software Development :: Libraries :: Python Modules

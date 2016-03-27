@@ -161,3 +161,5 @@ class LibroDiarioGUI(BaseGUI):
             else:
                 self.reloadList()
 
+    def on_twItems_itemSelectionChanged(self):
+        pass

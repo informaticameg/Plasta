@@ -86,7 +86,7 @@ $ python setup.py install
 
 ## Wiki
 
-Check the Plasta wiki [here](https://github.com/informaticameg/Plasta/wiki).
+Check the Plasta wiki in [English](https://github.com/informaticameg/Plasta/) or [Spanish](https://github.com/informaticameg/Plasta/) version.
 
 ## License
 
@@ -121,8 +121,8 @@ Check the Plasta wiki [here](https://github.com/informaticameg/Plasta/wiki).
 
 ## Logo licence
 	
-	Plasta logo is property of
+	Plasta logo is licenced under the terms of Creative Commons licence.
 
-	Copyright (C) 2012 by Ccecilia Schiebel <@informaticameg.com>
+	Copyright (C) 2012 by Cecilia Schiebel <ceciliaschiebel@gmail.com>
 
-	under the terms of Creative Commons licence.
+	
