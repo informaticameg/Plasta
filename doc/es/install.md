@@ -8,8 +8,8 @@ $ pip install plasta
 ### Desde Github
 
 ```sh
-$ wget http://pypi.python.org/packages/source/s/six/six-1.0b1.tar.gz
-$ tar xvf six-1.0b1.tar.gz 
+$ wget https://github.com/informaticameg/Plasta/archive/master.zip
+$ tar xvf master.zip
 $ cd plasta/
 $ python setup.py install
 ```
@@ -18,7 +18,7 @@ $ python setup.py install
 
 Puedes usar Plasta localmente copiando la carpeta `plasta` en el nivel principal de la carpeta de tu aplicación.
 
-Si también deseas usar `storm` localmente, descarga y copia la carpeta en la carpeta de trabajo de tu aplicación.
+Si también deseas usar `storm` localmente, [descarga](https://launchpad.net/storm/+download) y copia la carpeta en la carpeta de trabajo de tu aplicación.
 
 Un ejemplo:
 ```

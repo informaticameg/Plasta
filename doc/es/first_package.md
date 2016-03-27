@@ -141,10 +141,10 @@ Por último crearemos el archivo add.py, y su contenido sería este:
 ```python
 from os.path import join, abspath, dirname
 from PyQt4 import uic
-from plasta.gui.add_window import BaseAddWindow
+from plasta.gui.add_window import BaseAdd
 from cliente import Cliente
 
-class AddCliente(BaseAddWindow):
+class AddCliente(BaseAdd):
 
 	def __init__(self, manager, itemToEdit = False, managers = []):
 		# constructor de la clase base

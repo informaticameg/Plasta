@@ -21,11 +21,11 @@ This is where the attributes for a model are defined, as stated in the documenta
 
 This will be in charge of controlling model objects with which you are working, and where the operations side base logic are defined.
 
-### The GUIManager class
+### The BaseGUI class
 
 Here they are defined all operations that control the main GUI of a model. 
 
-### The BaseAddWindow class
+### The BaseAdd class
 
 This class has operations to handle the operations of the form add / edit.
 
@@ -47,7 +47,7 @@ For the correctly work of Plasta, must respect these conventions:
 | Base class | Example |
 |-|-|
 | BaseManager     | ClientManager |
-| GUIManager      | ClientGUI |
+| BaseGUI         | ClientGUI |
 | BaseAddWindow   | AddClient |
 
 #### Widgets names in the main screen of a model

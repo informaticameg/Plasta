@@ -29,5 +29,5 @@
 
 ## [Example Apps](https://github.com/informaticameg/plasta)
 
-* Address book
+* Contact list
 * Movements manager

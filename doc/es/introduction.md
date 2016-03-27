@@ -21,7 +21,7 @@ Aquí es donde se definen los atributos para un modelo, según lo estipulado en 
 
 Ésta será la encargada de controlar los objetos del modelo con el que se esté trabajando, y donde están definidas las operaciones base del lado de la lógica.
 
-### La clase GUIManager
+### La clase BaseGUI
 
 Aquí están definidas todas las operaciones que controlarán la interfaz gráfica principal de un modelo. 
 
@@ -47,7 +47,7 @@ Para el correcto funcionamiento de Plasta, se deberán respetar estas convencion
 | Clase base | Ejemplo |
 |-|-|
 | BaseManager     | ClienteManager |
-| GUIManager      | ClienteGUI |
+| BaseGUI         | ClienteGUI |
 | BaseAddWindow   | AddCliente |
 
 #### Nombres widgets en la pantalla principal de un modelo

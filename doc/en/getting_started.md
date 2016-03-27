@@ -1,4 +1,4 @@
-# How to start 
+# Getting started
 
 ## Choosing the structure of the application
 
