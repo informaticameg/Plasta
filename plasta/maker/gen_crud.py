@@ -130,10 +130,10 @@ def _generateFiles(data):
 
 def _readContentFiles():
   return {
-    'storm':open(_thisFolder + '/__init__.py', 'r').read(),
-    'add':open(_thisFolder + '/add.py', 'r').read(),
-    'gui':open(_thisFolder + '/gui.py', 'r').read(),
-    'manager':open(_thisFolder + '/manager.py', 'r').read()
+    'storm':open(_thisFolder + '/__init__.txt', 'r').read(),
+    'add':open(_thisFolder + '/add.txt', 'r').read(),
+    'gui':open(_thisFolder + '/gui.txt', 'r').read(),
+    'manager':open(_thisFolder + '/manager.txt', 'r').read()
   }
 
 def _writeContentFile(objInfo, fileType, content):
