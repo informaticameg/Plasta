@@ -57,7 +57,7 @@ For the correctly work of Plasta, must respect these conventions:
 | lbTitle      | QLabel |
 | btNew        | QPushButton |
 | btEdit       | QPushButton |
-| btDel        | QPushButton |
+| btDelete     | QPushButton |
 | leSearch     | QLineEdit |
 | cbFilters    | QComboBox |
 | lbItemsCount | QLabel |

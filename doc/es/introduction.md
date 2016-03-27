@@ -57,7 +57,7 @@ Para el correcto funcionamiento de Plasta, se deberán respetar estas convencion
 | lbTitle      | QLabel |
 | btNew        | QPushButton |
 | btEdit       | QPushButton |
-| btDel        | QPushButton |
+| btDelete     | QPushButton |
 | leSearch     | QLineEdit |
 | cbFilters    | QComboBox |
 | lbItemsCount | QLabel |
