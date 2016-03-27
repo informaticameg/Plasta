@@ -4,7 +4,7 @@
 from PyQt4 import QtCore, QtGui
 
 
-class BaseAddWindow(QtGui.QDialog):
+class BaseAdd(QtGui.QDialog):
     '''Base class to handle
     Clase base para el manejo de la pantalla para dar de alta/modificar un registro.
     '''

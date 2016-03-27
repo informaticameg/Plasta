@@ -270,14 +270,17 @@ class BaseGUI( QtGui.QMainWindow ):
 ##############################
 
     def add( self ):
+        'Call the add dialog window'
         #REIMPLEMENT
         return self.DialogAddClass( self.manager, itemaeditar = False, managers = self.managers )
 
     def edit( self, obj ):
+        'Call the edit dialog window'
         #REIMPLEMENT
         return self.DialogAddClass( self.manager, itemaeditar = obj, managers = self.managers )
 
     def delete( self, obj ):
+        'Delete a determinated object'
         #REIMPLEMENT
         self.manager.delete( obj )
 
@@ -286,9 +289,7 @@ class BaseGUI( QtGui.QMainWindow ):
 ###################
 
     def setItemsCount( self, valor ):
-        '''
-        Establece en el label la cantidad de elementos listados.
-        '''
+        'Set the count items in the label of list'
         self.lbCantidadItems.setText( str( valor ) + ' items(s) seleccionado(s)' )
 
     def on_leBusqueda_textChanged( self, cadena ):

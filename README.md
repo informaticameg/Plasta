@@ -7,15 +7,12 @@ Plasta is a framework written in Python for rapid deployment of [CRUDs]((http://
 Is designed with the MVC pattern and the DRY (Don't Repeat Yourself) development
 technique.
 
-## Features
+## Sinopsis
 
-Plasta uses the Storm ORM on data persistence, and the graphic library Qt on graphic interfaces.
+In software engineering we often find the task of performing various CRUD (Create, read, update and delete) in the development of a typical management system or application. This leads to the repetitive task of writing the same operations over and over again for each CRUD being performed, increasing deployment time, lines of code, risk of errors and increased maintenance.
+Plasta born to cover the task of automating these processes.
 
-It focuses on both deployment and maintenanceof an aplication is minimized, for this the core of Plasta is designed so that at any time, if necessary, you can reimplement any
-method that does not meet our interests. Leaving it open to the possibility of a more comfortable development.
-
-Has a number of Qt's .ui files by default ready for use.
-
+It focuses on both deployment and maintenanceof an aplication is minimized, for this the core of Plasta is designed so that at any time, if necessary, you can reimplement any method that does not meet our interests. Leaving it open to the possibility of a more comfortable development.
 
 ## Database Support
 
@@ -23,6 +20,12 @@ Using [Storm ORM](https://storm.canonical.com/), Plasta is conditioned by the su
 
 For more info see the official [documentation](https://storm.canonical.com/Manual) of Storm.
 
+
+## GUI Support
+
+Plasta uses the graphic library Qt on graphic interfaces.
+
+Has a number of Qt's .ui files by default ready for use.
 
 ## Resuming technical features
 
@@ -33,15 +36,15 @@ For more info see the official [documentation](https://storm.canonical.com/Manua
 ## Structure of a CRUD
 
 Each CRUD is made up of a Python package, that contains the follow structure:
-* Object Class (e.g.: Client).
-* Manager Class (e.g.: ClientsManager)
-* Main Class of the CRUD (e.g.: ClientsGUI)
-* Adding a Record Class (e.g.: AddClient)
-* Qt's .ui File for <add client> screen.
+* Object class (e.g.: Client).
+* Manager class (e.g.: ClientsManager)
+* Main class of the gui CRUD (e.g.: ClientsGUI)
+* Adding a record class (e.g.: AddClient)
+* Qt's .ui file for <add client> screen.
 
 Then the resulting package would be something like this:
 ```
-+ /client
+/client
 |--- __init__.py
 |--- manager.py
 |--- gui.py
@@ -50,6 +53,8 @@ Then the resulting package would be something like this:
 ```
 
 **With this structure we're ready to manage Client objects and working with them.**
+
+See [Creating the first package Plasta]() for more details.
 
 ## Not implemented yet
 
@@ -62,15 +67,34 @@ Plasta requires:
 * Storm 0.19. Download [here](https://launchpad.net/storm/+download).
 * PyQt 4.7. Download [here](http://www.riverbankcomputing.co.uk/software/pyqt/download).
 
+## Install
+
+
+### From pip
+```sh
+$ pip install plasta
+```
+
+### From Github
+
+```sh
+$ wget https://github.com/informaticameg/Plasta/archive/master.zip
+$ tar xvf six-1.0b1.tar.gz 
+$ cd plasta/
+$ python setup.py install
+```
+
 ## Wiki
 
 Check the Plasta wiki [here](https://github.com/informaticameg/Plasta/wiki).
 
-## MIT License
+## License
 
 
     Copyright (C) 2012 by Informática MEG <contacto@informaticameg.com>
 	
+	MIT Licence
+
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
     in the Software without restriction, including without limitation the rights
@@ -90,5 +114,15 @@ Check the Plasta wiki [here](https://github.com/informaticameg/Plasta/wiki).
     THE SOFTWARE.
 
 **Plasta is maintained by:**
-* Jonathan Ferreyra <jalejandroferreyra@gmail.com> [@jonathanferreyra](https://github.com/jonathanferreyra)
-* Emiliano Fernandez emilianohfernandez@gmail.com [@emilianox](https://github.com/emilianox)
+* Jonathan Ferreyra <jalejandroferreyra@gmail.com> 
+	* GitHub [@jonathanferreyra](https://github.com/jonathanferreyra)
+* Emiliano Fernandez <emilianohfernandez@gmail.com>
+	* GitHub [@emilianox](https://github.com/emilianox)
+
+## Logo licence
+	
+	Plasta logo is property of
+
+	Copyright (C) 2012 by Ccecilia Schiebel <@informaticameg.com>
+
+	under the terms of Creative Commons licence.
