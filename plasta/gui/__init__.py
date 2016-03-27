@@ -64,11 +64,11 @@ class BaseGUI( QtGui.QMainWindow ):
         self.loadShortcuts()
         self.centerOnScreen()
 
-        self.btEditar.setVisible(False)
-        self.btEliminar.setVisible(False)
+        self.btEdit.setVisible(False)
+        self.btDelete.setVisible(False)
 
         self.setWindowIcon( QtGui.QIcon( QtGui.QPixmap( join( abspath( dirname( __file__ ) ), ICONFILE ) ) ) )
-        self.lbTitulo.setText(self.pluralTitle)
+        self.lbTitle.setText(self.pluralTitle)
         self.setWindowTitle(self.pluralTitle)
 
     def toogleFullScreen( self ):
@@ -85,9 +85,9 @@ class BaseGUI( QtGui.QMainWindow ):
         self._atajo_fullscreen = QtGui.QShortcut( QtGui.QKeySequence( "F11" ), self, self.toogleFullScreen )
         QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.Key_Escape ), self, self.close )
 
-        QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_N ), self, self.on_btAgregar_clicked )
-        QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_M ), self, self.on_btEditar_clicked )
-        QtGui.QShortcut( QtGui.QKeySequence( "Del" ), self, self.on_btEliminar_clicked )
+        QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_N ), self, self.on_btAdd_clicked )
+        QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_M ), self, self.on_btEdit_clicked )
+        QtGui.QShortcut( QtGui.QKeySequence( "Del" ), self, self.on_btDelete_clicked )
 
     def _get_attributes_names( self ):
         '''
@@ -103,7 +103,7 @@ class BaseGUI( QtGui.QMainWindow ):
             self.ATRIBUTOSLISTA_CLASSNAMES = [ self.manager.getAttributeName( p.values()[0] ) for p in self.ATRIBUTOSLISTA]
             columnasTablas = [p.keys()[0] for p in self.ATRIBUTOSLISTA]
 
-        self.MyTabla = MyTableWidget( self.twDatos, columnasTablas, self.ALINEACIONLISTA)
+        self.MyTabla = MyTableWidget( self.twItems, columnasTablas, self.ALINEACIONLISTA)
         # conecta el menu contextual a la tabla
         self.connect( self.MyTabla.widget, QtCore.SIGNAL( 'customContextMenuRequested(const QPoint&)' ), self.on_context_menu )
 
@@ -153,7 +153,7 @@ class BaseGUI( QtGui.QMainWindow ):
         Reliza la busqueda y carga la tabla
         '''
         # obtiene el valor cargado en la barra de busqueda
-        valor = unicode(self.leBusqueda.text().toUtf8(),'utf-8')
+        valor = unicode(self.leSearch.text().toUtf8(),'utf-8')
         # carga la lista segun el estado de la barra de busqueda
         self.reloadList() if valor != u'' else self.loadTable()
 
@@ -189,7 +189,7 @@ class BaseGUI( QtGui.QMainWindow ):
         Vuelve a cargar la lista a partir de los valores actuales en
         la barra de busqueda y el filtro seleccionado.
         '''
-        valor = unicode( self.leBusqueda.text().toUtf8(), 'utf-8' )
+        valor = unicode( self.leSearch.text().toUtf8(), 'utf-8' )
         campo = unicode( self.cbCampos.itemText(
                     self.cbCampos.currentIndex() ).toUtf8() )
         if self.ATRI_COMBO_BUSQUEDA :
@@ -198,7 +198,7 @@ class BaseGUI( QtGui.QMainWindow ):
             campo = self._obtainColumnForName( campo )
         resultado = self.search( campo, valor )
         self.loadTable( resultado )
-        self._setSearchColor( self.leBusqueda, resultado )
+        self._setSearchColor( self.leSearch, resultado )
 
     def loadCombobox( self ):
         '''
@@ -209,7 +209,7 @@ class BaseGUI( QtGui.QMainWindow ):
             atributos = self.manager.getClassAttributes()
             for atributo in atributos:
                 self.ATRI_COMBO_BUSQUEDA.append( {atributo:self._obtainColumnForName( atributo )} )
-        map( self.cbCampos.addItem, [p.keys()[0] for p in self.ATRI_COMBO_BUSQUEDA] )
+        map( self.cbFields.addItem, [p.keys()[0] for p in self.ATRI_COMBO_BUSQUEDA] )
 
     def loadTable( self, listadeobj = None ):
         '''
@@ -233,9 +233,9 @@ class BaseGUI( QtGui.QMainWindow ):
     def on_context_menu( self, point ):
         mypoint = QtCore.QPoint( point.x() + 10, point.y() + 30 )
         self.popMenu = QtGui.QMenu( self )
-        self.popMenu.addAction("Nuevo",self.on_btAgregar_clicked ,QtGui.QKeySequence("Ctrl+N"))
-        self.popMenu.addAction("Modificar",self.on_btEditar_clicked ,QtGui.QKeySequence("Ctrl+M"))
-        self.popMenu.addAction("Eliminar",self.on_btEliminar_clicked ,QtGui.QKeySequence("Del"))
+        self.popMenu.addAction("Nuevo",self.on_btAdd_clicked ,QtGui.QKeySequence("Ctrl+N"))
+        self.popMenu.addAction("Modificar",self.on_btEdit_clicked ,QtGui.QKeySequence("Ctrl+M"))
+        self.popMenu.addAction("Eliminar",self.on_btDelete_clicked ,QtGui.QKeySequence("Del"))
 
         self.popMenu.exec_(self.MyTabla.widget.mapToGlobal(mypoint) )
 
@@ -290,25 +290,25 @@ class BaseGUI( QtGui.QMainWindow ):
 
     def setItemsCount( self, valor ):
         'Set the count items in the label of list'
-        self.lbCantidadItems.setText( str( valor ) + ' items(s) seleccionado(s)' )
+        self.lbItemsCount.setText( str( valor ) + ' items(s) seleccionado(s)' )
 
     def on_leBusqueda_textChanged( self, cadena ):
         self._find()
 
     @QtCore.pyqtSlot( int )
     def on_cbCampos_currentIndexChanged ( self, entero ):
-        if not self.leBusqueda.text().isEmpty() :
+        if not self.leSearch.text().isEmpty() :
             self._find()
 
     @QtCore.pyqtSlot()
-    def on_btAgregar_clicked( self ):
+    def on_btAdd_clicked( self ):
         wAgregar = self.add()
         wAgregar.setWindowIcon(self.windowIcon())
         wAgregar.postSaveMethod = self.reloadList
         wAgregar.exec_()
 
     @QtCore.pyqtSlot()
-    def on_btEditar_clicked( self ):
+    def on_btEdit_clicked( self ):
         listadeobjetosseleccionados = self.actual_rows_to_objects()
         if listadeobjetosseleccionados:
             for obj in listadeobjetosseleccionados:
@@ -318,7 +318,7 @@ class BaseGUI( QtGui.QMainWindow ):
                 wEditar.exec_()
 
     @QtCore.pyqtSlot()
-    def on_btEliminar_clicked( self ):
+    def on_btDelete_clicked( self ):
         listadeobjetosseleccionados = self.actual_rows_to_objects()
         if listadeobjetosseleccionados:
             for obj in listadeobjetosseleccionados:
@@ -329,13 +329,13 @@ class BaseGUI( QtGui.QMainWindow ):
                     self.delete( obj )
                     self._find()
 
-    def on_twDatos_itemSelectionChanged(self):
-        self.btEditar.setVisible(False)
-        self.btEliminar.setVisible(False)
+    def on_twItems_itemSelectionChanged(self):
+        self.btEdit.setVisible(False)
+        self.btDelete.setVisible(False)
         items = self.MyTabla.getListSelectedRows()
         if items  :
-            self.btEditar.setVisible(True)
-            self.btEliminar.setVisible(True)
+            self.btEdit.setVisible(True)
+            self.btDelete.setVisible(True)
 
 #########
 # OTROS #
