@@ -32,7 +32,7 @@ Esta clase posee las operaciones para manejar las operaciones del formulario  ag
 ## Terminologías
 
 | Término | Definición |
-|-|-|
+|---------|------------|
 | Manager | clase controladora de un modelo |
 | Paquete | paquete Plasta compuesta de las 4 clases |
 | UI | archivo xml de una ventana Qt |
@@ -45,7 +45,7 @@ Para el correcto funcionamiento de Plasta, se deberán respetar estas convencion
 #### Nombres de las clases
 
 | Clase base | Ejemplo |
-|-|-|
+|------------|---------|
 | BaseManager     | ClienteManager |
 | BaseGUI         | ClienteGUI |
 | BaseAddWindow   | AddCliente |
@@ -53,7 +53,7 @@ Para el correcto funcionamiento de Plasta, se deberán respetar estas convencion
 #### Nombres widgets en la pantalla principal de un modelo
 
 | Nombre widget | Tipo widget |
-|-|-|
+|---------------|-------------|
 | lbTitle      | QLabel |
 | btNew        | QPushButton |
 | btEdit       | QPushButton |
@@ -66,7 +66,7 @@ Para el correcto funcionamiento de Plasta, se deberán respetar estas convencion
 #### Nombres widgets en el formulario agregar/editar
 
 | Nombre widget | Tipo widget |
-|-|-|
+|---------------|-------------|
 | btSave        | QPushButton |
 | btCancel      | QPushButton |
 
@@ -87,3 +87,7 @@ Plasta ha adoptado estos prefijos para nombrar a los widgets de la GUI:
 | QDateTimeEdit  | dte |
 | QTimeEdit      | tme |
 | QCheckBox      | chk |
+
+
+
+[Ir a > Inicio](https://github.com/informaticameg/Plasta/blob/master/doc/es/index.md) | [Ir a > Instalación](https://github.com/informaticameg/Plasta/blob/master/doc/es/install.md) | [Ir a > Como empezar](https://github.com/informaticameg/Plasta/blob/master/doc/es/getting_started.md) | [Ir a > Casos de uso](https://github.com/informaticameg/plasta/blob/master/doc/es/uses_case.md) | [Ir a > Aplicaciones de ejemplo](https://github.com/informaticameg/plasta/blob/master/doc/es/example_apps.md)

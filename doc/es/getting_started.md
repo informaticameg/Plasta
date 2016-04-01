@@ -45,7 +45,7 @@ Plasta viene con un generador para las siguientes operaciones:
 
 ### Generar paquete para un modelo
 
-`> plasta g crud [OPTIONS] NAMEMODEL [ATTRIBUTES]`
+`> python plastagen g crud [OPTIONS] NAMEMODEL [ATTRIBUTES]`
 
 **Opciones:**
 * `-ui`: genera junto con el modelo el archivo ui
@@ -59,7 +59,7 @@ Plasta viene con un generador para las siguientes operaciones:
 Para indicar el tipo de los atributos, sigue las indicaciones de la siguiente tabla:
 
 | Tipo atributo | Widget relacionado |
-|-|-|
+|---------------|--------------------|
 | unicode (por defecto) | QLineEdit |
 | int | QSpinBox | 
 | float | QDoubleSpinBox | 
@@ -71,20 +71,21 @@ Formato a usar: `atributo:tipo` e.g: `nombre cumpleanios:date estaActivado:bool`
 
 **Ejemplos de uso:**
 
-`> plasta g crud -ui persona nombre apellido direccion cumpleanios:date sexo`
+`> python plastagen g crud -ui persona nombre apellido direccion cumpleanios:date sexo`
 
 *Resultado:* generará el paquete con las 4 clases y el archivo ui
 
-`> plasta g crud -s -m persona nombre apellido direccion sexo`
+`> python plastagen g crud -s -m persona nombre apellido direccion sexo`
 
 *Resultado:* generará el paquete solamente con las clases Storm y Manager.
 
 ### Generar archivo ui para un formulario
 
-`> plasta g ui [ATTRIBUTES]`
+`> python plastagen g ui [ATTRIBUTES]`
 
 **Ejemplo de uso:**
 
-`> plasta g ui nombre apellido email`
+`> python plastagen g ui nombre apellido email`
 
-## [Ir a > Creando el primer paquete Plasta](https://github.com/informaticameg/plasta)
+
+[Ir a > Inicio](https://github.com/informaticameg/Plasta/blob/master/doc/es/index.md) | [Ir a > Instalación](https://github.com/informaticameg/Plasta/blob/master/doc/es/install.md) | [Ir a > Como empezar](https://github.com/informaticameg/Plasta/blob/master/doc/es/getting_started.md) | [Ir a > Casos de uso](https://github.com/informaticameg/plasta/blob/master/doc/es/uses_case.md) | [Ir a > Aplicaciones de ejemplo](https://github.com/informaticameg/plasta/blob/master/doc/es/example_apps.md)

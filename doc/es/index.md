@@ -31,5 +31,3 @@
 
 * Agenda de contactos
 * Gestor de movimientos
-
-# hablar sobre los validadores en add.py

@@ -173,7 +173,7 @@ Para que cuando se de alta un registro, el valor contenido en ese widget, se est
 
 Usando el generador de Plasta para crear este paquete, el comando sería el siguiente:
 
-`$ plasta g crud cliente nombres telefono domicilio zona`
+`$ python plastagen plastagen g crud cliente nombres telefono domicilio zona`
 
 
 **5. Creando el archivo run.py**
@@ -202,3 +202,7 @@ window.show()
 sys.exit(app.exec_())
 
 ```
+
+
+
+[Ir a > Inicio](https://github.com/informaticameg/Plasta/blob/master/doc/es/index.md) | [Ir a > Instalación](https://github.com/informaticameg/Plasta/blob/master/doc/es/install.md) | [Ir a > Como empezar](https://github.com/informaticameg/Plasta/blob/master/doc/es/getting_started.md) | [Ir a > Casos de uso](https://github.com/informaticameg/plasta/blob/master/doc/es/uses_case.md) | [Ir a > Aplicaciones de ejemplo](https://github.com/informaticameg/plasta/blob/master/doc/es/example_apps.md)

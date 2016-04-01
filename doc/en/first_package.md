@@ -168,7 +168,7 @@ To that adding a record, the value in the widget, it is established in that attr
 
 Using the Plasta generator to create this package, the command would be:
 
-`$ plasta g crud client names phone address zone`
+`$ python plastagen g crud client names phone address zone`
 
 
 **5. Creating the run.py file**
