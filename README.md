@@ -70,7 +70,7 @@ Plasta requires:
 ## Install
 
 
-### From pip
+### From pip (TODO)
 ```sh
 $ pip install plasta
 ```

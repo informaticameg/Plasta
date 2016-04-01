@@ -1,6 +1,6 @@
 # Instalación
 
-### Desde pip
+### Desde pip (TODO)
 ```sh
 $ pip install plasta
 ```
