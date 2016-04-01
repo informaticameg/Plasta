@@ -1,24 +1,24 @@
 # Plasta Wiki
 
-## [Introducción](https://github.com/informaticameg/plasta)
+## [Introducción](https://github.com/informaticameg/plasta/blob/master/doc/es/introduction.md)
 
 * Licencia
 * Componentes
 * Terminologías
 * Convenciones 
 
-## [Instalación](https://github.com/informaticameg/plasta)
+## [Instalación](https://github.com/informaticameg/plasta/blob/master/doc/es/install.md)
 
 * Usando localmente
 * Usando globalmente
 
-## [Como empezar](https://github.com/informaticameg/plasta)
+## [Como empezar](https://github.com/informaticameg/plasta/blob/master/doc/es/getting_started.md)
 
 * Eligiendo la estructura de la aplicación
 * Generador Plasta
-* [Creando el primer paquete Plasta](https://github.com/informaticameg/plasta)
+* [Creando el primer paquete Plasta](https://github.com/informaticameg/Plasta/blob/master/doc/es/first_package.md)
 
-## [Casos de uso](https://github.com/informaticameg/plasta)
+## [Casos de uso](https://github.com/informaticameg/Plasta/blob/master/doc/es/uses_case.md)
 
 * Crear un objeto que contenga referencias
 * Pasar una referencia de un modelo a otro
@@ -27,7 +27,7 @@
 * Cambiar el atributo principal de la clase 'ide' por otro 
 * Formateando atributos en la lista
 
-## [Aplicaciones de ejemplo](https://github.com/informaticameg/plasta)
+## [Aplicaciones de ejemplo](https://github.com/informaticameg/Plasta/blob/master/doc/es/example_apps.md)
 
 * Agenda de contactos
 * Gestor de movimientos
