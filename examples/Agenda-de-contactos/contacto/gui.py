@@ -10,27 +10,25 @@ class ContactosGUI( BaseGUI ):
 
     def __init__(self, manager, managers = []):
         BaseGUI.__init__(self, manager, managers)
-
         self.DialogAddClass  = AddContacto
 
         # elementos en el combo de filtros
-        self.ATRI_COMBO_BUSQUEDA = [
-        {u'Nombre':Contacto.nombre},
-        {u'Apellido':Contacto.apellido},
-        {u'Numero':Contacto.numero},
-        {u'E-mail':Contacto.email},
-        ]
-
-        # alineacion de los atributos en la lista
-        self.ALINEACIONLISTA = ['C','L','L','C','L']
+        self.addFilter(u'Nombre', Contacto.nombre)
+        self.addFilter(u'Apellido', Contacto.apellido)
+        self.addFilter(u'Numero', Contacto.numero)
+        self.addFilter(u'E-mail', Contacto.email)
 
         # atributos mostrados en la lista
-        self.ATRIBUTOSLISTA = [
-        {u' ':Contacto.ide},
-        {u'Nombre':Contacto.nombre},
-        {u'Apellido':Contacto.apellido},
-        {u'Numero':Contacto.numero},
-        {u'E-mail':Contacto.email},
-        ]
+        self.addTableColumn(u' ', Contacto.ide, alignment='C')
+        self.addTableColumn(u'Nombre', Contacto.nombre)
+        self.addTableColumn(u'Apellido', Contacto.apellido)
+        self.addTableColumn(u'Numero', Contacto.numero, alignment='C')
+        self.addTableColumn(u'E-mail', Contacto.email, fnParse=self.parseEmail)
+
         self.pluralTitle = "Contactos"
+        self.lang = 'en'
         self._start_operations()
+
+    def parseEmail(self, row, currentValue):
+        # example use parse attribute
+        return currentValue.upper()

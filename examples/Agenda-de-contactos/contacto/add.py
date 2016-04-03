@@ -1,14 +1,13 @@
 from plasta.gui.add import BaseAdd
 from PyQt4 import uic
-from os.path import join,abspath,dirname
+from os.path import join, abspath, dirname
 from contacto import Contacto
 
 class AddContacto( BaseAdd ):
 
     def __init__(self, manager, itemToEdit = False, managers = []):
         BaseAdd.__init__(self, manager, itemToEdit, managers)
-        FILENAME = 'add.ui'
-        uic.loadUi(join(abspath(dirname(__file__)),FILENAME), self)
+        self.loadUI(join(abspath(dirname(__file__)),'add.ui'))
 
         self.linkToAttribute(self.leNombre, Contacto.nombre)
         self.linkToAttribute(self.leApellido, Contacto.apellido)
