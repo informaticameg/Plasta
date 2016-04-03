@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt4 import QtCore, QtGui, uic
-
+from os.path import join, abspath, dirname
 
 class BaseAdd(QtGui.QDialog):
     '''Base class to handle add/edit windows'''
@@ -88,42 +88,30 @@ class BaseAdd(QtGui.QDialog):
     def isEditing(self):
         return self.itemToEdit is not None
 
-    def getMsgCurLang(self, msg):
+    def getMsgByLang(self, msg):
         return self.messages[self.lang][msg]
 
     def _showResultMessage(self, resultado):
         if not self.itemToEdit:
             if resultado :
                 QtGui.QMessageBox.information(
-                    self, self.getMsgCurLang('newTitle') + self.getClassName(), self.getClassName().capitalize() + self.getMsgCurLang('newSuccefullSave'))
+                    self, self.getMsgByLang('newTitle') + self.getClassName(), self.getClassName().capitalize() + self.getMsgByLang('newSuccefullSave'))
             else:
                 QtGui.QMessageBox.warning(
-                    self, self.getMsgCurLang('newTitle') + self.getClassName(), self.getMsgCurLang('newErrorSave') + self.getClassName())
+                    self, self.getMsgByLang('newTitle') + self.getClassName(), self.getMsgByLang('newErrorSave') + self.getClassName())
         else:
             if resultado :
                 QtGui.QMessageBox.information(
-                    self, self.getMsgCurLang('editTitle') + self.getClassName(), self.getClassName().capitalize() + self.getMsgCurLang('editSuccefullSave'))
+                    self, self.getMsgByLang('editTitle') + self.getClassName(), self.getClassName().capitalize() + self.getMsgByLang('editSuccefullSave'))
             else:
                 QtGui.QMessageBox.warning(
-                    self, self.getMsgCurLang('editTitle') + self.getClassName(), self.getMsgCurLang('editErrorSave') + self.getClassName())
-
-    @QtCore.pyqtSlot()
-    def on_btExit_clicked(self):
-        self.close()
-
-#################
-# AUX FUNCTIONS #
-#################
-
-    def loadUI(self):
-        uic.loadUi(join(abspath(dirname(__file__)), self.FILENAME), self)
+                    self, self.getMsgByLang('editTitle') + self.getClassName(), self.getMsgByLang('editErrorSave') + self.getClassName())
 
     def setValidators(self):
         '''
         A partir de las restricciones de la clase, valida antes de ser guardado el
         nuevo registro, que cumplan con esas restricciones.
         '''
-
         infoclase = self.manager.getClassAttributesInfo()
         for dato in self.ITEMLIST:
             widget = dato.keys()[0]
@@ -519,7 +507,7 @@ class BaseAdd(QtGui.QDialog):
         'float':lambda value: True,
         'date':lambda value: True,
         }
-        message = self.getMsgCurLang('validatePresence').replace('{field}', field.capitalize())
+        message = self.getMsgByLang('validatePresence').replace('{field}', field.capitalize())
         return checkByType[infoAttr['type']](value), message
 
 
@@ -545,4 +533,4 @@ class BaseAdd(QtGui.QDialog):
         if self.itemToEdit:
             if value in dataValues:
                 del dataValues[dataValues.index(value)]
-        return not value in dataValues, self.getMsgCurLang('validateUnique')
+        return not value in dataValues, self.getMsgByLang('validateUnique')

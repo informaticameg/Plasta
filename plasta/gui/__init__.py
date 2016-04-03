@@ -13,7 +13,7 @@ class BaseGUI( QtGui.QMainWindow ):
     def __init__(self, manager, managers = None, parent = None):
         QtGui.QMainWindow.__init__(self, parent)
         # Name file of ui for gui
-        self.FILENAME = join(abspath(dirname(__file__)), 'uis/en_list.ui')
+        self.FILENAME = join(abspath(dirname(__file__)), 'uis/list.ui')
         # Name file of icon window
         self.ICONFILE = ''
         #
@@ -54,10 +54,33 @@ class BaseGUI( QtGui.QMainWindow ):
         # Plural title to show in gui
         self.pluralTitle = self.manager.getClassName()
 
+        self.lang = 'es'
+        self.messages = {
+            'es':{
+                'new':'Nuevo',
+                'edit':'Editar',
+                'delete':'Eliminar',
+                'deleteConfirm':u"¿Está seguro que desea eliminar?.\n\n",
+                'itemsCount':' item(s) listado(s)',
+                'search':'Buscar',
+                'filters':'Filtros'
+            },
+            'en':{
+                'new':'New',
+                'edit':'Edit',
+                'delete':'Delete',
+                'deleteConfirm':u"¿Are you sure?.\n\n",
+                'itemsCount':' item(s) listed',
+                'search':'Search',
+                'filters':'Filters'
+            }
+        }
+
     def _start_operations( self ):
         '''Operations necessary to display the window'''
         self.fullScreen = False
         self.loadUI()
+        self.translateWidgets()
         self.makeTable()
         self.loadCombobox()
         self.loadTable()
@@ -75,6 +98,16 @@ class BaseGUI( QtGui.QMainWindow ):
 
     def loadUI(self):
         uic.loadUi( self.FILENAME, self )
+
+    def getMsgByLang(self, msg):
+        return self.messages[self.lang][msg]
+
+    def translateWidgets(self):
+        self.btNew.setText(self.getMsgByLang('new'))
+        self.btEdit.setText(self.getMsgByLang('edit'))
+        self.btDelete.setText(self.getMsgByLang('delete'))
+        self.lbSearch.setText(self.getMsgByLang('search'))
+        self.lbFilters.setText(self.getMsgByLang('filters'))
 
     def centerOnScreen ( self ):
         '''Centers the window on the screen.'''
@@ -187,7 +220,7 @@ class BaseGUI( QtGui.QMainWindow ):
 
     def setItemsCount( self, valor ):
         'Set the count items in the label of list'
-        self.lbItemsCount.setText( str( valor ) + ' items(s) seleccionado(s)' )
+        self.lbItemsCount.setText( str( valor ) + self.getMsgByLang('itemsCount'))
 
 ###############
 # API TO VARS #
@@ -244,7 +277,7 @@ class BaseGUI( QtGui.QMainWindow ):
             try:
                 campo = self.manager.CLASS.__dict__['_storm_columns'][busqueda]
             except:
-                print "no tengo idea del error gui-_obtainColumnForName"
+                print "error: gui.obtainColumnForName()"
                 campo = busqueda
         else:
             campo = busqueda
@@ -287,9 +320,9 @@ class BaseGUI( QtGui.QMainWindow ):
     def on_context_menu( self, point ):
         mypoint = QtCore.QPoint( point.x() + 10, point.y() + 30 )
         self.popMenu = QtGui.QMenu( self )
-        self.popMenu.addAction("Nuevo",self.on_btNew_clicked ,QtGui.QKeySequence("Ctrl+N"))
-        self.popMenu.addAction("Modificar",self.on_btEdit_clicked ,QtGui.QKeySequence("Ctrl+M"))
-        self.popMenu.addAction("Eliminar",self.on_btDelete_clicked ,QtGui.QKeySequence("Del"))
+        self.popMenu.addAction(self.getMsgByLang('new'), self.on_btNew_clicked ,QtGui.QKeySequence("Ctrl+N"))
+        self.popMenu.addAction(self.getMsgByLang('edit'), self.on_btEdit_clicked ,QtGui.QKeySequence("Ctrl+M"))
+        self.popMenu.addAction(self.getMsgByLang('delete'), self.on_btDelete_clicked ,QtGui.QKeySequence("Del"))
 
         self.popMenu.exec_(self.MyTabla.widget.mapToGlobal(mypoint) )
 
@@ -346,8 +379,9 @@ class BaseGUI( QtGui.QMainWindow ):
         listadeobjetosseleccionados = self.actualRowsToObjects()
         if listadeobjetosseleccionados:
             for obj in listadeobjetosseleccionados:
-                result = QtGui.QMessageBox.warning( self, u"Eliminar",
-                    u"¿Esta seguro que desea eliminar?.\n\n",
+                result = QtGui.QMessageBox.warning(self,
+                    self.getMsgByLang('delete'),
+                    self.getMsgByLang('deleteConfirm'),
                     QtGui.QMessageBox.Yes, QtGui.QMessageBox.No )
                 if result == QtGui.QMessageBox.Yes:
                     self.delete( obj )

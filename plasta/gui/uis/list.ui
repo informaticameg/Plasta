@@ -31,7 +31,7 @@ border-bottom-left-radius: 6px 6px;
       <item>
        <widget class="QLabel" name="lbTitle">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -45,7 +45,7 @@ border-bottom-left-radius: 6px 6px;
         <property name="styleSheet">
          <string notr="true">QLabel {
 color: #252424;
-font: bold 16px;
+font: bold 18px;
 font-family: Ubuntu, Helvetica, sans-serif;
 }</string>
         </property>
@@ -70,7 +70,7 @@ font-family: Ubuntu, Helvetica, sans-serif;
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLabel" name="label_2">
+         <widget class="QLabel" name="lbSearch">
           <property name="styleSheet">
            <string notr="true">QLabel{
 color:rgb(85, 85, 85);
@@ -105,77 +105,12 @@ font-family: Ubuntu, Helvetica, sans-serif;
               <height>0</height>
              </size>
             </property>
-            <property name="styleSheet">
-             <string notr="true">QLineEdit { 
-border: 1px solid #999999; 
-padding: 2px 2px 2px 2px;
-min-width: 90px;
-height: 20px;
-
-border-top-left-radius: 3px ;
-border-top-right-radius: 0px solid white;
-border-bottom-right-radius: 0px ;
-border-bottom-left-radius: 3px;
-
-}</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lbLupita">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>26</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>30</width>
-              <height>26</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel { 
-background: white;
-border: 1px solid #999999; 
-padding: 2px 2px 2px 2px;
-
-height: 30px;
-width:26px;
-
-border-top-left-radius: 0px ;
-border-top-right-radius: 3px;
-border-bottom-right-radius: 3px;
-border-bottom-left-radius: 0px;
-
-border-left: 0px solid white;
-}</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="pixmap">
-             <pixmap resource="images_rc/images.qrc">:/newPrefix/find.png</pixmap>
-            </property>
-            <property name="scaledContents">
-             <bool>true</bool>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
            </widget>
           </item>
          </layout>
         </item>
         <item>
-         <widget class="QLabel" name="label_5">
+         <widget class="QLabel" name="lbFilters">
           <property name="styleSheet">
            <string notr="true">QLabel{
 color:rgb(85, 85, 85);
@@ -189,26 +124,7 @@ font-family: Ubuntu, Helvetica, sans-serif;
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="cbFilters">
-          <property name="styleSheet">
-           <string notr="true">QComboBox {
-border: 1px solid #999999; 
-border-radius: 4px;
-padding: 2px 2px 2px 2px;
-min-width: 6em;
-}
-
-QComboBox::down-arrow {
-image: url(:newPrefix/arrow_down.png);
-height: 10px;
-}
-QComboBox:editable {
-background: white;
-border-radius: 0px;
-}
-QComboBox::drop-down { border-style: none}</string>
-          </property>
-         </widget>
+         <widget class="QComboBox" name="cbFilters"/>
         </item>
        </layout>
       </item>
@@ -302,7 +218,6 @@ QComboBox::drop-down { border-style: none}</string>
          <string notr="true">QLabel {
 color: rgb(147, 147, 147);
 font: 10px;
-font-family: Ubuntu, Helvetica, sans-serif;
 }</string>
         </property>
         <property name="text">
@@ -318,32 +233,6 @@ font-family: Ubuntu, Helvetica, sans-serif;
        <font>
         <family>Ubuntu,Helvetica,sans-serif</family>
        </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QHeaderView::section {
-border-radius: 3px;
-padding: 2px 4px 2px 4px;
-
-/* Fuente */
-color: #3A3939;
-text-align: left;
-font-family: Ubuntu, Helvetica, sans-serif;
-
-background-color:rgb(244, 244, 244);
-/*qlineargradient(spread:reflect, x1:1, y1:1, x2:1, y2:0, stop:0 rgba(240, 240, 240, 255), stop:0.509174 rgba(250, 250, 250, 255), stop:0.963303 rgba(255, 255, 255, 255));*/
-/* Bordes */
-border-bottom: 1px solid #E3E3E3;
-border-top: 1px solid #FFFFFF;
-padding:6px;
-border-top-left-radius: 0px;
-}
-
-QTableWidget{
-font-family: Ubuntu, Helvetica, sans-serif;
-/*font-size: 12px;*/
-text-align: left;
-border: 1px solid #BFBFBF;
-}</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::Box</enum>
