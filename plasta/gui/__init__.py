@@ -42,8 +42,8 @@ class BaseGUI( QtGui.QMainWindow ):
 
         # Alignment of each atttribute in the list
         # Possible values: C = CENTER, L = LEFT, R = RIGHT
-        # Use: self.ALINEACIONLISTA = ['C', 'L', 'R', 'L']
-        self.ALINEACIONLISTA = []
+        # Use: self.alignmentColumns = ['C', 'L', 'R', 'L']
+        self.alignmentColumns = []
 
         # DialogAddClass: reference to the class to instantiate to
         # handle dialog window add / edit
@@ -94,10 +94,10 @@ class BaseGUI( QtGui.QMainWindow ):
         self.lbTitle.setText(self.pluralTitle)
         self.setWindowTitle(self.pluralTitle)
 
-        self.setStyleSheet(open('style.css').read())
-
-    def loadUI(self):
-        uic.loadUi( self.FILENAME, self )
+    def loadUI(self, pathToFile = None):
+        if pathToFile is None:
+            pathToFile = self.FILENAME
+        uic.loadUi(pathToFile, self)
 
     def getMsgByLang(self, msg):
         return self.messages[self.lang][msg]
@@ -136,12 +136,12 @@ class BaseGUI( QtGui.QMainWindow ):
     def makeTable( self ):
         '''Create the structure of table (columns)'''
         if not self.ATRIBUTOSLISTA :
-            columnasTablas = [p.capitalize() for p in self._get_attributes_names()]
+            tableColumns = [p.capitalize() for p in self._get_attributes_names()]
         else:
             self.ATRIBUTOSLISTA_CLASSNAMES = [ self.manager.getAttributeName( p.values()[0] ) for p in self.ATRIBUTOSLISTA]
-            columnasTablas = [p.keys()[0] for p in self.ATRIBUTOSLISTA]
+            tableColumns = [p.keys()[0] for p in self.ATRIBUTOSLISTA]
 
-        self.MyTabla = MyTableWidget( self.twItems, columnasTablas, self.ALINEACIONLISTA)
+        self.MyTabla = MyTableWidget( self.twItems, tableColumns, self.alignmentColumns)
         # conecta el menu contextual a la tabla
         self.connect( self.MyTabla.widget, QtCore.SIGNAL( 'customContextMenuRequested(const QPoint&)' ), self.on_context_menu )
 
@@ -226,17 +226,19 @@ class BaseGUI( QtGui.QMainWindow ):
 # API TO VARS #
 ###############
 
-    def addTableColumn(self, showName, classAttribute, fnParse = None):
+    def addTableColumn(self, showName, classAttribute, fnParse = None, alignment = 'L'):
         item = {}
-        item[unicode(showName, 'utf-8')] = classAttribute
+        item[showName] = classAttribute
         self.ATRIBUTOSLISTA.append(item)
         if fnParse:
             idx = len(self.ATRIBUTOSLISTA) - 1
             self.fnsParseListAttrs.append([idx, fnParse])
 
+        self.alignmentColumns.append(alignment)
+
     def addFilter(self, showName, classAttribute):
         item = {}
-        item[unicode(showName, 'utf-8')] = classAttribute
+        item[showName] = classAttribute
         self.ATRI_COMBO_BUSQUEDA.append(item)
 
 #################

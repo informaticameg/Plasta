@@ -17,7 +17,7 @@ class BaseAdd(QtGui.QDialog):
         # sintax: [{'showText', Object.attribute}, ...]
         self.ITEMLIST = []
         # name or path of ui to use
-        self.FILENAME = join(abspath(dirname(__file__)), 'add.ui')
+        self.FILENAME = 'add.ui'
         self.dict_referencias = {} # diccionario que contiene la instancia seleccionada en el buscador
         self.postSaveMethod = None # metodo que BaseGUI que se ejecuta luego de save()
         self._dictWidgetReferencias = {} # dictionary that contain the buttons widgets and the reference to wich belong
@@ -82,8 +82,10 @@ class BaseAdd(QtGui.QDialog):
 # AUX FUNCTIONS #
 #################
 
-    def loadUI(self):
-        uic.loadUi(self.FILENAME, self)
+    def loadUI(self, pathToFile = None):
+        if pathToFile is None:
+            pathToFile = self.FILENAME
+        uic.loadUi(pathToFile, self)
 
     def isEditing(self):
         return self.itemToEdit is not None
