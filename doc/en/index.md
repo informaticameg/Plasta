@@ -2,21 +2,21 @@
 
 ## [Introduction](https://github.com/informaticameg/Plasta/blob/master/doc/en/introduction.md)
 
-* Licence
-* Components
-* Terminologies
-* Conventions 
+* [Licence](https://github.com/informaticameg/Plasta/blob/master/doc/en/introduction.md#licence)
+* [Components](https://github.com/informaticameg/Plasta/blob/master/doc/en/introduction.md#components)
+* [Terminologies](https://github.com/informaticameg/Plasta/blob/master/doc/en/introduction.md#terminologies)
+* [Conventions](https://github.com/informaticameg/Plasta/blob/master/doc/en/introduction.md#conventions)
 
 ## [Install](https://github.com/informaticameg/Plasta/blob/master/doc/en/install.md)
 
-* Using locally
-* Using globally
+* [Using locally](https://github.com/informaticameg/Plasta/blob/master/doc/en/install.md#using-locally)
+* [Using globally](https://github.com/informaticameg/Plasta/blob/master/doc/en/install.md#using-globally)
 
 ## [Getting started](https://github.com/informaticameg/Plasta/blob/master/doc/en/getting_started.md)
 
-* Choosing the structure of the application
-* Plasta generator
-* [Creating the first package Plasta](https://github.com/informaticameg/plasta/blob/master/doc/en/first_package.md)
+* [Choosing the structure of the application](https://github.com/informaticameg/Plasta/blob/master/doc/en/getting_started.md#choosing-the-structure-of-the-application)
+* [Plasta generator](https://github.com/informaticameg/Plasta/blob/master/doc/en/getting_started.md#plasta-generator)
+* [Creating the first package Plasta](https://github.com/informaticameg/plasta/blob/master/doc/en/first_package.md#creating-the-first-package-plasta)
 
 ## [Use cases](https://github.com/informaticameg/plasta/blob/master/doc/en/uses_cases.md)
 

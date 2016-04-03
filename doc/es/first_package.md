@@ -110,25 +110,17 @@ class ClientesGUI(BaseGUI):
 		self.DialogAddClass = AddCliente
 		
 		# atributos usados como filtros
-        self.ATRI_COMBO_BUSQUEDA = [ 
-	        {u'Nombres':Cliente.nombres},
-	        {u'Telefono':Cliente.telefono},
-	        {u'Dirección':Cliente.direccion},
-	        {u'Zona':Cliente.zona},
-        ]
-
-        # alineación de los atributos en la lista
-		# C = CENTER, L = LEFT, R = RIGHT
-        self.ALINEACIONLISTA = ['C','L','L','L','C']        
+        self.addFilter(u'Nombres', Cliente.nombres)
+        self.addFilter(u'Telefono', Cliente.telefono)
+        self.addFilter(u'Dirección', Cliente.direccion)
+        self.addFilter(u'Zona', Cliente.zona)   
         
         # columnas/atributos mostrados en la lista
-        self.ATRIBUTOSLISTA = [ 
-	        {u'#':Cliente.ide},
-	        {u'Nombres':Cliente.nombres},
-	        {u'Telefono':Cliente.telefono},
-	        {u'Dirección':Cliente.direccion},
-	        {u'Zona':Cliente.zona},
-        ]
+        self.addTableColumn(u'#', Cliente.ide, alignment='C')
+        self.addTableColumn(u'Nombres', Cliente.nombres)
+        self.addTableColumn(u'Telefono', Cliente.telefono)
+        self.addTableColumn(u'Dirección', Cliente.direccion)
+        self.addTableColumn(u'Zona', Cliente.zona, alignment='C')
 
 		# realiza las operaciones de inicio para levantar la ventana
 		self._start_operations()
@@ -148,20 +140,17 @@ class AddCliente(BaseAdd):
 
 	def __init__(self, manager, itemToEdit = False, managers = []):
 		# constructor de la clase base
-		BaseAddWindow.__init__(self, manager, itemToEdit)
-		# ubicación del archivo ui para esta ventana
-		FILENAME = 'add.ui'
+		BaseAdd.__init__(self, manager, itemToEdit)
+
 		# lee y levanta la información del archivo ui
-		uic.loadUi( join(abspath(dirname(__file__)), FILENAME), self )
+		self.loadUI(join(abspath(dirname(__file__)),'add.ui'))
 
 		# aquí indicaremos qué widget de la interfaz 
 		# se corresponde con un atributo de la clase
-		self.ITEMLIST = [
-			{self.leNombres : Cliente.nombres},
-			{self.leTelefono : Cliente.telefono},
-			{self.leDomicilio : Cliente.domicilio},
-			{self.leZona : Cliente.zona}
-		]
+		self.linkToAttribute(self.leNombres, Cliente.nombres)
+		self.linkToAttribute(self.leTelefono, Cliente.telefono)
+		self.linkToAttribute(self.leDireccion, Cliente.direccion)
+		self.linkToAttribute(self.leZona, Cliente.zona)
 		
 		self._start_operations()
 ```

@@ -47,7 +47,7 @@ library_gui = LibraryGUI(manager = library_mgr, managers = [books_gui])
 
 ## Cambiar el orden de los atributos mostrados en la lista
 
-En el archivo `gui.py`, solamente al cambiar el orden de los elementos en la lista `self.ATRIBUTOSLISTA` ya se verán reflejados los cambios en la tabla.
+En el archivo `gui.py`, solamente al cambiar el orden en que son definidos los atributos de la lista, ya se verán reflejados los cambios en la tabla.
 
 ```python
 class PersonsGUI( BaseGUI ):
@@ -57,12 +57,11 @@ class PersonsGUI( BaseGUI ):
         
         [...]
         
-        self.ATRIBUTOSLISTA = [ 
-	        {u'#':Person.ide},
-	        {u'Name':Person.name},
-	        {u'Last name':Person.last_name},
-	        {u'E-mail':Person.email},
-        ]
+        self.addTableColumn(u'#', Person.ide)
+        self.addTableColumn(u'Name', Person.name)
+        self.addTableColumn(u'Last name', Person.last_name)
+        self.addTableColumn(u'E-mail', Person.email)
+
         self._start_operations()  
 ```
 
@@ -71,10 +70,10 @@ class PersonsGUI( BaseGUI ):
 Solamente renombrando las claves dentro de la lista de diccionarios `self.ATRIBUTOSLISTA`, ya se reflejarán los cambios en la tabla.
 
 ```python
-self.ATRIBUTOSLISTA = [ 
-	{u'#':Person.ide},
-    {u'ChangeMe':Person.name}
-]
+...
+self.addTableColumn(u'#', Person.ide)
+self.addTableColumn(u'ChangeMe', Person.name)
+...
 ```
 
 ## Cambiar el atributo principal de la clase 'ide' por otro 
@@ -105,23 +104,15 @@ Veamos un ejemplo de como:
 
 
 ```python
-self.ATRIBUTOSLISTA = [ 
-    {u'Date':InvoiceRow.date},         # type date
-    {u'Supplier':InvoiceRow.supplier}, # type unicode
-    {u'Amount':InvoiceRow.amount},     # type float
-]
-
-def fnParseDate(row, value):
+def fnParseDate(self, row, value):
 	return value.strftime("%d/%m/%Y")
 
-def fnParseAmount(row, value):
+def fnParseAmount(self, row, value):
 	return "$ %8.2f" % value
 
-self.fnsParseListAttrs = [
-	[0, fnParseDate], # 0, is the index of attr in self.ATRIBUTOSLISTA list
-	[2, fnParseAmount]
-]
-
+self.addTableColumn(u'Date', InvoiceRow.date, fnParse=self.fnParseDate) # type date
+self.addTableColumn(u'Supplier', InvoiceRow.supplier) # type unicode
+self.addTableColumn(u'Amount', InvoiceRow.amount, fnParse=self.fnParse) # type float
 ```
 
 [Ir a > Inicio](https://github.com/informaticameg/Plasta/blob/master/doc/es/index.md) | [Ir a > Instalación](https://github.com/informaticameg/Plasta/blob/master/doc/es/install.md) | [Ir a > Como empezar](https://github.com/informaticameg/Plasta/blob/master/doc/es/getting_started.md) | [Ir a > Casos de uso](https://github.com/informaticameg/plasta/blob/master/doc/es/uses_case.md) | [Ir a > Aplicaciones de ejemplo](https://github.com/informaticameg/plasta/blob/master/doc/es/example_apps.md)
