@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtCore, QtGui, uic
 
 
 class BaseAdd(QtGui.QDialog):
@@ -13,8 +13,11 @@ class BaseAdd(QtGui.QDialog):
         self.managers = managers
         self.itemToEdit = itemToEdit
 
+        # list of columns/attributes of the table
+        # sintax: [{'showText', Object.attribute}, ...]
         self.ITEMLIST = []
-        self.FILENAME = 'add.ui'
+        # name or path of ui to use
+        self.FILENAME = join(abspath(dirname(__file__)), 'add.ui')
         self.dict_referencias = {} # diccionario que contiene la instancia seleccionada en el buscador
         self.postSaveMethod = None # metodo que BaseGUI que se ejecuta luego de save()
         self._dictWidgetReferencias = {} # dictionary that contain the buttons widgets and the reference to wich belong
@@ -54,9 +57,9 @@ class BaseAdd(QtGui.QDialog):
             }
         }
 
-##########################
-# METODOS DE LOS EVENTOS #
-##########################
+###################
+# EVENT FUNCTIONS #
+###################
 
     @QtCore.pyqtSlot()
     def on_btSave_clicked(self):
@@ -70,6 +73,20 @@ class BaseAdd(QtGui.QDialog):
                 self._showResultMessage(resultado)
                 self.close()
         return resultado
+
+    @QtCore.pyqtSlot()
+    def on_btExit_clicked(self):
+        self.close()
+
+#################
+# AUX FUNCTIONS #
+#################
+
+    def loadUI(self):
+        uic.loadUi(self.FILENAME, self)
+
+    def isEditing(self):
+        return self.itemToEdit is not None
 
     def getMsgCurLang(self, msg):
         return self.messages[self.lang][msg]
@@ -94,9 +111,12 @@ class BaseAdd(QtGui.QDialog):
     def on_btExit_clicked(self):
         self.close()
 
-######################
-# METODOS AUXILIARES #
-######################
+#################
+# AUX FUNCTIONS #
+#################
+
+    def loadUI(self):
+        uic.loadUi(join(abspath(dirname(__file__)), self.FILENAME), self)
 
     def setValidators(self):
         '''
@@ -108,7 +128,7 @@ class BaseAdd(QtGui.QDialog):
         for dato in self.ITEMLIST:
             widget = dato.keys()[0]
             atributo_clase = dato.values()[0]
-            nombrecolumnalabel = "lb"+[k for k, v in self.__dict__.iteritems() if v == widget][0][2:]
+            nombrecolumnalabel = "lb" + [k for k, v in self.__dict__.iteritems() if v == widget][0][2:]
             if str(type(atributo_clase)) == "<class 'storm.references.Reference'>" :
                 try:
                     widget.setReadOnly(True)
@@ -116,7 +136,7 @@ class BaseAdd(QtGui.QDialog):
                     nombreboton = "bt" + [k for k, v in self.__dict__.iteritems() if v == widget][0][2:]
                     widgetboton = self.__dict__[nombreboton]
                     self._dictWidgetReferencias[ widgetboton ] = atributo_clase
-                    self.connect(widgetboton, QtCore.SIGNAL('clicked ()'),self.mostrarBuscador)
+                    self.connect(widgetboton, QtCore.SIGNAL('clicked ()'), self.mostrarBuscador)
                 except Exception, msg:
                     print 'KeyError: Posiblemente no has agregado el boton para elegir una referencia.\nMensaje del error: ' + str(msg)
             else:
@@ -463,9 +483,18 @@ class BaseAdd(QtGui.QDialog):
             if dicti.values()[0] is referencia :
                 return dicti.keys()[0]
 
-#############################################
-### Validadores a la hora de guardar/editar
-#############################################
+###############
+# API TO VARS #
+###############
+
+    def linkToAttribute(self, widget, classAttribute):
+        item = {}
+        item[widget] = classAttribute
+        self.ITEMLIST.append(item)
+
+###############################
+# VALIDATORS USED TO ADD/EDIT #
+###############################
 
     def _validatesPresenceOf(self, field, value = None):
         '''Valida que el campo indicado haya sido rellenado.

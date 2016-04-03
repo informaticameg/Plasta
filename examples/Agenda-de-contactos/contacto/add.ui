@@ -7,29 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>447</width>
-    <height>205</height>
+    <height>209</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
-  </property>
-  <property name="styleSheet">
-   <string notr="true">QDialog{background-color:#E0E0E0 ;}
-
-QLineEdit,QDateEdit { 
-border: 1px solid #999999; 
-padding: 2px 2px 2px 2px;
-min-width: 90px;
-height: 20px;
-
-border-top-left-radius: 3px ;
-border-top-right-radius: 3px;
-border-bottom-right-radius: 3px;
-border-bottom-left-radius: 3px;
-}
-QLineEdit:focus { border: 1px solid #7F7F7F; }
-
-QLabel {color: #252424;}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="leftMargin">
@@ -178,7 +160,10 @@ QLabel {color: #252424;}</string>
       <number>0</number>
      </property>
      <item>
-      <widget class="QPushButton" name="btSalir">
+      <widget class="QPushButton" name="btExit">
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
        <property name="text">
         <string>Salir</string>
        </property>
@@ -198,7 +183,7 @@ QLabel {color: #252424;}</string>
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btGuardar">
+      <widget class="QPushButton" name="btSave">
        <property name="cursor">
         <cursorShape>PointingHandCursor</cursorShape>
        </property>
@@ -216,7 +201,7 @@ QLabel {color: #252424;}</string>
  </resources>
  <connections>
   <connection>
-   <sender>btSalir</sender>
+   <sender>btExit</sender>
    <signal>clicked()</signal>
    <receiver>Dialog</receiver>
    <slot>close()</slot>

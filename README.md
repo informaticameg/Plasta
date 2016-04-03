@@ -88,6 +88,10 @@ $ python setup.py install
 
 Check the Plasta wiki in [English](https://github.com/informaticameg/Plasta/blob/master/doc/en/index.md) or [Spanish](https://github.com/informaticameg/Plasta/blob/master/doc/es/index.md) version.
 
+## Plasta Social
+
+* Follow us on [Twitter](https://twitter.com/PlastaFramework)
+
 ## License
 
 

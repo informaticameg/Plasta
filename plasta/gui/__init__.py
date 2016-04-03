@@ -27,7 +27,7 @@ class BaseGUI( QtGui.QMainWindow ):
         # en el mismo elemento, el atributo de la clase que se mostrara en esa columna
         # Ejemplo:
         # self.ATRIBUTOSLISTA = [ {u'Nombres':Cliente.Nombres}, {u'Domicilio':Cliente.Domicilio}]
-        self.ATRIBUTOSLISTA = None
+        self.ATRIBUTOSLISTA = []
 
         # ATRI_COMBO_BUSQUEDA: lista de diccionarios donde puedes indicar el orden de como
         # quieres que se muestren y vean los atributos en el combo de los filtros
@@ -55,10 +55,9 @@ class BaseGUI( QtGui.QMainWindow ):
         self.pluralTitle = self.manager.getClassName()
 
     def _start_operations( self ):
-        u'''Operations necessary to display the window'''
+        '''Operations necessary to display the window'''
         self.fullScreen = False
-        uic.loadUi( self.FILENAME, self )
-
+        self.loadUI()
         self.makeTable()
         self.loadCombobox()
         self.loadTable()
@@ -71,6 +70,17 @@ class BaseGUI( QtGui.QMainWindow ):
         self.setWindowIcon( QtGui.QIcon( QtGui.QPixmap( join( abspath( dirname( __file__ ) ), self.ICONFILE ) ) ) )
         self.lbTitle.setText(self.pluralTitle)
         self.setWindowTitle(self.pluralTitle)
+
+        self.setStyleSheet(open('style.css').read())
+
+    def loadUI(self):
+        uic.loadUi( self.FILENAME, self )
+
+    def centerOnScreen ( self ):
+        '''Centers the window on the screen.'''
+        resolution = QtGui.QDesktopWidget().screenGeometry()
+        self.move( ( resolution.width() / 2 ) - ( self.frameSize().width() / 2 ),
+                  ( resolution.height() / 2 ) - ( self.frameSize().height() / 2 ) )
 
     def toogleFullScreen( self ):
         ''' '''
@@ -90,12 +100,6 @@ class BaseGUI( QtGui.QMainWindow ):
         QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_M ), self, self.on_btEdit_clicked )
         QtGui.QShortcut( QtGui.QKeySequence( "Del" ), self, self.on_btDelete_clicked )
 
-    def _get_attributes_names( self ):
-        '''
-        Obtiene los atributos de la clase que maneja self.manager
-        '''
-        return self.ATRIBUTOSLISTA_CLASSNAMES if self.ATRIBUTOSLISTA else self.manager.getClassAttributes()
-
     def makeTable( self ):
         '''Create the structure of table (columns)'''
         if not self.ATRIBUTOSLISTA :
@@ -107,6 +111,104 @@ class BaseGUI( QtGui.QMainWindow ):
         self.MyTabla = MyTableWidget( self.twItems, columnasTablas, self.ALINEACIONLISTA)
         # conecta el menu contextual a la tabla
         self.connect( self.MyTabla.widget, QtCore.SIGNAL( 'customContextMenuRequested(const QPoint&)' ), self.on_context_menu )
+
+    def reloadList( self ):
+        '''
+        Vuelve a cargar la lista a partir de los valores actuales en
+        la barra de busqueda y el filtro seleccionado.
+        '''
+        valor = unicode( self.leSearch.text().toUtf8(), 'utf-8' )
+        campo = unicode( self.cbFilters.itemText(
+                    self.cbFilters.currentIndex() ).toUtf8() )
+        if self.ATRI_COMBO_BUSQUEDA :
+            campo = [p[campo] for p in self.ATRI_COMBO_BUSQUEDA if campo in p ][0]
+        else:
+            campo = self._obtainColumnForName( campo )
+        resultado = self.manager.searchBy( campo, valor )
+        self.loadTable( resultado )
+        self._setSearchColor( self.leSearch, resultado )
+
+    def loadTable( self, listadeobj = None ):
+        '''
+        Carga la lista de objetos en la tabla
+        @param listadeobj:if none carga todos, sino lo de la lista
+        '''
+        if listadeobj == None:
+            listadeobj = self.manager.getall()
+        listadefilas = [self._getAttributesValues( obj ) for obj in listadeobj]
+        self.MyTabla.addItems( listadefilas )
+        self.setItemsCount( len( listadeobj ) )
+
+    def loadCombobox( self ):
+        '''
+        Carga el combobox de campos
+        '''
+        self.cbFilters.clear()
+        if not self.ATRI_COMBO_BUSQUEDA :
+            atributos = self.manager.getClassAttributes()
+            for atributo in atributos:
+                self.ATRI_COMBO_BUSQUEDA.append( {atributo:self._obtainColumnForName( atributo )} )
+        map( self.cbFilters.addItem, [p.keys()[0] for p in self.ATRI_COMBO_BUSQUEDA] )
+
+    def find( self ):
+        '''
+        Reliza la busqueda y carga la tabla
+        '''
+        # obtiene el valor cargado en la barra de busqueda
+        valor = unicode(self.leSearch.text().toUtf8(),'utf-8')
+        # carga la lista segun el estado de la barra de busqueda
+        self.reloadList() if valor != u'' else self.loadTable()
+
+    def actualRowsToObjects( self ):
+        '''
+        Obtiene los objetos seleccionados en la tabla
+        @return: un objeto del tipo que maneja self.manager
+        '''
+        listadelistastring = self.MyTabla.getListSelectedRows()
+        atributos_names = self._get_attributes_names()
+        classid = self.manager.CLASSid
+        listadeobjetos = []
+        if listadelistastring != []:
+            # obtiene el tipo de dato de la clave del objeto
+            for value in self.manager.getClassAttributesInfo().values() :
+                if value['primary'] == True :
+                    primary_type = value['type']
+
+            for lista in listadelistastring:
+                posicion_ide = atributos_names.index( classid )
+                if primary_type is 'int' :
+                    valor_ide = int( lista[posicion_ide] )
+                else:
+                    valor_ide = lista[posicion_ide]
+
+                listadeobjetos.append( self.manager.searchBy( self._obtainColumnForName( self.manager.CLASSid ), valor_ide )[0] )
+            return listadeobjetos
+        return None
+
+    def setItemsCount( self, valor ):
+        'Set the count items in the label of list'
+        self.lbItemsCount.setText( str( valor ) + ' items(s) seleccionado(s)' )
+
+###############
+# API TO VARS #
+###############
+
+    def addTableColumn(self, showName, classAttribute, fnParse = None):
+        item = {}
+        item[unicode(showName, 'utf-8')] = classAttribute
+        self.ATRIBUTOSLISTA.append(item)
+        if fnParse:
+            idx = len(self.ATRIBUTOSLISTA) - 1
+            self.fnsParseListAttrs.append([idx, fnParse])
+
+    def addFilter(self, showName, classAttribute):
+        item = {}
+        item[unicode(showName, 'utf-8')] = classAttribute
+        self.ATRI_COMBO_BUSQUEDA.append(item)
+
+#################
+# AUX FUNCTIONS #
+#################
 
     def _getAttributesValues( self, obj ):
         '''
@@ -149,15 +251,6 @@ class BaseGUI( QtGui.QMainWindow ):
         #END MAGIC###############
         return campo
 
-    def _find( self ):
-        '''
-        Reliza la busqueda y carga la tabla
-        '''
-        # obtiene el valor cargado en la barra de busqueda
-        valor = unicode(self.leSearch.text().toUtf8(),'utf-8')
-        # carga la lista segun el estado de la barra de busqueda
-        self.reloadList() if valor != u'' else self.loadTable()
-
     def _setSearchColor(self, widget, resultados_busqueda):
         color_rojo = 'background-color: rgb(255, 178, 178);'
         try:
@@ -185,51 +278,11 @@ class BaseGUI( QtGui.QMainWindow ):
             self.myStyleSheetRojo = ''
             self._setSearchColor( widget, resultados_busqueda )
 
-    def reloadList( self ):
+    def _get_attributes_names( self ):
         '''
-        Vuelve a cargar la lista a partir de los valores actuales en
-        la barra de busqueda y el filtro seleccionado.
+        Obtiene los atributos de la clase que maneja self.manager
         '''
-        valor = unicode( self.leSearch.text().toUtf8(), 'utf-8' )
-        campo = unicode( self.cbFilters.itemText(
-                    self.cbFilters.currentIndex() ).toUtf8() )
-        if self.ATRI_COMBO_BUSQUEDA :
-            campo = [p[campo] for p in self.ATRI_COMBO_BUSQUEDA if campo in p ][0]
-        else:
-            campo = self._obtainColumnForName( campo )
-        resultado = self.search( campo, valor )
-        self.loadTable( resultado )
-        self._setSearchColor( self.leSearch, resultado )
-
-    def loadCombobox( self ):
-        '''
-        Carga el combobox de campos
-        '''
-        self.cbFilters.clear()
-        if not self.ATRI_COMBO_BUSQUEDA :
-            atributos = self.manager.getClassAttributes()
-            for atributo in atributos:
-                self.ATRI_COMBO_BUSQUEDA.append( {atributo:self._obtainColumnForName( atributo )} )
-        map( self.cbFilters.addItem, [p.keys()[0] for p in self.ATRI_COMBO_BUSQUEDA] )
-
-    def loadTable( self, listadeobj = None ):
-        '''
-        Carga la lista de objetos en la tabla
-        @param listadeobj:if none carga todos, sino lo de la lista
-        '''
-        if listadeobj == None:
-            listadeobj = self.manager.getall()
-        listadefilas = [self._getAttributesValues( obj ) for obj in listadeobj]
-        self.MyTabla.addItems( listadefilas )
-        self.setItemsCount( len( listadeobj ) )
-
-    def search( self, camponame, valor ):
-        '''
-        @param camponame:el nombre del campo en string
-        @param valor:el valor de el campo(soporta los tipos de datos de searchBy)
-        @return: lista de obj
-        '''
-        return self.manager.searchBy( camponame, valor )
+        return self.ATRIBUTOSLISTA_CLASSNAMES if self.ATRIBUTOSLISTA else self.manager.getClassAttributes()
 
     def on_context_menu( self, point ):
         mypoint = QtCore.QPoint( point.x() + 10, point.y() + 30 )
@@ -240,35 +293,9 @@ class BaseGUI( QtGui.QMainWindow ):
 
         self.popMenu.exec_(self.MyTabla.widget.mapToGlobal(mypoint) )
 
-    def actual_rows_to_objects( self ):
-        '''
-        Obtiene los objetos seleccionados en la tabla
-        @return: un objeto del tipo que maneja self.manager
-        '''
-        listadelistastring = self.MyTabla.getListSelectedRows()
-        atributos_names = self._get_attributes_names()
-        classid = self.manager.CLASSid
-        listadeobjetos = []
-        if listadelistastring != []:
-            # obtiene el tipo de dato de la clave del objeto
-            for value in self.manager.getClassAttributesInfo().values() :
-                if value['primary'] == True :
-                    primary_type = value['type']
-
-            for lista in listadelistastring:
-                posicion_ide = atributos_names.index( classid )
-                if primary_type is 'int' :
-                    valor_ide = int( lista[posicion_ide] )
-                else:
-                    valor_ide = lista[posicion_ide]
-
-                listadeobjetos.append( self.manager.searchBy( self._obtainColumnForName( self.manager.CLASSid ), valor_ide )[0] )
-            return listadeobjetos
-        return None
-
-##############################
-# METODOS PARA REIMPLEMENTAR #
-##############################
+##########################
+# METHODS TO REIMPLEMENT #
+##########################
 
     def add( self ):
         'Call the add dialog window'
@@ -289,17 +316,13 @@ class BaseGUI( QtGui.QMainWindow ):
 # EVENT FUNCTIONS #
 ###################
 
-    def setItemsCount( self, valor ):
-        'Set the count items in the label of list'
-        self.lbItemsCount.setText( str( valor ) + ' items(s) seleccionado(s)' )
-
     def on_leSearch_textChanged( self, cadena ):
-        self._find()
+        self.find()
 
     @QtCore.pyqtSlot( int )
     def on_cbFilters_currentIndexChanged ( self, entero ):
         if not self.leSearch.text().isEmpty() :
-            self._find()
+            self.find()
 
     @QtCore.pyqtSlot()
     def on_btNew_clicked( self ):
@@ -310,7 +333,7 @@ class BaseGUI( QtGui.QMainWindow ):
 
     @QtCore.pyqtSlot()
     def on_btEdit_clicked( self ):
-        listadeobjetosseleccionados = self.actual_rows_to_objects()
+        listadeobjetosseleccionados = self.actualRowsToObjects()
         if listadeobjetosseleccionados:
             for obj in listadeobjetosseleccionados:
                 wEditar = self.edit( obj )
@@ -320,7 +343,7 @@ class BaseGUI( QtGui.QMainWindow ):
 
     @QtCore.pyqtSlot()
     def on_btDelete_clicked( self ):
-        listadeobjetosseleccionados = self.actual_rows_to_objects()
+        listadeobjetosseleccionados = self.actualRowsToObjects()
         if listadeobjetosseleccionados:
             for obj in listadeobjetosseleccionados:
                 result = QtGui.QMessageBox.warning( self, u"Eliminar",
@@ -328,7 +351,7 @@ class BaseGUI( QtGui.QMainWindow ):
                     QtGui.QMessageBox.Yes, QtGui.QMessageBox.No )
                 if result == QtGui.QMessageBox.Yes:
                     self.delete( obj )
-                    self._find()
+                    self.find()
 
     def on_twItems_itemSelectionChanged(self):
         self.btEdit.setVisible(False)
@@ -337,13 +360,3 @@ class BaseGUI( QtGui.QMainWindow ):
         if items  :
             self.btEdit.setVisible(True)
             self.btDelete.setVisible(True)
-
-#########
-# OTROS #
-#########
-
-    def centerOnScreen ( self ):
-        '''Centers the window on the screen.'''
-        resolution = QtGui.QDesktopWidget().screenGeometry()
-        self.move( ( resolution.width() / 2 ) - ( self.frameSize().width() / 2 ),
-                  ( resolution.height() / 2 ) - ( self.frameSize().height() / 2 ) )

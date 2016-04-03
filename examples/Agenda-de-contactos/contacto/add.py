@@ -5,16 +5,14 @@ from contacto import Contacto
 
 class AddContacto( BaseAdd ):
 
-    def __init__(self, unManager, itemaeditar = False, managers = []):
-        BaseAdd.__init__(self, unManager, itemaeditar, managers)
+    def __init__(self, manager, itemToEdit = False, managers = []):
+        BaseAdd.__init__(self, manager, itemToEdit, managers)
         FILENAME = 'add.ui'
         uic.loadUi(join(abspath(dirname(__file__)),FILENAME), self)
 
-        self.ITEMLIST = [
-             {self.leNombre:Contacto.nombre},
-             {self.leApellido:Contacto.apellido},
-             {self.leNumero:Contacto.numero},
-             {self.leEmail:Contacto.email},
-        ]
+        self.linkToAttribute(self.leNombre, Contacto.nombre)
+        self.linkToAttribute(self.leApellido, Contacto.apellido)
+        self.linkToAttribute(self.leNumero, Contacto.numero)
+        self.linkToAttribute(self.leEmail, Contacto.email)
 
         self._start_operations()

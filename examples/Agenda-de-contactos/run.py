@@ -4,15 +4,15 @@ from contacto.manager import ContactosManager
 from contacto.gui import ContactosGUI
 from storm.locals import *
 
-# objeto Store de Storm
+# object Store de Storm
 DATABASE = create_database('sqlite: contactos.db')
 almacen = Store(DATABASE)
 
-# instancia del manager
-# reset: si esta en TRUE, borra todo lo correspondiente a ese objeto en la bd
+# manager instance
+# reset: if TRUE, delete all rows of contacts in database
 cm = ContactosManager(almacen, reset = False)
 
-# mostramos la ventana
+# displaying the window
 app = QtGui.QApplication(sys.argv)
 window = ContactosGUI( manager = cm, managers = [] )
 window.show()
