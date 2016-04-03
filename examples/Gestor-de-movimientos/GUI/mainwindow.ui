@@ -67,10 +67,6 @@ border-bottom-left-radius: 6px 6px;
         <property name="text">
          <string>Libro Diario</string>
         </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>:/newPrefix/config-date.png</normaloff>:/newPrefix/config-date.png</iconset>
-        </property>
         <property name="iconSize">
          <size>
           <width>60</width>
@@ -102,10 +98,6 @@ border-bottom-left-radius: 6px 6px;
         <property name="text">
          <string>Cuentas</string>
         </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>:/newPrefix/gnome-sticky-notes-applet.png</normaloff>:/newPrefix/gnome-sticky-notes-applet.png</iconset>
-        </property>
         <property name="iconSize">
          <size>
           <width>60</width>
@@ -122,9 +114,5 @@ border-bottom-left-radius: 6px 6px;
    </layout>
   </widget>
  </widget>
- <resources>
-  <include location="images_rc/images.qrc"/>
-  <include location="images_rc/icons.qrc"/>
- </resources>
  <connections/>
 </ui>

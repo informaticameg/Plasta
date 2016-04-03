@@ -300,10 +300,6 @@ border: 1px solid #BFBFBF;
    </layout>
   </widget>
  </widget>
- <resources>
-  <include location="../GUI/images_rc/images.qrc"/>
-  <include location="../plasta/gui/uis/images_rc/images.qrc"/>
- </resources>
  <connections>
   <connection>
    <sender>pushButton</sender>

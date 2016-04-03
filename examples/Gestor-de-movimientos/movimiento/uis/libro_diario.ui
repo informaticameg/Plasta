@@ -13,35 +13,6 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QMainWindow{
-background-color:#F0EEEE ;
-
-border-top-left-radius: 6px 6px;
-border-top-right-radius: 6px 6px;
-border-bottom-right-radius: 6px 6px;
-border-bottom-left-radius: 6px 6px;
-}
-
-QComboBox {
-border: 1px solid #999999; 
-border-radius: 4px;
-padding: 2px 2px 2px 2px;
-min-width: 6em;
-}
-
-QComboBox::down-arrow {
-image: url(:newPrefix/arrow_down.png);
-height: 10px;
-}
-QComboBox:editable {
-background: white;
-border-radius: 0px;
-}
-QComboBox::drop-down { border-style: none}
-
-QLabel{color:rgb(85, 85, 85);font:bold;font-family: Ubuntu, Helvetica, sans-serif;}</string>
-  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
@@ -487,8 +458,6 @@ border-top-left-radius: 0px;border-top-right-radius: 0px;border-bottom-right-rad
    </layout>
   </widget>
  </widget>
- <resources>
-  <include location="images_rc/images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

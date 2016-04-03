@@ -11,14 +11,11 @@ class CuentasGUI(BaseGUI):
     def __init__(self,manager, managers = []):
         BaseGUI.__init__(self, manager, managers)
 
-        self.ALINEACIONLISTA = ['C','L','L','L']
-        self.ATRIBUTOSLISTA = [
-            {u' ':Cuenta.ide},
-            {u'Nombre':Cuenta.nombre},
-            {u'Tipo':Cuenta.tipo},
-            {u'Descripcion':Cuenta.descripcion}
-        ]
-        self.MyTabla = None
+        self.addTableColumn(u' ', Cuenta.ide, alignment='C')
+        self.addTableColumn(u'Nombre', Cuenta.nombre)
+        self.addTableColumn(u'Tipo', Cuenta.tipo)
+        self.addTableColumn(u'Descripcion', Cuenta.descripcion)
+
         self.DialogAddClass = AddCuenta
 
         self._start_operations()
@@ -28,7 +25,7 @@ class CuentasGUI(BaseGUI):
 
     def _makeTable(self):
         if not self.ATRIBUTOSLISTA :
-            columnasTablas = [p.capitalize() for p in self._obtener_atributos_names()]
+            columnasTablas = [p.capitalize() for p in self._get_attributes_names()]
         else:
             self.ATRIBUTOSLISTA_CLASSNAMES = [ self.manager.getAttributeName( p.values()[0] ) for p in self.ATRIBUTOSLISTA]
             columnasTablas = [p.keys()[0] for p in self.ATRIBUTOSLISTA]

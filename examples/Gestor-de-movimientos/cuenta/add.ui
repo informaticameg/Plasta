@@ -246,9 +246,6 @@ min-height: 20px;</string>
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../../Plasta/src/plasta/gui/uis/images_rc/images.qrc"/>
- </resources>
  <connections>
   <connection>
    <sender>btSalir</sender>

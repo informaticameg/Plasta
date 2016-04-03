@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import locale
+
 from plasta.gui import BaseGUI
 from movimiento import Movimiento
 from os.path import join,abspath,dirname
@@ -15,43 +15,27 @@ class LibroDiarioGUI(BaseGUI):
     def __init__(self,manager, managers = []):
         BaseGUI.__init__(self, manager, managers)
         self.FILENAME = join(abspath(dirname(__file__)),'uis/libro_diario.ui')
-
         self.DialogAddClass  = AddMovimiento
-        self.ALINEACIONLISTA = ['C','L','L','L','R']
 
-        self.ATRIBUTOSLISTA = [
-            {u'Fecha':Movimiento.fecha},
-            {u'Razon Social':Movimiento.razon_social},
-            {u'Descripcion':Movimiento.descripcion},
-            {u'Cuenta':Movimiento.cuenta},
-            {u'Monto':Movimiento.monto}
-        ]
+        self.addTableColumn(u'Fecha', Movimiento.fecha, alignment='C', fnParse=self.parseFecha)
+        self.addTableColumn(u'Razon Social', Movimiento.razon_social)
+        self.addTableColumn(u'Descripcion', Movimiento.descripcion)
+        self.addTableColumn(u'Cuenta', Movimiento.cuenta)
+        self.addTableColumn(u'Monto', Movimiento.monto, alignment='R', fnParse=self.parseMonto)
 
         self.cuentasManager = managers[0].manager
         self.balance = Balance()
-        locale.setlocale( locale.LC_ALL, '' )
         self._start_operations()
 
 #===============================================================================
 # LOGICA GUI Y EXTRAS
 #===============================================================================
 
-    def _obtenerValoresAtributos(self,obj):
-        resultado = []
-        atributos_objeto = self.manager.getClassAttributesValues(obj)
-        if not self.ATRIBUTOSLISTA :
-            return atributos_objeto
-        else:
-            atributos_clase = self.manager.getClassAttributes()
-            atributos_ordenados = self.ATRIBUTOSLISTA_CLASSNAMES
-            for atributo in atributos_ordenados:
-                resultado.append( atributos_objeto[ atributos_clase.index( atributo ) ] )
-            # formatea la fecha, de date -> str
-            resultado[0] = resultado[0].strftime("%d/%m/%Y")
-            # formatear el monto
-            monto = locale.currency(float(resultado[4]), grouping = True)
-            resultado[4] = unicode( monto )
-            return resultado
+    def parseFecha(self, row, value):
+        return value.strftime("%d/%m/%Y")
+
+    def parseMonto(self, row, value):
+        return "$ %8.2f" % float(value)
 
     def _start_operations(self):
         u'''
@@ -87,7 +71,7 @@ class LibroDiarioGUI(BaseGUI):
     def loadTable(self,listadeobj = None):
         if listadeobj == None:
             listadeobj = self.manager.getall()
-        listadefilas = [self._obtenerValoresAtributos(obj) for obj in listadeobj]
+        listadefilas = [self._getAttributesValues(obj) for obj in listadeobj]
         self.MyTabla.addItems(listadefilas)
 
     def obtenerTipoMovimientoSeleccionado(self):
