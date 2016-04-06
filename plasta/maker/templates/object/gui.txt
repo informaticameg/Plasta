@@ -13,12 +13,6 @@ class %Object_name%GUI( BaseGUI ):
 
         self.DialogAddClass = Add%Object_name%
 
-        #self.ATRI_COMBO_BUSQUEDA = [
+{filters}
 {attributes}
-        #]
-
-        #self.ATRIBUTOSLISTA = [
-{attributes}
-        #]
-
         self._start_operations()

@@ -86,7 +86,7 @@ def _generateContentFiles(objInfo):
     attrs = ''
     for attr, widget in objInfo['widgetToAttr'].iteritems():
       widgetName = _meta['widgets'][widget] + attr.lower().capitalize()
-      attrs += ' ' * 10 + '{self.%s:%s.%s},\n' % (widgetName, objInfo['className'], attr)
+      attrs += ' ' * 8 + 'self.linkToAttribute(self.%s, %s.%s)\n' % (widgetName, objInfo['className'], attr)
     # generate content the file
     content = contentFiles['add']
     content = content.replace('%Object_name%', objInfo['className'])
@@ -100,12 +100,16 @@ def _generateContentFiles(objInfo):
   if objInfo['classesToGenerate']['gui']:
     # generate attrs
     attrs = ''
+    filters = ''
     for attr, widget in objInfo['widgetToAttr'].iteritems():
-      attrs += ' ' * 10 + "#{u'%s':%s.%s},\n" % (attr.lower().capitalize(), objInfo['className'], attr)
+      stAttr = attr.lower().capitalize()
+      filters += ' ' * 8 + "self.addFilter('%s', %s.%s)\n" % (stAttr, objInfo['className'], attr)
+      attrs += ' ' * 8 + "self.addTableColumn('%s', %s.%s)\n" % (stAttr, objInfo['className'], attr)
     # generate content the file
     content = contentFiles['gui']
     content = content.replace('%Object_name%', objInfo['className'])
     content = content.replace('%object_name%', objInfo['className'].lower())
+    content = content.replace('{filters}', filters)
     content = content.replace('{attributes}', attrs)
     _writeContentFile(objInfo, 'gui', content)
 
@@ -124,9 +128,25 @@ def _generateFiles(data):
     '/' + data['className'].replace(" ", "").lower())
   outputFolder = data['outputFolder'] + nameFolder
   data['outputNameFolder'] = outputFolder
-  import shutil
+  import shutil, os
   shutil.copytree(_thisFolder, outputFolder)
-  #print 'generate files...ok'
+  os.rename(
+    pathtools.convertPath(outputFolder + '/__init__.txt'),
+    pathtools.convertPath(outputFolder + '/__init__.py')
+  )
+  os.rename(
+    pathtools.convertPath(outputFolder + '/add.txt'),
+    pathtools.convertPath(outputFolder + '/add.py')
+  )
+  os.rename(
+    pathtools.convertPath(outputFolder + '/gui.txt'),
+    pathtools.convertPath(outputFolder + '/gui.py')
+  )
+  os.rename(
+    pathtools.convertPath(outputFolder + '/manager.txt'),
+    pathtools.convertPath(outputFolder + '/manager.py')
+  )
+
 
 def _readContentFiles():
   return {
