@@ -59,7 +59,7 @@ def __obtenerEventoCerrarVentana(nombre_boton, tipo_ventana) :
     resultado = resultado.replace('#tipo_ventana#',tipo_ventana)
     return resultado
 
-def __obtenerTextoBotones(botones) :
+def __obtenerTextoBotones(botones, lang) :
     """
     """
     values = {'bt_salir_aceptar':False,'bt_salir_guardar':False,
@@ -68,17 +68,29 @@ def __obtenerTextoBotones(botones) :
         values[k] = v
     boton1, boton2 = '',''
     if values['bt_salir_aceptar']:
-        boton1, boton2 = 'Salir','Aceptar'
+        if lang == 'es':
+            boton1, boton2 = 'Salir','Aceptar'
+        elif lang == 'en':
+            boton1, boton2 = 'Exit','Acept'
     elif values['bt_salir_guardar']:
-        boton1, boton2 = 'Salir','Guardar'
+        if lang == 'es':
+            boton1, boton2 = 'Salir','Guardar'
+        elif lang == 'en':
+            boton1, boton2 = 'Exit','Save'
     elif values['bt_cancelar_aceptar']:
-        boton1, boton2 = 'Cancelar','Aceptar'
+        if lang == 'es':
+            boton1, boton2 = 'Cancelar','Aceptar'
+        elif lang == 'en':
+            boton1, boton2 = 'Cancel','Acept'
     elif values['bt_limpiar']:
-        boton1, boton2 = 'Limpiar',''
+        if lang == 'es':
+            boton1, boton2 = 'Limpiar',''
+        elif lang == 'en':
+            boton1, boton2 = 'Clean',''
 
     return boton1, boton2
 
-def __generarBotones(codigo, botones = {}):
+def __generarBotones(codigo, lang, botones = {}):
     """
     Devuelve el codigo xml correspondiente al tipo de botones indicado.
     """
@@ -89,7 +101,7 @@ def __generarBotones(codigo, botones = {}):
         for k in botones:
             defButtons[k] = botones[k]
         # obtiene que botones se van a generar
-        botonA, botonB = __obtenerTextoBotones(botones)
+        botonA, botonB = __obtenerTextoBotones(botones, lang)
         resultado = xml_widgets.par_botones.replace('###',botonA)
         resultado = resultado.replace('%%%',botonB)
         return resultado
@@ -97,7 +109,7 @@ def __generarBotones(codigo, botones = {}):
         return codigo
     pass
 
-def __generarWidgets(campos, botones = {}):
+def __generarWidgets(campos, lang, botones = {}):
     """
     Genera el codigo xml correspondiente a los campos indicados.
     """
@@ -124,7 +136,7 @@ def __generarWidgets(campos, botones = {}):
     # genera el codigo correspondiente a los botones en caso de que
     # se reciba algun valor como parametro
     if botones :
-        codigo_widgets += __generarBotones(codigo_widgets, botones)
+        codigo_widgets += __generarBotones(codigo_widgets, lang, botones)
 
     return codigo_widgets
 
@@ -173,12 +185,14 @@ def generateUI( destino,
     {str}  destino = ubicacion de destino
     {dict} campos = [{u'field1': u'QLineEdit'}, {u'field2': u'QLineEdit'}, ...]
     {dict} botones = {'bt_limpiar': False, 'bt_cancelar_aceptar': False, 'bt_salir_guardar': True, 'bt_salir_aceptar': False}
-    {dict} opciones = {'tipo': 'Dialog', 'generar_plantilla': False}
+    {dict} opciones = {'tipo': 'Dialog', 'generar_plantilla': False, 'lang':'es|en'}
     """
+    if 'lang' not in opciones.keys():
+        opciones['lang'] = 'es'
     ### Atributos
     ancho_ventana = 400
     alto_ventana = __obtenerAltoVentana(campos)
-    widgets = __generarWidgets(campos, botones)
+    widgets = __generarWidgets(campos, opciones['lang'], botones)
     resultado = ''
     tipo_ventana = opciones['tipo']
     opciones_generacion = opciones.keys()
@@ -191,7 +205,7 @@ def generateUI( destino,
     resultado = resultado.replace('%widgets%',widgets)
 
     # reemplaza la señal del boton que cierra la ventana
-    btn1, btn2 = __obtenerTextoBotones(botones)
+    btn1, btn2 = __obtenerTextoBotones(botones, opciones['lang'])
     codigo_evento = __obtenerEventoCerrarVentana(btn1,tipo_ventana)
     resultado = resultado.replace('<connections/>',codigo_evento)
 

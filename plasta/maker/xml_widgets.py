@@ -293,6 +293,10 @@ spinbox = '''<item>
      <widget class="QSpinBox" name="#prefijo##nombre_widget#"/>
     </item>'''
 
+doublespinbox = '''<item>
+     <widget class="QDoubleSpinBox" name="#prefijo##nombre_widget#"/>
+    </item>'''
+
 # diccionario que contiene el fuente de los distintos widgets
 source_widgets = {
 'QCheckBox':checkbox,
@@ -302,5 +306,6 @@ source_widgets = {
 'QLineEditWithReference':lineedit_with_btref,
 'QDateEdit':dateedit,
 'QDateTimeEdit':datetimeedit,
-'QSpinBox':spinbox
+'QSpinBox':spinbox,
+'QDoubleSpinBox':doublespinbox
 }

@@ -30,6 +30,9 @@
 import os, sys, optparse
 from plasta.tools import pathtools
 
+# generator version
+__version__ = '0.0.6'
+
 def pprint(to_show):
   import pprint
   pp = pprint.PrettyPrinter(indent=4)
@@ -93,20 +96,21 @@ def generate_crud(options, args):
     gen_crud.generatePackage(data)
     # generate ui file
     if options['ui']:
-      generate_ui(args[1:])
+      generate_ui(args)
 
 def generate_ui(args):
-  if len(args) >= 1:
-    attrs = args
+  if len(args[1:]) >= 1:
+    modelName = args[0]
+    attrs = args[1:]
     _attrs, _widgets = __parseAttrs(attrs)
     fields = [] # {u'field1': u'QLineEdit'}
     for attr in _attrs:
       nameWidget = _widgets[attr['name']]
       fields.append({attr['name']: 'Q%s%s' % (nameWidget[0].capitalize(), nameWidget[1:])})
     from plasta.maker import gen_ui
-    outputFolder = pathtools.getPathProgramFolder()
     from os.path import join,abspath,dirname
-    checkDir = join(abspath(dirname(__file__)), 'add.ui')
+    checkDir = pathtools.convertPath(
+      pathtools.getPathProgramFolder() + '%s/add.ui' % modelName)
     gen_ui.generateUI(
       destino = checkDir,
       campos = fields,
