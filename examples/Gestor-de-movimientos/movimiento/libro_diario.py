@@ -105,7 +105,7 @@ class LibroDiarioGUI(BaseGUI):
         border: 1px solid #BFBFBF;
         border-top-left-radius: 0px;border-top-right-radius: 0px;border-bottom-right-radius: 6px;border-bottom-left-radius: 6px;
         }'''
-        self.lbBalance.setText( str(locale.currency( float(monto), grouping = True)) )
+        self.lbBalance.setText( "$ %8.2f" % float(monto))
         if monto == 0 :
             self.lbBalance.setText("$ 00,00")
             self.lbBalance.setStyleSheet(style)

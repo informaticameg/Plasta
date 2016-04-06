@@ -24,7 +24,6 @@ class MainWindow(QtGui.QMainWindow):
 
         self.managers = managers
 
-
     def __centerOnScreen (self):
         resolution = QtGui.QDesktopWidget().screenGeometry()
         self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
