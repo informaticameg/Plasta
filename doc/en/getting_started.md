@@ -64,7 +64,7 @@ Plasta comes with a generator for the following operations:
 To indicate type attributes, follow the directions in the following table:
 
 | Attribute type | Related widget |
-|-|-|
+|----------------|----------------|
 | unicode (default) | QLineEdit |
 | int | QSpinBox | 
 | float | QDoubleSpinBox | 

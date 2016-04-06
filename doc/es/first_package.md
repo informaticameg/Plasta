@@ -28,7 +28,7 @@ El paquete resultante entonces quedaría algo así:
 
 **1. Creando el archivo __init__.py**
 
-Continuando con el ejemplo de “Cliente”, lo primero que haremos es crear un paquete Python para el objeto Cliente: creamos la carpeta `/cliente` y dentro de ella, creamos el archivo `__init__.py`. 
+Continuando con el ejemplo de “Cliente”, lo primero que haremos es crear un paquete Python para el objeto Cliente: creamos la carpeta `/cliente` y dentro de ella, creamos el archivo `__init__.py`.
 
 El código para el archivo sería algo así:
 
@@ -46,13 +46,13 @@ class Cliente (object):
 	telefono = Unicode()
 	domicilio = Unicode()
 	zona = Int()
-	
+
   	def __init__(self, nombres, telefono, domicilio, zona):
     	self.nombres = nombres
 	    self.telefono = telefono
     	self.domicilio = domicilio
 	    self.zona = zona
-	
+
 	# valor que se mostrará al invocar esta función
 	def __str__(self):
 		return self.nombres
@@ -64,7 +64,7 @@ comporte.
 **2. Creando el archivo manager.py**
 
 Una vez hecho el objeto Cliente, pasamos a crear la clase controladora
-para este objeto. 
+para este objeto.
 
 Por convención usaremos el nombre `ClientesManager`. Quedando algo
 así:
@@ -108,19 +108,19 @@ class ClientesGUI(BaseGUI):
 
 		# clase que mostrará a los diálogos de agregar y editar
 		self.DialogAddClass = AddCliente
-		
+
 		# atributos usados como filtros
-        self.addFilter(u'Nombres', Cliente.nombres)
-        self.addFilter(u'Telefono', Cliente.telefono)
-        self.addFilter(u'Dirección', Cliente.direccion)
-        self.addFilter(u'Zona', Cliente.zona)   
-        
-        # columnas/atributos mostrados en la lista
-        self.addTableColumn(u'#', Cliente.ide, alignment='C')
-        self.addTableColumn(u'Nombres', Cliente.nombres)
-        self.addTableColumn(u'Telefono', Cliente.telefono)
-        self.addTableColumn(u'Dirección', Cliente.direccion)
-        self.addTableColumn(u'Zona', Cliente.zona, alignment='C')
+    self.addFilter(u'Nombres', Cliente.nombres)
+    self.addFilter(u'Telefono', Cliente.telefono)
+    self.addFilter(u'Dirección', Cliente.direccion)
+    self.addFilter(u'Zona', Cliente.zona)
+
+    # columnas/atributos mostrados en la lista
+    self.addTableColumn(u'#', Cliente.ide, alignment='C')
+    self.addTableColumn(u'Nombres', Cliente.nombres)
+    self.addTableColumn(u'Telefono', Cliente.telefono)
+    self.addTableColumn(u'Dirección', Cliente.direccion)
+    self.addTableColumn(u'Zona', Cliente.zona, alignment='C')
 
 		# realiza las operaciones de inicio para levantar la ventana
 		self._start_operations()
@@ -145,17 +145,17 @@ class AddCliente(BaseAdd):
 		# lee y levanta la información del archivo ui
 		self.loadUI(join(abspath(dirname(__file__)),'add.ui'))
 
-		# aquí indicaremos qué widget de la interfaz 
+		# aquí indicaremos qué widget de la interfaz
 		# se corresponde con un atributo de la clase
 		self.linkToAttribute(self.leNombres, Cliente.nombres)
 		self.linkToAttribute(self.leTelefono, Cliente.telefono)
 		self.linkToAttribute(self.leDireccion, Cliente.direccion)
 		self.linkToAttribute(self.leZona, Cliente.zona)
-		
+
 		self._start_operations()
 ```
 
-Es importante destacar que en `self.ITEMLIST` indicaremos con qué widget se corresponderá que atributo de la clase que estamos manejando. 
+Es importante destacar que con la funcion `self.linkToAttribute` indicaremos con qué widget se corresponderá que atributo de la clase que estamos manejando.
 Para que cuando se de alta un registro, el valor contenido en ese widget, se establezca en ese atributo del objeto.
 
 **Es necesario** que el orden en que estén indicados los items, se corresponda con el orden de los parámetros en el constructor de la clase del objeto con el que se este trabajando.
@@ -167,7 +167,7 @@ Usando el generador de Plasta para crear este paquete, el comando sería el sigu
 
 **5. Creando el archivo run.py**
 
-Por último crearemos el archivo que ejecutará la aplicación: 
+Por último crearemos el archivo que ejecutará la aplicación:
 
 ```python
 import sys

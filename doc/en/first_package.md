@@ -1,6 +1,6 @@
 # Getting started
 
-## Creating the first package Plasta 
+## Creating the first package Plasta
 
 ## Structure of a CRUD
 
@@ -43,13 +43,13 @@ class Client (object):
 	phone = Unicode()
 	address = Unicode()
 	zone = Int()
-	
+
   	def __init__(self, names, phone, address, zone):
       self.names = names
       self.phone = phone
       self.address = address
       self.zone = zone
-	
+
 	# value to be displayed when you invoke this function
 	def __str__(self):
 		return self.names
@@ -102,13 +102,13 @@ class ClientsGUI(BaseGUI):
 
 		# class display to add and edit dialogs
 		self.DialogAddClass = AddClient
-		
+
 		# attributes used as filters
         self.addFiler(u'Names', Client.names)
         self.addFiler(u'Phone', Client.phone)
         self.addFiler(u'Address', Client.address)
         self.addFiler(u'Zone', Client.zone)
-       
+
         # columns / attributes shown in the list
         self.addTableColumn(u'#', Cliente.ide, alignment='C')
         self.addTableColumn(u'Names', Client.names)
@@ -137,21 +137,21 @@ class AddClient(BaseAdd):
 		BaseAdd.__init__(self, manager, itemToEdit)
 		# read and get up ui file information
 		self.loadUI(join(abspath(dirname(__file__)),'add.ui'))
-		
-        # here indicate what interface widget
-        # it corresponds to an attribute of the class
+
+    # here indicate what interface widget
+    # it corresponds to an attribute of the class
 		self.linkToAttribute(self.leNames, Cliente.names)
 		self.linkToAttribute(self.lePhone, Cliente.phone)
 		self.linkToAttribute(self.leAddress, Cliente.address)
 		self.linkToAttribute(self.leZone, Cliente.zone)
-		
+
 		self._start_operations()
 ```
 
-It is important to note that `self.ITEM list` indicate what will correspond widget attribute of the class that we are dealing with.
+Importantly, with the `self.linkToAttribute` function indicate how widget will correspond to the class attribute are handling.
 To that adding a record, the value in the widget, it is established in that attribute of the object.
 
-**Is necessary** que el orden en que estén indicados los items, the order in which items are indicated it corresponds to the order of the parameters in the constructor of the class of object you are working with.
+**Is necessary** the order in which items are indicated it corresponds to the order of the parameters in the constructor of the class of object you are working with.
 
 Using the Plasta generator to create this package, the command would be:
 
