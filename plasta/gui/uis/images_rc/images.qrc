@@ -1,7 +1,0 @@
-<RCC>
-  <qresource prefix="newPrefix">
-    <file>arrow_down.png</file>
-    <file>close.png</file>
-    <file>find.png</file>
-  </qresource>
-</RCC>

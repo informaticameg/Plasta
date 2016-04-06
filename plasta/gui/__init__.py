@@ -5,7 +5,6 @@ from os.path import join, abspath, dirname
 from PyQt4 import QtCore, QtGui, uic
 from plasta.gui.mytablewidget import MyTableWidget
 from plasta.tools import pathtools
-import uis.images_rc
 
 class BaseGUI( QtGui.QMainWindow ):
     '''Base class to handle operations of CRUD screen'''
