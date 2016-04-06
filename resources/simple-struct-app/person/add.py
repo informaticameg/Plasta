@@ -12,11 +12,6 @@ class AddPerson( BaseAddWindow ):
         BaseAddWindow.__init__(self, manager, itemToEdit, managers)
         uic.loadUi(join(abspath(dirname(__file__)), 'add.ui'), self)
 
-        # list of widget/attributes
-        # que se corresponden con el
-        # contructor de la clase Person
-        self.ITEMLIST = [
-          {self.leName:Person.name}
-        ]
+        self.linkToAttribute(self.leName, Person.name)
 
         self._start_operations()

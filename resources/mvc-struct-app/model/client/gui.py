@@ -13,16 +13,12 @@ class ClientGUI( BaseGUI ):
 
         self.DialogAddClass = AddClient
 
-        self.ATRI_COMBO_BUSQUEDA = [
-          {u'Name':Client.name}
-        ]
+        self.addFilter(u'Name', Client.name)
 
-        self.ATRIBUTOSLISTA = [
-          {u'#':Client.ide},
-          {u'Name':Client.name},
-          {u'Address':Client.address},
-          {u'Phone':Client.phone}
-        ]
+        self.addTableColumn(u'#', Client.ide)
+        self.addTableColumn(u'Name', Client.name)
+        self.addTableColumn(u'Address', Client.address)
+        self.addTableColumn(u'Phone', Client.phone)
 
         self.pluralTitle = "Clients"
         self._start_operations()

@@ -15,18 +15,14 @@ class PersonGUI( BaseGUI ):
         self.DialogAddClass = AddPerson
 
         # attributtes wich load in combo of filters
-        self.ATRI_COMBO_BUSQUEDA = [
-          {u'Name':Person.name},
-          {u'Address':Person.address}
-        ]
+        self.addFilter(u'Name', Person.name)
+        self.addFilter(u'Address', Person.address)
 
         # attributtes showed in the list
-        self.ATRIBUTOSLISTA = [
-          {u'#':Person.ide},
-          {u'Name':Person.name},
-          {u'Address':Person.address},
-          {u'Birthday':Person.birthday},
-          {u'Sex':Person.sex}
-        ]
+        self.addTableColumn(u'#':Person, ide)
+        self.addTableColumn(u'Name', Person.name)
+        self.addTableColumn(u'Address', Person.address)
+        self.addTableColumn(u'Birthday', Person.birthday)
+        self.addTableColumn(u'Sex', Person.sex)
 
         self._start_operations()

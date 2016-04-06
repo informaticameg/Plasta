@@ -10,12 +10,10 @@ class AddClient( BaseAddWindow ):
 
     def __init__(self, manager, itemToEdit = False, managers = []):
         BaseAddWindow.__init__(self, manager, itemToEdit, managers)
-        uic.loadUi(join(abspath(dirname(__file__)), 'add.ui'), self)
+        self.loadUI(join(abspath(dirname(__file__)), 'add.ui'))
 
-        self.ITEMLIST = [
-          {self.leName:Client.name},
-          {self.leAddress:Client.address},
-          {self.lePhone:Client.phone}
-        ]
+        self.linkToAttribute(self.leName, Client.name)
+        self.linkToAttribute(self.leAddress, Client.address)
+        self.linkToAttribute(self.lePhone, Client.phone)
 
         self._start_operations()
