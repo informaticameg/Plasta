@@ -7,11 +7,12 @@ from os.path import join, abspath, dirname
 class BaseAdd(QtGui.QDialog):
     '''Base class to handle add/edit windows'''
 
-    def __init__(self, manager, itemToEdit = False, managers = []):
+    def __init__(self, manager, itemToEdit = False, managers = [], parent = None):
         QtGui.QDialog.__init__(self)
         self.manager = manager
         self.managers = managers
         self.itemToEdit = itemToEdit
+        self.parent = parent
 
         # list of columns/attributes of the table
         # sintax: [{'showText', Object.attribute}, ...]
