@@ -34,13 +34,18 @@ class BaseAdd(QtGui.QDialog):
         # debe retornar una tupla {bool} result, {str} errorMessage
         self.validatorCustom = {}
 
+        # functions parsers to apply before save
+        # sintax: {Class.attr:fnParse, ...}
+        self.parsers = {}
+
+        self.singleTitle = self.manager.getClassName()
         self.lang = 'en'
         self.messages = {
             'es':{
                 'newTitle':'Nuevo',
                 'editTitle':'Editar',
-                'newSuccefullSave':u" agregado con éxito.",
-                'editSuccefullSave':u" editado con éxito.",
+                'newSuccefullSave':u" agregado correctamente",
+                'editSuccefullSave':u" editado correctamente",
                 'newErrorSave':u"No se pudo agregar el ",
                 'editErrorSave':u"No se pudo editar el ",
                 'validateUnique':u'Ya existe un elemento con el mismo nombre',
@@ -49,8 +54,8 @@ class BaseAdd(QtGui.QDialog):
             'en':{
                 'newTitle':'New',
                 'editTitle':'Edit',
-                'newSuccefullSave':u" added succefull.",
-                'editSuccefullSave':u" edited succefull.",
+                'newSuccefullSave':u" added succefull",
+                'editSuccefullSave':u" edited succefull",
                 'newErrorSave':u"Can't be added ",
                 'editErrorSave':u"Can't be edited ",
                 'validateUnique':u'Already exists a element with the same name',
@@ -96,19 +101,20 @@ class BaseAdd(QtGui.QDialog):
 
     def _showResultMessage(self, resultado):
         if not self.itemToEdit:
+            resultado = True if resultado is None else False
             if resultado :
                 QtGui.QMessageBox.information(
-                    self, self.getMsgByLang('newTitle') + self.getClassName(), self.getClassName().capitalize() + self.getMsgByLang('newSuccefullSave'))
+                    self, self.getMsgByLang('newTitle') + self.singleTitle, self.getClassName().capitalize() + self.getMsgByLang('newSuccefullSave'))
             else:
                 QtGui.QMessageBox.warning(
-                    self, self.getMsgByLang('newTitle') + self.getClassName(), self.getMsgByLang('newErrorSave') + self.getClassName())
+                    self, self.getMsgByLang('newTitle') + self.singleTitle, self.getMsgByLang('newErrorSave') + self.singleTitle)
         else:
             if resultado :
                 QtGui.QMessageBox.information(
-                    self, self.getMsgByLang('editTitle') + self.getClassName(), self.getClassName().capitalize() + self.getMsgByLang('editSuccefullSave'))
+                    self, self.getMsgByLang('editTitle') + self.singleTitle, self.singleTitle.capitalize() + self.getMsgByLang('editSuccefullSave'))
             else:
                 QtGui.QMessageBox.warning(
-                    self, self.getMsgByLang('editTitle') + self.getClassName(), self.getMsgByLang('editErrorSave') + self.getClassName())
+                    self, self.getMsgByLang('editTitle') + self.singleTitle, self.getMsgByLang('editErrorSave') + self.singleTitle)
 
     def setValidators(self):
         '''
@@ -239,67 +245,80 @@ class BaseAdd(QtGui.QDialog):
                 #    raise Exception("No existe un validador llamado: ", self.validators[attr])
         return True
 
+    def getListAttributesNames(self):
+        '''Retorna una lista con los nombres de los
+        atributos existentes en self.ITEMLIST'''
+        result = []
+        for item in self.ITEMLIST:
+            classAttr = item.values()[0]
+            result.append(self.manager._getPropertyName(classAttr))
+        return result
+
     def getKeyDictionary(self, dic, val):
         """return the key of dictionary dic given the value"""
         return [k for k, v in dic.iteritems() if v == val][0]
 
-    def getDataOfWidgets(self, widgets = None, remoteId = True):
+    def getDataOfWidgets(self, widgets = None):
         '''
         Obtiene los datos de las widget contenidos
          en las claves de ITEMLIST
         @return: lista de valores
         '''
         from PyQt4.QtGui import QIntValidator,QLineEdit,QComboBox,QLabel,QDateEdit,QTextEdit,QSpinBox,QDoubleSpinBox,QCheckBox
+        from plasta.utils.qt import getDataOfWidgets as getDOW
 
-        def textToUnicode(dato):
-            return unicode(dato.toUtf8(),'utf-8')
+        # def textToUnicode(dato):
+        #     return unicode(dato.toUtf8(),'utf-8')
 
-        def isCheckBox(widget):
-            return widget.isChecked()
+        # def isCheckBox(widget):
+        #     return widget.isChecked()
 
-        def isSpinBox(widget):
-            return widget.value()
+        # def isSpinBox(widget):
+        #     return widget.value()
 
-        def isTextEdit(widget):
-            return textToUnicode( widget.toPlainText() )
+        # def isTextEdit(widget):
+        #     return textToUnicode( widget.toPlainText() )
 
-        def isLineedit(widget):
-            if type(widget.validator()) == QIntValidator:
-                if not widget.text().isEmpty() :
-                    value = int(isLabel(widget))
-                else:
-                    value = None
-            else:
-                value = isLabel(widget)
-            return value
+        # def isLineedit(widget):
+        #     if type(widget.validator()) == QIntValidator:
+        #         if not widget.text().isEmpty() :
+        #             value = int(isLabel(widget))
+        #         else:
+        #             value = None
+        #     else:
+        #         value = isLabel(widget)
+        #     return value
 
-        def isDateEdit(widget):
-            return textToUnicode(widget.date().toString(widget.displayFormat()))
+        # def isDateEdit(widget):
+        #     return textToUnicode(widget.date().toString(widget.displayFormat()))
 
-        def isCombobox(widget):
-            return textToUnicode(widget.itemText(widget.currentIndex()))
+        # def isCombobox(widget):
+        #     return textToUnicode(widget.itemText(widget.currentIndex()))
 
-        def isLabel(widget):
-            return textToUnicode(widget.text())
+        # def isLabel(widget):
+        #     return textToUnicode(widget.text())
 
-        funcionwidget = {QLineEdit:isLineedit,QComboBox:isCombobox,QLabel:isLabel,
-                        QDateEdit:isDateEdit,QTextEdit:isTextEdit,QSpinBox:isSpinBox,
-                        QDoubleSpinBox:isSpinBox,QCheckBox:isCheckBox}
+        # funcionwidget = {QLineEdit:isLineedit,QComboBox:isCombobox,QLabel:isLabel,
+        #                 QDateEdit:isDateEdit,QTextEdit:isTextEdit,QSpinBox:isSpinBox,
+        #                 QDoubleSpinBox:isSpinBox,QCheckBox:isCheckBox}
+
+        # values = []
+        # if widgets :
+        #     for widget in widgets:
+        #         valor = funcionwidget[type(widget)](widget)
+        #         values.append(valor)
+        #     return values
+        if widgets:
+            return getDOW(widgets)
 
         values = []
-        if widgets :
-            for widget in widgets:
-                valor = funcionwidget[type(widget)](widget)
-                values.append(valor)
-            return values
-
         for dicci in self.ITEMLIST:
             widget = dicci.keys()[0]
             attribute = dicci.values()[0]
 
             if not str(type(attribute)) == "<class 'storm.references.Reference'>":
                 if not(widget in self.dict_referencias):
-                    valor = funcionwidget[type(widget)](widget)
+                    valor = getDOW([widget])[0]
                 else:
                     valor = self.dict_referencias[widget]
             else:
@@ -357,21 +376,32 @@ class BaseAdd(QtGui.QDialog):
                 self.itemToEdit.__setattr__(nombrepropiedad,dato)
         return True
 
-    def save(self, listadedatos):
+    def applyParsers(self, listData):
+        if len(self.parsers.keys()) > 0:
+            attrs = self.getListAttributesNames()
+            for class_attr, fnParser in self.parsers.iteritems():
+                stName = self.manager._getPropertyName(class_attr)
+                idx = attrs.index(stName)
+                if idx >= 0:
+                    listData[idx] = fnParser(listData[idx])
+
+    def save(self, listData):
         '''
         Metodo que automatiza el guardado de los datos.
-        @param listadedatos:lista de datos perteneciente al init de la clase que maneja
+        @param listData:lista de datos perteneciente al init de la clase que maneja
         '''
         #REIMPLEMENT
-        return self.manager.add(*listadedatos)
+        self.applyParsers(listData)
+        return self.manager.add(*listData)
 
-    def edit(self, listadedatos):
+    def edit(self, listData):
         '''
         Metodo que automatiza el edit de los datos.
-        @param listadedatos:lista de datos perteneciente al init de la clase que maneja
+        @param listData:lista de datos perteneciente al init de la clase que maneja
         '''
         #REIMPLEMENT
         try:
+            self.applyParsers(listData)
             self.editProperties()
             self.manager.almacen.commit()
             return True
@@ -482,6 +512,14 @@ class BaseAdd(QtGui.QDialog):
         item = {}
         item[widget] = classAttribute
         self.ITEMLIST.append(item)
+
+    def setParser(self, classAttr, fnParse, onlyAdd=True, onlyEdit=True):
+        if not self.itemToEdit:
+            if onlyAdd:
+                self.parsers[classAttr] = fnParse
+        else:
+            if onlyEdit:
+                self.parsers[classAttr] = fnParse
 
 ###############################
 # VALIDATORS USED TO ADD/EDIT #
