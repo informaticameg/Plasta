@@ -93,6 +93,14 @@ class BaseAdd(QtGui.QDialog):
             pathToFile = self.FILENAME
         uic.loadUi(pathToFile, self)
 
+    def setStyle(self, style=''):
+        path = 'plasta/gui/styles/{style}.css'
+        if len(style) > 0:
+            path_css = path.replace('{style}', style)
+        else:
+            path_css = path.replace('{style}', config.STYLE)
+        self.setStyleSheet(open(path_css).read())
+
     def isEditing(self):
         return self.itemToEdit is not None
 
@@ -327,7 +335,7 @@ class BaseAdd(QtGui.QDialog):
                     referenceClass = attribute.__dict__['_remote_key'].__dict__['cls']
                 except AttributeError, e:
                     referenceClass = attribute.__dict__['_remote_key'][0].__dict__['cls']
-                strValue = funcionwidget[type(widget)](widget)
+                strValue = getDOW([widget])[0]
                 columAttr = referenceClass.__dict__['_storm_columns'][referenceClass.__dict__['nombre']]
                 res = self.manager.almacen.find(referenceClass, columAttr == strValue)
                 res = [obj for obj in res]
@@ -353,7 +361,7 @@ class BaseAdd(QtGui.QDialog):
                 self.dict_referencias[v.keys()[0]] = self.itemToEdit.__getattribute__(
                     self.manager._getReferenceName(v.values()[0]))
             listcolumns.append(v.values()[0])
-        return self.manager.getDataObject(self.itemToEdit,listcolumns)
+        return self.manager.getDataObject(self.itemToEdit, listcolumns)
 
     def getClassName(self):
         '''
@@ -415,14 +423,15 @@ class BaseAdd(QtGui.QDialog):
         '''
 
         self._centerOnScreen()
+        self.setStyle()
         self.setValidators()
         self.btSave.setDefault(True)
         if self.itemToEdit:
-            self.btSave.setText('Editar')
-            self.setWindowTitle(u'Editar ' + self.getClassName())
+            self.btSave.setText(self.getMsgByLang('editTitle'))
+            self.setWindowTitle(self.getMsgByLang('editTitle') + ' ' + self.singleTitle.lower())
             self._loadDataInWidgets()
         else:
-            self.setWindowTitle(u"Nuevo " + self.getClassName())
+            self.setWindowTitle(self.getMsgByLang('newTitle') + ' ' + self.singleTitle.lower())
 
         QtGui.QShortcut( QtGui.QKeySequence( "F9" ), self, self.on_btSave_clicked )
         QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.Key_Escape ), self, self.close )

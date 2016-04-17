@@ -25,7 +25,7 @@
 
 import os.path
 import shutil
-from plasta.tools import pathtools
+from plasta.utils import pathtools
 import xml_widgets
 
 prefijos_widgets = {
