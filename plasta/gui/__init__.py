@@ -58,7 +58,7 @@ class BaseGUI( QtGui.QMainWindow ):
         # Plural title to show in gui
         self.pluralTitle = self.manager.getClassName()
 
-        self.lang = config.LANG
+        self.lang = config().LANG
         self.messages = {
             'es':{
                 'new':'Nuevo',
@@ -83,6 +83,7 @@ class BaseGUI( QtGui.QMainWindow ):
     def _start_operations( self ):
         '''Operations necessary to display the window'''
         self.fullScreen = False
+        self.lang = config().LANG
         self.translateWidgets()
         self.makeTable()
         self.loadCombobox()

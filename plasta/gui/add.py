@@ -40,7 +40,7 @@ class BaseAdd(QtGui.QDialog):
         self.parsers = {}
 
         self.singleTitle = self.manager.getClassName()
-        self.lang = config.LANG
+        self.lang = config().LANG
         self.messages = {
             'es':{
                 'newTitle':'Nuevo',
@@ -111,7 +111,7 @@ class BaseAdd(QtGui.QDialog):
 
     def _showResultMessage(self, resultado):
         if not self.itemToEdit:
-            resultado = True if resultado is None else False
+            resultado = True if resultado is None else resultado
             if resultado :
                 QtGui.QMessageBox.information(
                     self, self.getMsgByLang('newTitle') + self.singleTitle, self.getClassName().capitalize() + self.getMsgByLang('newSuccefullSave'))
@@ -423,7 +423,7 @@ class BaseAdd(QtGui.QDialog):
         '''
         operaciones que se requieren para iniciar la ventana
         '''
-
+        self.lang = config().LANG
         self._centerOnScreen()
         self.setStyle()
         self.setValidators()

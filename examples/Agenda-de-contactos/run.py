@@ -3,7 +3,9 @@ from PyQt4 import QtGui
 from contacto.manager import ContactosManager
 from contacto.gui import ContactosGUI
 from storm.locals import *
+from plasta.config import config
 
+config().LANG = 'es'
 # object Store de Storm
 DATABASE = create_database('sqlite: contactos.db')
 almacen = Store(DATABASE)

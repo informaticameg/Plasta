@@ -4,6 +4,7 @@
 from storm.locals import * #@UnusedWildImport
 import storm
 from storm.exceptions import OperationalError
+from plasta.config import config
 
 
 class BaseManager( object ):
@@ -305,7 +306,7 @@ class BaseManager( object ):
 
         # for more info of database types see:
         # https://storm.canonical.com/Manual#Table_of_properties_vs._python_vs._database_types
-        db = config.DB_OFFLINE['engine']
+        db = config().DATABASE
         possiblesvaluestype = {
             'sqlite':{
                 "str":"VARCHAR",

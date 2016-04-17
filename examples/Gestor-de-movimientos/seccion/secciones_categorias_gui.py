@@ -5,7 +5,7 @@ from plasta.gui import BaseGUI
 from PyQt4 import QtCore, uic , QtGui
 from os.path import join,abspath,dirname
 from plasta.gui.mytablewidget import MyTableWidget
-from plasta.gui.uis import images_rc
+# from plasta.gui.uis import images_rc
 
 from GUI.TreeView import TreeView
 

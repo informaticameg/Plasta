@@ -10,6 +10,7 @@ class CuentasGUI(BaseGUI):
 
     def __init__(self,manager, managers = []):
         BaseGUI.__init__(self, manager, managers)
+        self.loadUI()
 
         self.addTableColumn(u' ', Cuenta.ide, alignment='C')
         self.addTableColumn(u'Nombre', Cuenta.nombre)
@@ -19,6 +20,7 @@ class CuentasGUI(BaseGUI):
         self.DialogAddClass = AddCuenta
 
         self._start_operations()
+        self.setWindowTitle('Cuentas')
 
     def _start_operations(self):
         self._makeTable()

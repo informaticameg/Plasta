@@ -10,6 +10,8 @@ class SeccionesGUI(BaseGUI):
 
     def __init__(self,manager, managers = []):
         BaseGUI.__init__(self, manager, managers)
+        self.loadUI()
+
         self.ATRIBUTOSLISTA = [
             {u' ':Seccion.ide},
             {u'Nombre':Seccion.nombre}

@@ -19,22 +19,22 @@
 #       MA 02110-1301, USA.
 
 import ConfigParser
-from tools import pathtools
+from plasta.utils import pathtools
 import os
 
 class Configurations :
-    
+
     def __init__(self):
         self._cfgFile = pathtools.convertPath(
             pathtools.getPathProgramFolder() + 'tools/settings.cfg')
         self._config = ConfigParser.RawConfigParser()
         self._config.read(self._cfgFile)
-        
+
         if not os.path.exists(self._cfgFile) :
             cfg = open(self._cfgFile,'w')
             cfg.write('[settings]\npath_bd = ')
             cfg.close()
-                    
+
     def getPathBD(self):
         path_bd = self._config.get('settings', 'path_bd')
         return path_bd
@@ -43,4 +43,3 @@ class Configurations :
         self._config.set('settings','path_bd',path)
         self._config.write(open(self._cfgFile,'w'))
         return True
-    

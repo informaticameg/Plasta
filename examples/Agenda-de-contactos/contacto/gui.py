@@ -11,6 +11,7 @@ class ContactosGUI( BaseGUI ):
     def __init__(self, manager, managers = []):
         BaseGUI.__init__(self, manager, managers)
         self.DialogAddClass  = AddContacto
+        self.loadUI()
 
         # elementos en el combo de filtros
         self.addFilter(u'Nombre', Contacto.nombre)

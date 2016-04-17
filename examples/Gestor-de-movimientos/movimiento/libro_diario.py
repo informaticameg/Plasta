@@ -16,6 +16,7 @@ class LibroDiarioGUI(BaseGUI):
         BaseGUI.__init__(self, manager, managers)
         self.FILENAME = join(abspath(dirname(__file__)),'uis/libro_diario.ui')
         self.DialogAddClass  = AddMovimiento
+        self.loadUI()
 
         self.addTableColumn(u'Fecha', Movimiento.fecha, alignment='C', fnParse=self.parseFecha)
         self.addTableColumn(u'Razon Social', Movimiento.razon_social)
