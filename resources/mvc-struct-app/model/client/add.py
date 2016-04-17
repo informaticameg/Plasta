@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from plasta.gui.add_window import BaseAddWindow
+from plasta.gui.add import BaseAdd
 from PyQt4 import uic
 from os.path import join, abspath, dirname
 from model.client import Client
 
-class AddClient( BaseAddWindow ):
+class AddClient( BaseAdd ):
 
-    def __init__(self, manager, itemToEdit = False, managers = []):
-        BaseAddWindow.__init__(self, manager, itemToEdit, managers)
+    def __init__(self, manager, itemToEdit = False, managers = [], parent=None):
+        BaseAdd.__init__(self, manager, itemToEdit, managers, parent)
         self.loadUI(join(abspath(dirname(__file__)), 'add.ui'))
 
         self.linkToAttribute(self.leName, Client.name)

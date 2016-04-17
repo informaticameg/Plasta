@@ -10,12 +10,11 @@ class ClientGUI( BaseGUI ):
 
     def __init__(self, manager, managers = [], parent = None):
         BaseGUI.__init__(self, manager, managers, parent)
-
+        self.loadUI()
         self.DialogAddClass = AddClient
 
         self.addFilter(u'Name', Client.name)
 
-        self.addTableColumn(u'#', Client.ide)
         self.addTableColumn(u'Name', Client.name)
         self.addTableColumn(u'Address', Client.address)
         self.addTableColumn(u'Phone', Client.phone)
