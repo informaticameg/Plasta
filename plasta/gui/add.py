@@ -3,6 +3,7 @@
 
 from PyQt4 import QtCore, QtGui, uic
 from os.path import join, abspath, dirname
+from plasta.config import config
 
 class BaseAdd(QtGui.QDialog):
     '''Base class to handle add/edit windows'''
@@ -39,7 +40,7 @@ class BaseAdd(QtGui.QDialog):
         self.parsers = {}
 
         self.singleTitle = self.manager.getClassName()
-        self.lang = 'en'
+        self.lang = config.LANG
         self.messages = {
             'es':{
                 'newTitle':'Nuevo',
@@ -95,11 +96,12 @@ class BaseAdd(QtGui.QDialog):
 
     def setStyle(self, style=''):
         path = 'plasta/gui/styles/{style}.css'
-        if len(style) > 0:
-            path_css = path.replace('{style}', style)
-        else:
+        if len(config.STYLE) > 0:
             path_css = path.replace('{style}', config.STYLE)
-        self.setStyleSheet(open(path_css).read())
+            self.setStyleSheet(open(path_css).read())
+        elif len(style) > 0:
+            path_css = path.replace('{style}', style)
+            self.setStyleSheet(open(path_css).read())
 
     def isEditing(self):
         return self.itemToEdit is not None

@@ -300,16 +300,46 @@ class BaseManager( object ):
 
     def _getTableSql( self ):
         """Crea el string SQL dinamicamente"""
-        #puede haber algun problema ya que reference no tiene por que ser integer
+        # WARNING: puede haber algun problema ya que reference
+        # no tiene por que ser integer
+
+        # for more info of database types see:
+        # https://storm.canonical.com/Manual#Table_of_properties_vs._python_vs._database_types
+        db = config.DB_OFFLINE['engine']
         possiblesvaluestype = {
-            "str":"VARCHAR",
-            "int":"INTEGER",
-            "reference":"INTEGER",
-            "date":"VARCHAR",
-            "bool":"INTEGER",
-            "float":"FLOAT"
+            'sqlite':{
+                "str":"VARCHAR",
+                "int":"INTEGER",
+                "reference":"INTEGER",
+                "date":"VARCHAR",
+                "datetime":"VARCHAR",
+                "bool":"INTEGER",
+                "float":"FLOAT"
+            },
+            'mysql':{
+                "str":"TEXT",
+                "int":"INT",
+                "reference":"INT",
+                "date":"DATE",
+                "datetime":"DATETIME",
+                "bool":"TINYINT(1)",
+                "float":"FLOAT"
+            },
+            'postgres':{
+                "str":"VARCHAR",
+                "int":"INT",
+                "reference":"INT",
+                "date":"DATE",
+                "datetime":"TIMESTAMP",
+                "bool":"BOOL",
+                "float":"FLOAT"
+            }
         }
-        possiblesvaluesprimary = {False:"", True:"PRIMARY KEY"}
+        possiblesvaluesprimary = {False:""}
+        if db in ['sqlite', 'postgres']:
+            possiblesvaluesprimary[True] = "PRIMARY KEY"
+        else: #mysql
+            possiblesvaluesprimary[True] = "PRIMARY KEY AUTO_INCREMENT"
         possiblevaluesnull = {False:"NOT NULL", True:""}
 
         info = self.getClassAttributesInfo()
@@ -318,7 +348,7 @@ class BaseManager( object ):
         for columna in info:
             name = info[columna]["name"] if info[columna]["reference"] is False else info[columna]["name"] + "_id"
             elemento = ( name + " " +
-                possiblesvaluestype[info[columna]["type"]] + " " +
+                possiblesvaluestype[db][info[columna]["type"]] + " " +
                 possiblesvaluesprimary[info[columna]["primary"]] +
                 possiblevaluesnull[info[columna]["null"]] + ",\n" )
             tablestring += elemento

@@ -4,7 +4,8 @@
 from os.path import join, abspath, dirname
 from PyQt4 import QtCore, QtGui, uic
 from plasta.gui.mytablewidget import MyTableWidget
-from plasta.tools import pathtools
+from plasta.utils import pathtools
+from plasta.config import config
 
 class BaseGUI( QtGui.QMainWindow ):
     '''Base class to handle operations of CRUD screen'''
@@ -57,7 +58,7 @@ class BaseGUI( QtGui.QMainWindow ):
         # Plural title to show in gui
         self.pluralTitle = self.manager.getClassName()
 
-        self.lang = 'es'
+        self.lang = config.LANG
         self.messages = {
             'es':{
                 'new':'Nuevo',
@@ -114,11 +115,12 @@ class BaseGUI( QtGui.QMainWindow ):
 
     def setStyle(self, style=''):
         path = 'plasta/gui/styles/{style}.css'
-        if len(style) > 0:
-            path_css = path.replace('{style}', style)
-        else:
+        if len(config.STYLE) > 0:
             path_css = path.replace('{style}', config.STYLE)
-        self.setStyleSheet(open(path_css).read())
+            self.setStyleSheet(open(path_css).read())
+        elif len(style) > 0:
+            path_css = path.replace('{style}', style)
+            self.setStyleSheet(open(path_css).read())
 
     def centerOnScreen ( self ):
         '''Centers the window on the screen.'''
