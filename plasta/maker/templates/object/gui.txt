@@ -8,8 +8,8 @@ from %object_name%.add import Add%Object_name%
 
 class %Object_name%GUI( BaseGUI ):
 
-    def __init__(self, manager, managers = []):
-        BaseGUI.__init__(self, manager, managers)
+    def __init__(self, manager, managers = [], parent = None):
+        BaseGUI.__init__(self, manager, managers, parent)
 
         self.DialogAddClass = Add%Object_name%
 

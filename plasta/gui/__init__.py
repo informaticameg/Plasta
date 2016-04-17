@@ -12,7 +12,8 @@ class BaseGUI( QtGui.QMainWindow ):
     def __init__(self, manager, managers = None, parent = None):
         QtGui.QMainWindow.__init__(self, parent)
         # Name file of ui for gui
-        self.FILENAME = join(abspath(dirname(__file__)), 'uis/list.ui')
+        self.FILENAME = pathtools.convertPath(
+            join(abspath(dirname(__file__)), 'uis/list.ui'))
         # Name file of icon window
         self.ICONFILE = ''
         #
@@ -43,6 +44,9 @@ class BaseGUI( QtGui.QMainWindow ):
         # Possible values: C = CENTER, L = LEFT, R = RIGHT
         # Use: self.alignmentColumns = ['C', 'L', 'R', 'L']
         self.alignmentColumns = []
+
+        # List of objects current are listeds
+        self.items = []
 
         # DialogAddClass: reference to the class to instantiate to
         # handle dialog window add / edit
@@ -78,13 +82,13 @@ class BaseGUI( QtGui.QMainWindow ):
     def _start_operations( self ):
         '''Operations necessary to display the window'''
         self.fullScreen = False
-        self.loadUI()
         self.translateWidgets()
         self.makeTable()
         self.loadCombobox()
         self.loadTable()
         self.loadShortcuts()
         self.centerOnScreen()
+        self.setStyle()
 
         self.btEdit.setVisible(False)
         self.btDelete.setVisible(False)
@@ -107,6 +111,14 @@ class BaseGUI( QtGui.QMainWindow ):
         self.btDelete.setText(self.getMsgByLang('delete'))
         self.lbSearch.setText(self.getMsgByLang('search'))
         self.lbFilters.setText(self.getMsgByLang('filters'))
+
+    def setStyle(self, style=''):
+        path = 'plasta/gui/styles/{style}.css'
+        if len(style) > 0:
+            path_css = path.replace('{style}', style)
+        else:
+            path_css = path.replace('{style}', config.STYLE)
+        self.setStyleSheet(open(path_css).read())
 
     def centerOnScreen ( self ):
         '''Centers the window on the screen.'''
@@ -157,6 +169,7 @@ class BaseGUI( QtGui.QMainWindow ):
         else:
             campo = self._obtainColumnForName( campo )
         resultado = self.manager.searchBy( campo, valor )
+        self.items = resultado
         self.loadTable( resultado )
         self._setSearchColor( self.leSearch, resultado )
 
@@ -167,6 +180,7 @@ class BaseGUI( QtGui.QMainWindow ):
         '''
         if listadeobj == None:
             listadeobj = self.manager.getall()
+        self.items = listadeobj
         listadefilas = [self._getAttributesValues( obj ) for obj in listadeobj]
         self.MyTabla.addItems( listadefilas )
         self.setItemsCount( len( listadeobj ) )
@@ -196,26 +210,15 @@ class BaseGUI( QtGui.QMainWindow ):
         Obtiene los objetos seleccionados en la tabla
         @return: un objeto del tipo que maneja self.manager
         '''
-        listadelistastring = self.MyTabla.getListSelectedRows()
-        atributos_names = self._get_attributes_names()
-        classid = self.manager.CLASSid
-        listadeobjetos = []
-        if listadelistastring != []:
-            # obtiene el tipo de dato de la clave del objeto
-            for value in self.manager.getClassAttributesInfo().values() :
-                if value['primary'] == True :
-                    primary_type = value['type']
-
-            for lista in listadelistastring:
-                posicion_ide = atributos_names.index( classid )
-                if primary_type is 'int' :
-                    valor_ide = int( lista[posicion_ide] )
-                else:
-                    valor_ide = lista[posicion_ide]
-
-                listadeobjetos.append( self.manager.searchBy( self._obtainColumnForName( self.manager.CLASSid ), valor_ide )[0] )
-            return listadeobjetos
-        return None
+        try:
+            widget = self.MyTabla.widget
+            items = widget.selectedItems()
+            idxs = list(set([item.row() for item in items]))
+            result = [self.items[idx] for idx in idxs]
+            return result
+        except Exception, e:
+            print 'error:actualRowsToObjects:', e
+            return None
 
     def setItemsCount( self, valor ):
         'Set the count items in the label of list'
@@ -224,6 +227,9 @@ class BaseGUI( QtGui.QMainWindow ):
 ###############
 # API TO VARS #
 ###############
+
+    def addColumn(self, *args, **kwargs):
+        self.addTableColumn(*args, **kwargs)
 
     def addTableColumn(self, showName, classAttribute, fnParse = None, alignment = 'L'):
         item = {}
