@@ -54,7 +54,7 @@ Then the resulting package would be something like this:
 
 **With this structure we're ready to manage Client objects and working with them.**
 
-See [Creating the first package Plasta]() for more details.
+See [Creating the first package Plasta](https://github.com/informaticameg/plasta/blob/master/doc/en/first_package.md) for more details.
 
 ## Not implemented yet
 
@@ -79,7 +79,7 @@ $ pip install plasta
 
 ```sh
 $ wget https://github.com/informaticameg/Plasta/archive/master.zip
-$ tar xvf six-1.0b1.tar.gz 
+$ tar master.zip
 $ cd plasta/
 $ python setup.py install
 ```
@@ -96,7 +96,7 @@ Check the Plasta wiki in [English](https://github.com/informaticameg/Plasta/blob
 
 
     Copyright (C) 2012 by Informática MEG <contacto@informaticameg.com>
-	
+
 	MIT Licence
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -118,15 +118,14 @@ Check the Plasta wiki in [English](https://github.com/informaticameg/Plasta/blob
     THE SOFTWARE.
 
 **Plasta is maintained by:**
-* Jonathan Ferreyra <jalejandroferreyra@gmail.com> 
+* Jonathan Ferreyra <jalejandroferreyra@gmail.com>
 	* GitHub [@jonathanferreyra](https://github.com/jonathanferreyra)
 * Emiliano Fernandez <emilianohfernandez@gmail.com>
 	* GitHub [@emilianox](https://github.com/emilianox)
 
 ## Logo licence
-	
+
 	Plasta logo is licenced under the terms of Creative Commons licence.
 
 	Copyright (C) 2012 by Cecilia Schiebel <ceciliaschiebel@gmail.com>
 
-	
