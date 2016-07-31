@@ -188,7 +188,7 @@ def generateUI( destino,
     {dict} opciones = {'tipo': 'Dialog', 'generar_plantilla': False, 'lang':'es|en'}
     """
     if 'lang' not in opciones.keys():
-        opciones['lang'] = 'es'
+        opciones['lang'] = 'en'
     ### Atributos
     ancho_ventana = 400
     alto_ventana = __obtenerAltoVentana(campos)

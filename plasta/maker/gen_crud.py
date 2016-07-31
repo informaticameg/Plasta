@@ -84,7 +84,9 @@ def _generateContentFiles(objInfo):
   if objInfo['classesToGenerate']['add']:
     # generate attrs
     attrs = ''
-    for attr, widget in objInfo['widgetToAttr'].iteritems():
+    for _attr in objInfo['attributes']:
+      attr = _attr['name']
+      widget = objInfo['widgetToAttr'][attr]
       widgetName = _meta['widgets'][widget] + attr.lower().capitalize()
       attrs += ' ' * 8 + 'self.linkToAttribute(self.%s, %s.%s)\n' % (widgetName, objInfo['className'], attr)
     # generate content the file
@@ -101,10 +103,11 @@ def _generateContentFiles(objInfo):
     # generate attrs
     attrs = ''
     filters = ''
-    for attr, widget in objInfo['widgetToAttr'].iteritems():
+    for _attr in objInfo['attributes']:
+      attr = _attr['name']
       stAttr = attr.lower().capitalize()
-      filters += ' ' * 8 + "self.addFilter('%s', %s.%s)\n" % (stAttr, objInfo['className'], attr)
-      attrs += ' ' * 8 + "self.addTableColumn('%s', %s.%s)\n" % (stAttr, objInfo['className'], attr)
+      filters += ' ' * 8 + "self.addFilter(u'%s', %s.%s)\n" % (stAttr, objInfo['className'], attr)
+      attrs += ' ' * 8 + "self.addTableColumn(u'%s', %s.%s)\n" % (stAttr, objInfo['className'], attr)
     # generate content the file
     content = contentFiles['gui']
     content = content.replace('%Object_name%', objInfo['className'])

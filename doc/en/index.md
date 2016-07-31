@@ -9,9 +9,6 @@
 
 ## [Install](https://github.com/informaticameg/Plasta/blob/master/doc/en/install.md)
 
-* [Using locally](https://github.com/informaticameg/Plasta/blob/master/doc/en/install.md#using-locally)
-* [Using globally](https://github.com/informaticameg/Plasta/blob/master/doc/en/install.md#using-globally)
-
 ## [Getting started](https://github.com/informaticameg/Plasta/blob/master/doc/en/getting_started.md)
 
 * [Choosing the structure of the application](https://github.com/informaticameg/Plasta/blob/master/doc/en/getting_started.md#choosing-the-structure-of-the-application)
