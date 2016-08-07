@@ -3,25 +3,45 @@
 
 from PyQt4 import QtGui
 
+def loadUI(self, pathToFile):
+    from plasta import config
+    import cStringIO
+    from gui.uis import ui 
+    from PyQt4 import uic
+    from plasta.utils import pathtools
+    if config.DEVELOP:
+        mainFolder = pathtools.getPathProgramFolder()
+        uic.loadUi(pathtools.convertPath(mainFolder + pathToFile), self)
+    else:
+        uic.loadUi(cStringIO.StringIO(ui[pathToFile]), self)
+            
 def centerOnScreen(self):
-  resolution = QtGui.QDesktopWidget().screenGeometry()
-  self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
-    (resolution.height() / 2) - (self.frameSize().height() / 2))
+    resolution = QtGui.QDesktopWidget().screenGeometry()
+    self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
+              (resolution.height() / 2) - (self.frameSize().height() / 2))
 
 def parseDt2St(row, value):
-    return value.strftime("%d/%m/%Y")
+    if value:
+        return value.strftime("%d/%m/%Y")
+    return u''
 
 def parseAmount(row, value):
-    return "$ %8.2f" % float(value)
+    if value:
+        return "$ %8.2f" % float(value)
+    return u'$  0.00'
+
+def parseBool(row, value):
+    return 'SI' if value else 'NO'
 
 def setStyle(self, style=''):
-    import config
+    from plasta import config
     path = 'plasta/gui/styles/{style}.css'
     if len(style) > 0:
         path_css = path.replace('{style}', style)
     else:
         path_css = path.replace('{style}', config.STYLE)
-    self.setStyleSheet(open(path_css).read())
+    curStyleSheet = toUnicode(self.styleSheet())
+    self.setStyleSheet(open(path_css).read() + curStyleSheet)
 
 def toUnicode(MyQString):
     '''

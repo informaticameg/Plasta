@@ -6,11 +6,11 @@ from storm.locals import *
 
 class %Object_name%(object):
 
-    __storm_table__ = "%object_name%"
+    __storm_table__ = "%object_name%s"
 
     {attributes}
 
     {init_method}
 
     def __str__(self):
-        return ''
+        return u''
