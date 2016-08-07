@@ -121,18 +121,6 @@ class BaseGUI( QtGui.QMainWindow ):
         if self.widgets['lbTitle']:
             self.lbTitle.setText(self.pluralTitle)
         self.setWindowTitle(self.pluralTitle)
-
-    def loadUI(self, pathToFile = None):
-        if pathToFile is None:
-            pathToFile = self.FILENAME
-            
-        if self.develop:
-            from plasta.utils import pathtools
-            mainFolder = pathtools.getPathProgramFolder()
-            uic.loadUi(pathtools.convertPath(mainFolder + pathToFile), self)
-        else:
-            from gui.uis import ui as files
-            uic.loadUi(cStringIO.StringIO(files[pathToFile]), self)
                    
     def getMsgByLang(self, msg):
         return self.messages[self.lang][msg]

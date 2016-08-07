@@ -3,17 +3,19 @@
 
 from PyQt4 import QtGui
 
-def loadUI(self, pathToFile):
+def loadUI(self, pathToFile=None):
     from plasta import config
     import cStringIO
-    from gui.uis import ui 
+    from uis
     from PyQt4 import uic
     from plasta.utils import pathtools
-    if config.DEVELOP:
+	if pathToFile is None:
+       pathToFile = self.FILENAME
+    if config().DEVELOP:
         mainFolder = pathtools.getPathProgramFolder()
         uic.loadUi(pathtools.convertPath(mainFolder + pathToFile), self)
     else:
-        uic.loadUi(cStringIO.StringIO(ui[pathToFile]), self)
+        uic.loadUi(cStringIO.StringIO(uis[pathToFile]), self)
             
 def centerOnScreen(self):
     resolution = QtGui.QDesktopWidget().screenGeometry()

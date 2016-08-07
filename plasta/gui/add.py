@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt4 import QtCore, QtGui, uic
-from os.path import join, abspath, dirname
+from plasta.utils.qt import sortListOfListObjs, centerOnScreen, setStyle
 from plasta.config import config
 
 class BaseAdd(QtGui.QDialog):
@@ -23,11 +23,12 @@ class BaseAdd(QtGui.QDialog):
         self.dict_referencias = {} # diccionario que contiene la instancia seleccionada en el buscador
         self.postSaveMethod = None # metodo que BaseGUI que se ejecuta luego de save()
         self._dictWidgetReferencias = {} # dictionary that contain the buttons widgets and the reference to wich belong
-
+        self.develop = config.DEVELOP
+        
         # add here the validators to execute before save/edit
         # available validators: unique | presence
         # sintax: {'nameField':'nameValidator', ...}
-        # ej: {'codigo':'precenceOf'}
+        # ej: {'codigo':'precence'}
         self.validators = {}
 
         # self.validatorCustom = {'myattr':myFnCustom}
@@ -39,26 +40,31 @@ class BaseAdd(QtGui.QDialog):
         # sintax: {Class.attr:fnParse, ...}
         self.parsers = {}
 
+        # references attributes to other models
+        self.references = {}
+
         self.singleTitle = self.manager.getClassName()
         self.lang = config().LANG
         self.messages = {
             'es':{
-                'newTitle':'Nuevo',
-                'editTitle':'Editar',
+                'newTitle':'Nuevo ',
+                'editTitle':'Editar ',
                 'newSuccefullSave':u" agregado correctamente",
                 'editSuccefullSave':u" editado correctamente",
                 'newErrorSave':u"No se pudo agregar el ",
                 'editErrorSave':u"No se pudo editar el ",
-                'validateUnique':u'Ya existe un elemento con el mismo nombre',
+                'savingTitle':u"Guardando",
+				'validateUnique':u'Ya existe un elemento con el mismo nombre',
                 'validatePresence':u'{field} no puede dejarse vacío'
             },
             'en':{
-                'newTitle':'New',
-                'editTitle':'Edit',
+                'newTitle':'New ',
+                'editTitle':'Edit ',
                 'newSuccefullSave':u" added succefull",
                 'editSuccefullSave':u" edited succefull",
                 'newErrorSave':u"Can't be added ",
                 'editErrorSave':u"Can't be edited ",
+				'savingTitle':u"Saving",
                 'validateUnique':u'Already exists a element with the same name',
                 'validatePresence':u"{field} can't be empty value"
             }
@@ -70,6 +76,9 @@ class BaseAdd(QtGui.QDialog):
 
     @QtCore.pyqtSlot()
     def on_btSave_clicked(self):
+        self.btSave.setText(self.getMsgByLang('savingTitle') + '...')
+        self.btSave.setEnabled(False)
+        self.processEvents()
         resultado = False
         datos = self.getDataOfWidgets()
         if self.validateConstraintsFields() :
@@ -92,19 +101,17 @@ class BaseAdd(QtGui.QDialog):
     def loadUI(self, pathToFile = None):
         if pathToFile is None:
             pathToFile = self.FILENAME
-        uic.loadUi(pathToFile, self)
-
-    def setStyle(self, style=''):
-        path = 'plasta/gui/styles/{style}.css'
-        if len(config.STYLE) > 0:
-            path_css = path.replace('{style}', config.STYLE)
-            self.setStyleSheet(open(path_css).read())
-        elif len(style) > 0:
-            path_css = path.replace('{style}', style)
-            self.setStyleSheet(open(path_css).read())
+            
+        if self.develop:
+            from plasta.utils import pathtools
+            mainFolder = pathtools.getPathProgramFolder()
+            uic.loadUi(pathtools.convertPath(mainFolder + pathToFile), self)
+        else:
+            import cStringIO, uis
+            uic.loadUi(cStringIO.StringIO(uis[pathToFile]), self)
 
     def isEditing(self):
-        return self.itemToEdit is not None
+        return True if self.itemToEdit else False
 
     def getMsgByLang(self, msg):
         return self.messages[self.lang][msg]
@@ -114,17 +121,17 @@ class BaseAdd(QtGui.QDialog):
             resultado = True if resultado is None else resultado
             if resultado :
                 QtGui.QMessageBox.information(
-                    self, self.getMsgByLang('newTitle') + self.singleTitle, self.getClassName().capitalize() + self.getMsgByLang('newSuccefullSave'))
+                    self, self.getMsgByLang('newTitle') + self.singleTitle.lower(), self.singleTitle.capitalize()  + self.getMsgByLang('newSuccefullSave'))
             else:
                 QtGui.QMessageBox.warning(
-                    self, self.getMsgByLang('newTitle') + self.singleTitle, self.getMsgByLang('newErrorSave') + self.singleTitle)
+                    self, self.getMsgByLang('newTitle') + self.singleTitle.lower(), self.getMsgByLang('newErrorSave') + self.singleTitle.lower())
         else:
             if resultado :
                 QtGui.QMessageBox.information(
-                    self, self.getMsgByLang('editTitle') + self.singleTitle, self.singleTitle.capitalize() + self.getMsgByLang('editSuccefullSave'))
+                    self, self.getMsgByLang('editTitle') + self.singleTitle.lower(), self.singleTitle.capitalize() + self.getMsgByLang('editSuccefullSave'))
             else:
                 QtGui.QMessageBox.warning(
-                    self, self.getMsgByLang('editTitle') + self.singleTitle, self.getMsgByLang('editErrorSave') + self.singleTitle)
+                    self, self.getMsgByLang('editTitle') + self.singleTitle.lower(), self.getMsgByLang('editErrorSave') + self.singleTitle.lower())
 
     def setValidators(self):
         '''
@@ -138,14 +145,15 @@ class BaseAdd(QtGui.QDialog):
             nombrecolumnalabel = "lb" + [k for k, v in self.__dict__.iteritems() if v == widget][0][2:]
             if str(type(atributo_clase)) == "<class 'storm.references.Reference'>" :
                 try:
-                    widget.setReadOnly(True)
+                    #widget.setReadOnly(True)
                     # conecta el evento al boton de una referencia
                     nombreboton = "bt" + [k for k, v in self.__dict__.iteritems() if v == widget][0][2:]
                     widgetboton = self.__dict__[nombreboton]
                     self._dictWidgetReferencias[ widgetboton ] = atributo_clase
-                    self.connect(widgetboton, QtCore.SIGNAL('clicked ()'), self.mostrarBuscador)
+                    self.connect(widgetboton, QtCore.SIGNAL('clicked ()'), self.showSearcher)
                 except Exception, msg:
-                    print 'KeyError: Posiblemente no has agregado el boton para elegir una referencia.\nMensaje del error: ' + str(msg)
+                    pass
+                    #print 'KeyError: Posiblemente no has agregado el boton para elegir una referencia.\nMensaje del error: ' + str(msg)
             else:
                 columnastorm = self.manager.propertyToColumn(atributo_clase)
                 if infoclase[columnastorm]["type"] == 'str':
@@ -277,47 +285,6 @@ class BaseAdd(QtGui.QDialog):
         from PyQt4.QtGui import QIntValidator,QLineEdit,QComboBox,QLabel,QDateEdit,QTextEdit,QSpinBox,QDoubleSpinBox,QCheckBox
         from plasta.utils.qt import getDataOfWidgets as getDOW
 
-        # def textToUnicode(dato):
-        #     return unicode(dato.toUtf8(),'utf-8')
-
-        # def isCheckBox(widget):
-        #     return widget.isChecked()
-
-        # def isSpinBox(widget):
-        #     return widget.value()
-
-        # def isTextEdit(widget):
-        #     return textToUnicode( widget.toPlainText() )
-
-        # def isLineedit(widget):
-        #     if type(widget.validator()) == QIntValidator:
-        #         if not widget.text().isEmpty() :
-        #             value = int(isLabel(widget))
-        #         else:
-        #             value = None
-        #     else:
-        #         value = isLabel(widget)
-        #     return value
-
-        # def isDateEdit(widget):
-        #     return textToUnicode(widget.date().toString(widget.displayFormat()))
-
-        # def isCombobox(widget):
-        #     return textToUnicode(widget.itemText(widget.currentIndex()))
-
-        # def isLabel(widget):
-        #     return textToUnicode(widget.text())
-
-        # funcionwidget = {QLineEdit:isLineedit,QComboBox:isCombobox,QLabel:isLabel,
-        #                 QDateEdit:isDateEdit,QTextEdit:isTextEdit,QSpinBox:isSpinBox,
-        #                 QDoubleSpinBox:isSpinBox,QCheckBox:isCheckBox}
-
-        # values = []
-        # if widgets :
-        #     for widget in widgets:
-        #         valor = funcionwidget[type(widget)](widget)
-        #         values.append(valor)
-        #     return values
         if widgets:
             return getDOW(widgets)
 
@@ -332,18 +299,8 @@ class BaseAdd(QtGui.QDialog):
                 else:
                     valor = self.dict_referencias[widget]
             else:
-                #TODO: hacer que se obtenga el valor x.ide del objeto referencia
-                try:
-                    referenceClass = attribute.__dict__['_remote_key'].__dict__['cls']
-                except AttributeError, e:
-                    referenceClass = attribute.__dict__['_remote_key'][0].__dict__['cls']
-                strValue = getDOW([widget])[0]
-                columAttr = referenceClass.__dict__['_storm_columns'][referenceClass.__dict__['nombre']]
-                res = self.manager.almacen.find(referenceClass, columAttr == strValue)
-                res = [obj for obj in res]
-
-                if res:
-                    valor = res[0]
+                idx = widget.currentIndex()
+                valor = self.references[attribute]['objs'][idx]
             values.append(valor) if valor != u'' else values.append(None) #@NoEffect
         return values
 
@@ -363,7 +320,7 @@ class BaseAdd(QtGui.QDialog):
                 self.dict_referencias[v.keys()[0]] = self.itemToEdit.__getattribute__(
                     self.manager._getReferenceName(v.values()[0]))
             listcolumns.append(v.values()[0])
-        return self.manager.getDataObject(self.itemToEdit, listcolumns)
+        return self.manager.getDataObject(self.itemToEdit, listcolumns, rformat='list')
 
     def getClassName(self):
         '''
@@ -372,18 +329,19 @@ class BaseAdd(QtGui.QDialog):
         '''
         return self.manager.getClassName().lower()
 
-    def editProperties(self):
+    def editProperties(self, datos=None):
         '''
         Obtiene los datos de EDITITEM y los de los widgets
         los compara y si son distintos edita el atributo del obj
         '''
-        datos = self.getDataOfWidgets()
+        if not datos:
+            datos = self.getDataOfWidgets()
         propiedadesvalues = self.getDataInstance()
-        for i,dato in enumerate(datos):
+        for i, dato in enumerate(datos):
             nombrepropiedad = propiedadesvalues[i].keys()[0]
             valor = propiedadesvalues[i].values()[0]
             if valor != dato:
-                self.itemToEdit.__setattr__(nombrepropiedad,dato)
+                self.itemToEdit.__setattr__(nombrepropiedad, dato)
         return True
 
     def applyParsers(self, listData):
@@ -402,7 +360,7 @@ class BaseAdd(QtGui.QDialog):
         '''
         #REIMPLEMENT
         self.applyParsers(listData)
-        return self.manager.add(*listData)
+        return self.manager.add(listData)        
 
     def edit(self, listData):
         '''
@@ -412,8 +370,8 @@ class BaseAdd(QtGui.QDialog):
         #REIMPLEMENT
         try:
             self.applyParsers(listData)
-            self.editProperties()
-            self.manager.almacen.commit()
+            self.editProperties(listData)
+            self.manager.store.commit()            
             return True
         except Exception,e:
             print e
@@ -423,20 +381,62 @@ class BaseAdd(QtGui.QDialog):
         '''
         operaciones que se requieren para iniciar la ventana
         '''
-        self.lang = config().LANG
-        self._centerOnScreen()
-        self.setStyle()
+        self.processEvents = QtGui.QApplication.processEvents
+        centerOnScreen(self)
+        setStyle(self)
         self.setValidators()
         self.btSave.setDefault(True)
+        self.processEvents()
         if self.itemToEdit:
             self.btSave.setText(self.getMsgByLang('editTitle'))
             self.setWindowTitle(self.getMsgByLang('editTitle') + ' ' + self.singleTitle.lower())
             self._loadDataInWidgets()
+            self.processEvents()
         else:
             self.setWindowTitle(self.getMsgByLang('newTitle') + ' ' + self.singleTitle.lower())
 
         QtGui.QShortcut( QtGui.QKeySequence( "F9" ), self, self.on_btSave_clicked )
         QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.Key_Escape ), self, self.close )
+
+        for item in self.ITEMLIST:
+            widget = item.keys()[0]
+            value = item.values()[0]
+            if str(type(value)) == "<class 'storm.references.Reference'>" and\
+                str(type(widget)) == "<class 'PyQt4.QtGui.QComboBox'>":
+                try:
+                    cls = value.__dict__['_remote_key'][0].__dict__['cls']
+                except TypeError, e:
+                    cls = value.__dict__['_remote_key'].__dict__['cls']
+                self.references[value] = {'cls':cls, 'fnParser':None, 'objs':None}
+
+    def loadReferencesCombos(self, sort=True, sortAttr='nombre'):
+        '''
+        Load all combos references
+        '''
+        for refAttr in self.references.keys():
+            for attr in self.ITEMLIST:
+                if refAttr is attr.values()[0]:
+                    widget = attr.keys()[0]
+            self.loadReferenceCombo(widget, refAttr, sort, sortAttr)
+
+    def loadReferenceCombo(self, widget, refAttr, sort=True, sortAttr='nombre'):
+        '''
+        Load specified combo with reference items
+        '''
+        cls = self.references[refAttr]['cls']
+        objs = [obj for obj in self.manager.almacen.find( cls )]
+        if sort:
+            self.references[refAttr]['objs'] = sortListOfListObjs(objs, sortAttr)
+        else:
+            self.references[refAttr]['objs'] = objs
+        items = []
+        for obj in objs:
+            fnParser = self.references[refAttr]['fnParser']
+            if fnParser:
+                items.append(fnParser(obj))
+            else:
+                items.append(obj.__str__())
+        [widget.addItem(item) for item in items]
 
     def _loadDataInWidgets(self):
         '''
@@ -472,12 +472,6 @@ class BaseAdd(QtGui.QDialog):
                     widget.setDate(QtCore.QDate(dato.year, dato.month, dato.day))
         return True
 
-    def _centerOnScreen (self):
-        '''Centers the window on the screen.'''
-        resolution = QtGui.QDesktopWidget().screenGeometry()
-        self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
-                  (resolution.height() / 2) - (self.frameSize().height() / 2))
-
     def _toUnicode(self, MyQString):
         '''
         convierte un string a unicode
@@ -486,7 +480,7 @@ class BaseAdd(QtGui.QDialog):
         '''
         return unicode(MyQString.toUtf8(),'utf-8')
 
-    def showSearch(self):
+    def showSearcher(self):
         """
         """
         atributo = self._dictWidgetReferencias[self.sender()]
@@ -498,13 +492,17 @@ class BaseAdd(QtGui.QDialog):
                     atributo_remoto = all_info[info_atributo]['reference']['remote_key']
         # obtener el manager al que pertenece <atributo_remoto>
         manager_que_busco = None
-        for unmanager in self.managers:
-            if atributo_remoto.__dict__['cls'] == unmanager.CLASS:
-                manager_que_busco = unmanager
+        for key in self.managers.__dict__.keys():
+            unmanager = self.managers.__dict__[key]            
+            try:
+                if atributo_remoto.__dict__['cls'] == unmanager.CLASS:
+                    manager_que_busco = unmanager
+            except AttributeError, e:
+                pass
         # llamar a la ventana del buscador, pasandole el manager
-        from buscador import BaseBuscador
+        from buscador import BaseSearcher
         self.dict_referencias[ self.referenceToWidget(atributo) ] = None
-        search = BaseBuscador(manager_que_busco, self.dict_referencias)
+        search = BaseSearcher(manager_que_busco, self.dict_referencias)
         search.exec_()
 
     def referenceToWidget(self, referencia):
@@ -531,6 +529,12 @@ class BaseAdd(QtGui.QDialog):
         else:
             if onlyEdit:
                 self.parsers[classAttr] = fnParse
+
+    def addValidator(self, field, validator):
+        self.validators[field] = validator
+
+    def addReferenceComboParser(self, attribute, fn):
+        self.references[attribute]['fnParser'] = fn
 
 ###############################
 # VALIDATORS USED TO ADD/EDIT #
