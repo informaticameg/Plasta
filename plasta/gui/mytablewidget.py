@@ -32,7 +32,7 @@ from PyQt4 import QtCore, QtGui
 
 class MyTableWidget():
 
-    def __init__(self, TW, listadecolumnas, listadealineaciones = []):
+    def __init__(self, TW, listadecolumnas, listadealineaciones = [], fnParseItem=None):
         self.__widget = TW
         #self.__widget.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
         #quitAction = QtGui.QAction("Quit", self.__widget)
@@ -46,12 +46,13 @@ class MyTableWidget():
         #self.__widget.setContextMenuPolicy( QtCore.Qt.CustomContextMenu )
 
         self.__columns = listadecolumnas
+        self.fnParseItem = fnParseItem
 
         if listadealineaciones :
             alineaciones = {
-                'L':QtCore.Qt.AlignLeft,
+                'L':QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter,
                 'C':QtCore.Qt.AlignCenter,
-                'R':QtCore.Qt.AlignRight
+                'R':QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
             }
             self.__columns_align = [alineaciones[ali] for ali in listadealineaciones]
         else:
@@ -67,7 +68,8 @@ class MyTableWidget():
         alineaciones = self.__columns_align
         def aux(x, cell):
             item = QtGui.QTableWidgetItem(unicode(cell))# the text
-            #~ print item.flags(QtCore.QAbstractTableModel.flags( self, index ))
+            if self.fnParseItem:
+                item = self.fnParseItem(y, x, item, cell)
             item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable )
             item.setTextAlignment( alineaciones[x] )# the alignment
             widget.setItem(y, x, item)
@@ -86,6 +88,8 @@ class MyTableWidget():
         def addOneItem(listadedatos, y):
             def aux(x, cell):
                 item = QtGui.QTableWidgetItem(unicode(cell))# the text
+                if self.fnParseItem:
+                    item = self.fnParseItem(y, x, item, cell)
                 item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable )
                 try:
                     item.setTextAlignment( alineaciones[x] ) # the alignment
@@ -97,9 +101,11 @@ class MyTableWidget():
 
         if DATA != None:
             widget = self.__widget
+            self.widget.setUpdatesEnabled(False)
             self.fullClear()
             widget.setRowCount(len(DATA))
             [addOneItem(data, indice) for indice, data in enumerate(DATA)]
+            self.widget.setUpdatesEnabled(True)
 
     def getRowString(self, item = 'null'):
         """Devuelve una tupla con los datos de el tablewidget en la fila seleccionada
