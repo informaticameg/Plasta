@@ -71,33 +71,52 @@ class BaseManager( object ):
         '''
         return self.CLASS.__name__
 
-    def getDataObject( self, obj, columns ):
+    def getDataObject( self, obj, columns, rformat='dict'):
         '''
         obtiene y devuelve una lista de los datos obtenidos a partir de las
         columnas y de los datos que maneja
         @param obj:objeto instancia a extrer ex:unCliente
         @param columns:storm columns :ex:[Cliente.ide,Cliente.nombres]
+        @param format: dict | list
         @return: lista de dic: [{"ide":1},{"nombres":nombrecliente}]
         '''
         if isinstance( obj, self.CLASS ):
-            listpropiertisvalues = []
+            values = {} if rformat == 'dict' else []
             for propiedad in columns:
                 nombreatributo = self.getAttributeName( propiedad )
-                listpropiertisvalues.append( {nombreatributo:obj.__getattribute__( nombreatributo )} )
-            return listpropiertisvalues
+                if rformat == 'dict':
+                    values[nombreatributo] = obj.__getattribute__( nombreatributo )
+                else:
+                    values.append( {nombreatributo:obj.__getattribute__( nombreatributo )} )
+            return values
         else:
             raise Exception( "No se pudo obtener los valores debido a que no es una instancia correcta" )
 
-    def getClassAttributesValues( self, obj ):
+    def getClassAttributesValues( self, obj, rformat='list'):
         '''
-        obtiene los valores de el obj
+        obtiene los valores del obj
         @param obj:a obj de type
-        @return: a list of values
+        @param rformat: formato a retornar el valor > list | dict
+        @return: list o dict
         '''
         if isinstance( obj, self.CLASS ):
-            return [obj.__getattribute__( p ) for p in self.getClassAttributes()]
+            if rformat == 'list':
+                return [obj.__getattribute__( p ) for p in self.getClassAttributes()]
+            elif rformat == 'dict':
+                result = {}
+                for p in self.getClassAttributes():
+                    result[p] = obj.__getattribute__( p )
+                return result
         else:
             raise Exception( "no se pudo obtener los valores" )
+        
+    def checkIfExists(self, obj):
+        '''
+        Comprueba que el objeto indicado exista en la base de datos
+        '''
+        result = self.getById(obj.id)
+        return result is not None, result
+
 
 #=======================================================================
 # Generic Methods
@@ -140,7 +159,8 @@ class BaseManager( object ):
         obtiene la cantidad de objetos de este manager
         @return: int
         '''
-        return len(self.getall())
+        query = 'select count(*) from %s' % self.CLASS.__storm_table__
+        return [o for o in self.store.execute(query)][0][0]
 
     def getall( self ):
         '''
@@ -159,25 +179,29 @@ class BaseManager( object ):
             self.searchname = self.CLASS.nombre
         return self.searchBy( self.searchname, nombre )
 
+    def getById(self, ide):
+        '''
+        Retorna el objeto segun el <ide> indicado
+        '''
+        return self.store.find(self.CLASS, self.CLASS.id == ide).one()
+        
     def searchBy( self, column, nombre ):
         '''
-        hace una busqueda e el atributo column por el valor nombre
+        Realiza una busqueda por column segun el valor nombre
         @param column:a storm column
         @param nombre:str o int
         @return: lista de objetos
         '''
         if type( column ) == storm.references.Reference:
             objs = self.getall()
-            name = self._getReferenceName( column )
-            return [obj for obj in objs if nombre in obj.__getattribute__( name ).__str__()]
+            value = self._getReferenceName( column )
+            return [obj for obj in objs if obj.__getattribute__(value).__str__().lower().find(value) != -1]
         if nombre != "":
             import datetime
             if (type( nombre ) is unicode) or (type( nombre ) is str):
-                return [obj for obj in self.almacen.find( self.CLASS, column.like( unicode( u"%" + nombre + u"%" ) ) )]
-            elif type( nombre ) is int :
-                return [obj for obj in self.almacen.find( self.CLASS, column == nombre )]
-            elif ( type( nombre ) is datetime.datetime ) or ( type( nombre ) is datetime.date ):
-                return [obj for obj in self.almacen.find( self.CLASS, column == nombre )]
+                return [obj for obj in self.store.find( self.CLASS, column.like( unicode( u"%" + nombre + u"%" ) ) )]
+            elif type( nombre ) in [int, datetime.datetime, datetime.date] :
+                return [obj for obj in self.store.find( self.CLASS, column == nombre )]
             else:
                 raise Exception, u"Exception:No se busco adecuadamente debido a que el tipo de criterio es: " + unicode( type( nombre ) )
         else:
