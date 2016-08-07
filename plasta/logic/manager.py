@@ -109,7 +109,7 @@ class BaseManager( object ):
                 return result
         else:
             raise Exception( "no se pudo obtener los valores" )
-        
+
     def checkIfExists(self, obj):
         '''
         Comprueba que el objeto indicado exista en la base de datos
@@ -130,13 +130,13 @@ class BaseManager( object ):
         '''
         try:
             if type(params) is list:
-            	obj = self.CLASS( *params )
-        	elif type(params) is dict:
-            	obj = self.CLASS( **params )
-	        obj = self.store.add( obj )
-	        if commit:
-	            self.store.flush()
-    	        self.store.commit()
+                obj = self.CLASS( *params )
+            elif type(params) is dict:
+                obj = self.CLASS( **params )
+            obj = self.store.add( obj )
+            if commit:
+                self.store.flush()
+                self.store.commit()
             return obj
         except Exception, e:
             print e
@@ -184,7 +184,7 @@ class BaseManager( object ):
         Retorna el objeto segun el <ide> indicado
         '''
         return self.store.find(self.CLASS, self.CLASS.id == ide).one()
-        
+
     def searchBy( self, column, nombre ):
         '''
         Realiza una busqueda por column segun el valor nombre
@@ -333,8 +333,8 @@ class BaseManager( object ):
 
         # for more info of database types see:
         # https://storm.canonical.com/Manual#Table_of_properties_vs._python_vs._database_types
-        from plasta import config
-        db = config.DB_ENGINE        
+        from plasta.config import config
+        db = config.DB_ENGINE
         if engine:
             db = engine
         possiblesvaluestype = {
@@ -350,7 +350,7 @@ class BaseManager( object ):
             'mysql':{
                 "str":"TEXT",
                 "int":"INT",
-                "reference":"INT",                
+                "reference":"INT",
                 "date":"DATE",
                 "datetime":"DATETIME",
                 "bool":"TINYINT(1)",

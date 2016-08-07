@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt4 import QtCore, QtGui, uic
-from plasta.utils.qt import sortListOfListObjs, centerOnScreen, setStyle
+from plasta.utils.qt import centerOnScreen, setStyle
 from plasta.config import config
 
 class BaseAdd(QtGui.QDialog):
@@ -24,7 +24,7 @@ class BaseAdd(QtGui.QDialog):
         self.postSaveMethod = None # metodo que BaseGUI que se ejecuta luego de save()
         self._dictWidgetReferencias = {} # dictionary that contain the buttons widgets and the reference to wich belong
         self.develop = config.DEVELOP
-        
+
         # add here the validators to execute before save/edit
         # available validators: unique | presence
         # sintax: {'nameField':'nameValidator', ...}
@@ -54,7 +54,7 @@ class BaseAdd(QtGui.QDialog):
                 'newErrorSave':u"No se pudo agregar el ",
                 'editErrorSave':u"No se pudo editar el ",
                 'savingTitle':u"Guardando",
-				'validateUnique':u'Ya existe un elemento con el mismo nombre',
+                'validateUnique':u'Ya existe un elemento con el mismo nombre',
                 'validatePresence':u'{field} no puede dejarse vacío'
             },
             'en':{
@@ -64,7 +64,7 @@ class BaseAdd(QtGui.QDialog):
                 'editSuccefullSave':u" edited succefull",
                 'newErrorSave':u"Can't be added ",
                 'editErrorSave':u"Can't be edited ",
-				'savingTitle':u"Saving",
+                'savingTitle':u"Saving",
                 'validateUnique':u'Already exists a element with the same name',
                 'validatePresence':u"{field} can't be empty value"
             }
@@ -99,16 +99,8 @@ class BaseAdd(QtGui.QDialog):
 #################
 
     def loadUI(self, pathToFile = None):
-        if pathToFile is None:
-            pathToFile = self.FILENAME
-            
-        if self.develop:
-            from plasta.utils import pathtools
-            mainFolder = pathtools.getPathProgramFolder()
-            uic.loadUi(pathtools.convertPath(mainFolder + pathToFile), self)
-        else:
-            import cStringIO, uis
-            uic.loadUi(cStringIO.StringIO(uis[pathToFile]), self)
+        from plasta.utils.qt import loadUI
+        loadUI(self, pathToFile)
 
     def isEditing(self):
         return True if self.itemToEdit else False
@@ -360,7 +352,7 @@ class BaseAdd(QtGui.QDialog):
         '''
         #REIMPLEMENT
         self.applyParsers(listData)
-        return self.manager.add(listData)        
+        return self.manager.add(listData)
 
     def edit(self, listData):
         '''
@@ -371,7 +363,7 @@ class BaseAdd(QtGui.QDialog):
         try:
             self.applyParsers(listData)
             self.editProperties(listData)
-            self.manager.store.commit()            
+            self.manager.store.commit()
             return True
         except Exception,e:
             print e
@@ -493,7 +485,7 @@ class BaseAdd(QtGui.QDialog):
         # obtener el manager al que pertenece <atributo_remoto>
         manager_que_busco = None
         for key in self.managers.__dict__.keys():
-            unmanager = self.managers.__dict__[key]            
+            unmanager = self.managers.__dict__[key]
             try:
                 if atributo_remoto.__dict__['cls'] == unmanager.CLASS:
                     manager_que_busco = unmanager

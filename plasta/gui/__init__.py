@@ -17,7 +17,7 @@ class BaseGUI( QtGui.QMainWindow ):
         self.FILENAME = '/plasta/gui/uis/list.ui'
         self.processEvents = QtGui.QApplication.processEvents
         self.develop = config.DEVELOP
-        
+
         # Name file of icon window
         self.ICONFILE = ''
         #
@@ -121,7 +121,11 @@ class BaseGUI( QtGui.QMainWindow ):
         if self.widgets['lbTitle']:
             self.lbTitle.setText(self.pluralTitle)
         self.setWindowTitle(self.pluralTitle)
-                   
+
+    def loadUI(self, pathToFile = None):
+        from plasta.utils.qt import loadUI
+        loadUI(self, pathToFile)
+
     def getMsgByLang(self, msg):
         return self.messages[self.lang][msg]
 
@@ -346,9 +350,9 @@ class BaseGUI( QtGui.QMainWindow ):
                 if len( resultados_busqueda ) == 0 :
                     widget.setStyleSheet( self.myStyleSheetRojo )
                 else:
-                    widget.setStyleSheet( self.myStyleSheetBlanco )
+                    widget.setStyleSheet('')
             else:
-                widget.setStyleSheet( self.myStyleSheetBlanco )
+                widget.setStyleSheet('')
         except:
             self.myStyleSheetBlanco = ''
             self.myStyleSheetRojo = ''

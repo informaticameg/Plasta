@@ -39,4 +39,4 @@ class config(object):
 
     LANG = 'en'
     STYLE = ''
-    DATABASE = 'sqlite' # sqlite | mysql | postgres
+    DB_ENGINE = 'sqlite' # sqlite | mysql | postgres
