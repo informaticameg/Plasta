@@ -5,6 +5,7 @@ from os.path import join, abspath, dirname
 from PyQt4 import QtCore, QtGui, uic
 from plasta.gui.mytablewidget import MyTableWidget
 from plasta.utils import pathtools
+from plasta.utils.qt import centerOnScreen, setStyle
 from plasta.config import config
 
 class BaseGUI( QtGui.QMainWindow ):
@@ -13,8 +14,10 @@ class BaseGUI( QtGui.QMainWindow ):
     def __init__(self, manager, managers = None, parent = None):
         QtGui.QMainWindow.__init__(self, parent)
         # Name file of ui for gui
-        self.FILENAME = pathtools.convertPath(
-            join(abspath(dirname(__file__)), 'uis/list.ui'))
+        self.FILENAME = '/plasta/gui/uis/list.ui'
+        self.processEvents = QtGui.QApplication.processEvents
+        self.develop = config.DEVELOP
+        
         # Name file of icon window
         self.ICONFILE = ''
         #
@@ -41,6 +44,14 @@ class BaseGUI( QtGui.QMainWindow ):
         # Use: [[0, lambda (row, value): value.uppper()], ...]
         self.fnsParseListAttrs = []
 
+        #
+        self.fnAllItems = self.manager.getall
+        #
+        self.fnFilterItems = None
+
+        # funcion para parsear los items de la tabla
+        self.fnParseTableItem = None
+
         # Alignment of each atttribute in the list
         # Possible values: C = CENTER, L = LEFT, R = RIGHT
         # Use: self.alignmentColumns = ['C', 'L', 'R', 'L']
@@ -49,6 +60,12 @@ class BaseGUI( QtGui.QMainWindow ):
         # List of objects current are listeds
         self.items = []
 
+        self.widgets = {
+            'btNew':True, 'btEdit':True, 'btDelete':True,
+            'leSearch':True, 'cbFilters':True,
+            'twItems':True, 'lbItemsCount':True,
+            'lbTitle':True
+        }
         # DialogAddClass: reference to the class to instantiate to
         # handle dialog window add / edit
         self.DialogAddClass = None
@@ -82,52 +99,55 @@ class BaseGUI( QtGui.QMainWindow ):
 
     def _start_operations( self ):
         '''Operations necessary to display the window'''
+        self.processEvents = QtGui.QApplication.processEvents
         self.fullScreen = False
         self.lang = config().LANG
         self.translateWidgets()
         self.makeTable()
+        self.processEvents()
         self.loadCombobox()
         self.loadTable()
+        self.processEvents()
         self.loadShortcuts()
-        self.centerOnScreen()
-        self.setStyle()
+        centerOnScreen(self)
+        setStyle(self)
+        self.processEvents()
+        if self.widgets['btEdit']:
+            self.btEdit.setVisible(False)
+        if self.widgets['btDelete']:
+            self.btDelete.setVisible(False)
 
-        self.btEdit.setVisible(False)
-        self.btDelete.setVisible(False)
-
-        self.setWindowIcon( QtGui.QIcon( QtGui.QPixmap( join( abspath( dirname( __file__ ) ), self.ICONFILE ) ) ) )
-        self.lbTitle.setText(self.pluralTitle)
+        # self.setWindowIcon( QtGui.QIcon( QtGui.QPixmap( join( abspath( dirname( __file__ ) ), self.ICONFILE ) ) ) )
+        if self.widgets['lbTitle']:
+            self.lbTitle.setText(self.pluralTitle)
         self.setWindowTitle(self.pluralTitle)
 
     def loadUI(self, pathToFile = None):
         if pathToFile is None:
             pathToFile = self.FILENAME
-        uic.loadUi(pathToFile, self)
-
+            
+        if self.develop:
+            from plasta.utils import pathtools
+            mainFolder = pathtools.getPathProgramFolder()
+            uic.loadUi(pathtools.convertPath(mainFolder + pathToFile), self)
+        else:
+            from gui.uis import ui as files
+            uic.loadUi(cStringIO.StringIO(files[pathToFile]), self)
+                   
     def getMsgByLang(self, msg):
         return self.messages[self.lang][msg]
 
     def translateWidgets(self):
-        self.btNew.setText(self.getMsgByLang('new'))
-        self.btEdit.setText(self.getMsgByLang('edit'))
-        self.btDelete.setText(self.getMsgByLang('delete'))
-        self.lbSearch.setText(self.getMsgByLang('search'))
-        self.lbFilters.setText(self.getMsgByLang('filters'))
-
-    def setStyle(self, style=''):
-        path = 'plasta/gui/styles/{style}.css'
-        if len(config.STYLE) > 0:
-            path_css = path.replace('{style}', config.STYLE)
-            self.setStyleSheet(open(path_css).read())
-        elif len(style) > 0:
-            path_css = path.replace('{style}', style)
-            self.setStyleSheet(open(path_css).read())
-
-    def centerOnScreen ( self ):
-        '''Centers the window on the screen.'''
-        resolution = QtGui.QDesktopWidget().screenGeometry()
-        self.move( ( resolution.width() / 2 ) - ( self.frameSize().width() / 2 ),
-                  ( resolution.height() / 2 ) - ( self.frameSize().height() / 2 ) )
+        if self.widgets['btNew']:
+            self.btNew.setText(self.getMsgByLang('new'))
+        if self.widgets['btEdit']:
+            self.btEdit.setText(self.getMsgByLang('edit'))
+        if self.widgets['btDelete']:
+            self.btDelete.setText(self.getMsgByLang('delete'))
+        if self.widgets['leSearch']:
+            self.lbSearch.setText(self.getMsgByLang('search'))
+        if self.widgets['cbFilters']:
+            self.lbFilters.setText(self.getMsgByLang('filters'))
 
     def toogleFullScreen( self ):
         ''' '''
@@ -143,9 +163,12 @@ class BaseGUI( QtGui.QMainWindow ):
         self._atajo_fullscreen = QtGui.QShortcut( QtGui.QKeySequence( "F11" ), self, self.toogleFullScreen )
         QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.Key_Escape ), self, self.close )
 
-        QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_N ), self, self.on_btNew_clicked )
-        QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_M ), self, self.on_btEdit_clicked )
-        QtGui.QShortcut( QtGui.QKeySequence( "Del" ), self, self.on_btDelete_clicked )
+        if self.widgets['btNew']:
+            QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_N ), self, self.on_btNew_clicked )
+        if self.widgets['btEdit']:
+            QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.CTRL | QtCore.Qt.Key_M ), self, self.on_btEdit_clicked )
+        if self.widgets['btDelete']:
+            QtGui.QShortcut( QtGui.QKeySequence( "Del" ), self, self.on_btDelete_clicked )
 
     def makeTable( self ):
         '''Create the structure of table (columns)'''
@@ -155,26 +178,34 @@ class BaseGUI( QtGui.QMainWindow ):
             self.ATRIBUTOSLISTA_CLASSNAMES = [ self.manager.getAttributeName( p.values()[0] ) for p in self.ATRIBUTOSLISTA]
             tableColumns = [p.keys()[0] for p in self.ATRIBUTOSLISTA]
 
-        self.MyTabla = MyTableWidget( self.twItems, tableColumns, self.alignmentColumns)
+        self.tableItems = MyTableWidget(
+            self.twItems, tableColumns, self.alignmentColumns, fnParseItem=self.fnParseTableItem)
         # conecta el menu contextual a la tabla
-        self.connect( self.MyTabla.widget, QtCore.SIGNAL( 'customContextMenuRequested(const QPoint&)' ), self.on_context_menu )
+        #self.connect( self.tableItems.widget, QtCore.SIGNAL( 'customContextMenuRequested(const QPoint&)' ), self.on_context_menu )
 
     def reloadList( self ):
         '''
         Vuelve a cargar la lista a partir de los valores actuales en
         la barra de busqueda y el filtro seleccionado.
         '''
-        valor = unicode( self.leSearch.text().toUtf8(), 'utf-8' )
-        campo = unicode( self.cbFilters.itemText(
+        valor = u''
+        campo = u''
+        if self.widgets['leSearch']:
+            valor = unicode( self.leSearch.text().toUtf8(), 'utf-8' )
+        if self.widgets['cbFilters']:
+            campo = unicode( self.cbFilters.itemText(
                     self.cbFilters.currentIndex() ).toUtf8() )
         if self.ATRI_COMBO_BUSQUEDA :
             campo = [p[campo] for p in self.ATRI_COMBO_BUSQUEDA if campo in p ][0]
         else:
             campo = self._obtainColumnForName( campo )
         resultado = self.manager.searchBy( campo, valor )
+        if self.fnFilterItems:
+            resultado = self.fnFilterItems(resultado)
         self.items = resultado
         self.loadTable( resultado )
-        self._setSearchColor( self.leSearch, resultado )
+        if self.widgets['leSearch']:
+            self._setSearchColor( self.leSearch, resultado )
 
     def loadTable( self, listadeobj = None ):
         '''
@@ -182,29 +213,34 @@ class BaseGUI( QtGui.QMainWindow ):
         @param listadeobj:if none carga todos, sino lo de la lista
         '''
         if listadeobj == None:
-            listadeobj = self.manager.getall()
+            listadeobj = self.fnAllItems()
+        if self.fnFilterItems:
+            listadeobj = self.fnFilterItems(listadeobj)
         self.items = listadeobj
         listadefilas = [self._getAttributesValues( obj ) for obj in listadeobj]
-        self.MyTabla.addItems( listadefilas )
+        self.tableItems.addItems( listadefilas )
         self.setItemsCount( len( listadeobj ) )
 
     def loadCombobox( self ):
         '''
         Carga el combobox de campos
         '''
-        self.cbFilters.clear()
-        if not self.ATRI_COMBO_BUSQUEDA :
-            atributos = self.manager.getClassAttributes()
-            for atributo in atributos:
-                self.ATRI_COMBO_BUSQUEDA.append( {atributo:self._obtainColumnForName( atributo )} )
-        map( self.cbFilters.addItem, [p.keys()[0] for p in self.ATRI_COMBO_BUSQUEDA] )
+        if self.widgets['cbFilters']:
+            self.cbFilters.clear()
+            if not self.ATRI_COMBO_BUSQUEDA :
+                atributos = self.manager.getClassAttributes()
+                for atributo in atributos:
+                    self.ATRI_COMBO_BUSQUEDA.append( {atributo:self._obtainColumnForName( atributo )} )
+            map( self.cbFilters.addItem, [p.keys()[0] for p in self.ATRI_COMBO_BUSQUEDA] )
 
     def find( self ):
         '''
         Reliza la busqueda y carga la tabla
         '''
         # obtiene el valor cargado en la barra de busqueda
-        valor = unicode(self.leSearch.text().toUtf8(),'utf-8')
+        valor = u''
+        if self.widgets['leSearch']:
+            valor = unicode(self.leSearch.text().toUtf8(),'utf-8')
         # carga la lista segun el estado de la barra de busqueda
         self.reloadList() if valor != u'' else self.loadTable()
 
@@ -214,7 +250,7 @@ class BaseGUI( QtGui.QMainWindow ):
         @return: un objeto del tipo que maneja self.manager
         '''
         try:
-            widget = self.MyTabla.widget
+            widget = self.tableItems.widget
             items = widget.selectedItems()
             idxs = list(set([item.row() for item in items]))
             result = [self.items[idx] for idx in idxs]
@@ -225,7 +261,8 @@ class BaseGUI( QtGui.QMainWindow ):
 
     def setItemsCount( self, valor ):
         'Set the count items in the label of list'
-        self.lbItemsCount.setText( str( valor ) + self.getMsgByLang('itemsCount'))
+        if self.widgets['lbItemsCount']:
+            self.lbItemsCount.setText( str( valor ) + self.getMsgByLang('itemsCount'))
 
 ###############
 # API TO VARS #
@@ -248,6 +285,14 @@ class BaseGUI( QtGui.QMainWindow ):
         item = {}
         item[showName] = classAttribute
         self.ATRI_COMBO_BUSQUEDA.append(item)
+
+    def disableWidgets(self, widgets):
+        for w in widgets:
+            if w in self.widgets.keys():
+                self.widgets[w] = False
+            else:
+                print 'ERROR:disableWidgets() > "%s" not is a valid widget' % w
+                print '> possibles widgets: ', self.widgets.keys()
 
 #################
 # AUX FUNCTIONS #
@@ -334,7 +379,7 @@ class BaseGUI( QtGui.QMainWindow ):
         self.popMenu.addAction(self.getMsgByLang('edit'), self.on_btEdit_clicked ,QtGui.QKeySequence("Ctrl+M"))
         self.popMenu.addAction(self.getMsgByLang('delete'), self.on_btDelete_clicked ,QtGui.QKeySequence("Del"))
 
-        self.popMenu.exec_(self.MyTabla.widget.mapToGlobal(mypoint) )
+        self.popMenu.exec_(self.tableItems.widget.mapToGlobal(mypoint) )
 
 ##########################
 # METHODS TO REIMPLEMENT #
@@ -364,8 +409,9 @@ class BaseGUI( QtGui.QMainWindow ):
 
     @QtCore.pyqtSlot( int )
     def on_cbFilters_currentIndexChanged ( self, entero ):
-        if not self.leSearch.text().isEmpty() :
-            self.find()
+        if self.widgets['leSearch']:
+            if not self.leSearch.text().isEmpty() :
+                self.find()
 
     @QtCore.pyqtSlot()
     def on_btNew_clicked( self ):
@@ -398,9 +444,13 @@ class BaseGUI( QtGui.QMainWindow ):
                     self.find()
 
     def on_twItems_itemSelectionChanged(self):
-        self.btEdit.setVisible(False)
-        self.btDelete.setVisible(False)
-        items = self.MyTabla.getListSelectedRows()
+        if self.widgets['btEdit']:
+            self.btEdit.setVisible(False)
+        if self.widgets['btDelete']:
+            self.btDelete.setVisible(False)
+        items = self.tableItems.getListSelectedRows()
         if items  :
-            self.btEdit.setVisible(True)
-            self.btDelete.setVisible(True)
+            if self.widgets['btEdit']:
+                self.btEdit.setVisible(True)
+            if self.widgets['btDelete']:
+                self.btDelete.setVisible(True)
