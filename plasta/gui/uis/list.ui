@@ -311,8 +311,5 @@ font: 10px;
    </layout>
   </widget>
  </widget>
- <resources>
-  <include location="images_rc/images.qrc"/>
- </resources>
  <connections/>
 </ui>
