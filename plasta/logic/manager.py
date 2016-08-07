@@ -25,6 +25,7 @@ class BaseManager( object ):
 
         #@param almacen: el objeto STORE de storm
         self.almacen = almacen
+        self.store = almacen
         #@param reset: variable que determina si se va a resetear
         self.reset = reset
         # definir aqui referencias hacia otros modelos
@@ -56,12 +57,12 @@ class BaseManager( object ):
         nombredetabla = self.CLASS.__storm_table__
         #ELIMINO LA TABLA
         try:
-            self.almacen.execute( 'DROP TABLE ' + nombredetabla )
+            self.store.execute('DROP TABLE IF EXISTS %s;' % nombredetabla, noresult=True)
         except OperationalError, e:
             print e
         #CREO NUEVAMENTE LA TABLA
-        self.almacen.execute( 'CREATE TABLE ' + nombredetabla + ' ' + SQL )
-        self.almacen.commit()
+        self.store.execute('CREATE TABLE ' + nombredetabla + ' ' + SQL )
+        self.store.commit()
 
     def getClassName( self ):
         '''
@@ -102,18 +103,22 @@ class BaseManager( object ):
 # Generic Methods
 #=======================================================================
 
-    def add( self, *params ):
+    def add( self, params, commit=True):
         '''
         Crea y agrega un objeto al almacen
         @param *params: los parametros que recibe el init de self.CLASS
         @return: true o false, dependiendo si se completo la operacion
         '''
         try:
-            obj = self.CLASS( *params )
-            self.almacen.add( obj )
-            self.almacen.flush()
-            self.almacen.commit()
-            return True
+            if type(params) is list:
+            	obj = self.CLASS( *params )
+        	elif type(params) is dict:
+            	obj = self.CLASS( **params )
+	        obj = self.store.add( obj )
+	        if commit:
+	            self.store.flush()
+    	        self.store.commit()
+            return obj
         except Exception, e:
             print e
             return False
@@ -124,9 +129,9 @@ class BaseManager( object ):
         @param obj:un objeto del tipo self.CLASS
         '''
         if isinstance( obj, self.CLASS ):
-            self.almacen.remove( obj )#where o is the object representing the row you want to remove
+            self.store.remove( obj )#where o is the object representing the row you want to remove
             del obj#lo sacamos de la ram
-            self.almacen.commit()
+            self.store.commit()
             return True
         return False
 
@@ -142,7 +147,7 @@ class BaseManager( object ):
         obtiene todos los objetos de este manager
         @return: lista de objs
         '''
-        return [obj for obj in self.almacen.find( self.CLASS )]
+        return [obj for obj in self.store.find( self.CLASS )]
 
     def get( self, nombre ):
         '''
@@ -299,14 +304,15 @@ class BaseManager( object ):
         nombreatributo = self._getPropertyName( propiedad )
         return self.CLASS.__dict__[nombreatributo]
 
-    def _getTableSql( self ):
+    def _getTableSql( self, engine=None):
         """Crea el string SQL dinamicamente"""
-        # WARNING: puede haber algun problema ya que reference
-        # no tiene por que ser integer
 
         # for more info of database types see:
         # https://storm.canonical.com/Manual#Table_of_properties_vs._python_vs._database_types
-        db = config().DATABASE
+        from plasta import config
+        db = config.DB_ENGINE        
+        if engine:
+            db = engine
         possiblesvaluestype = {
             'sqlite':{
                 "str":"VARCHAR",
@@ -320,7 +326,7 @@ class BaseManager( object ):
             'mysql':{
                 "str":"TEXT",
                 "int":"INT",
-                "reference":"INT",
+                "reference":"INT",                
                 "date":"DATE",
                 "datetime":"DATETIME",
                 "bool":"TINYINT(1)",
@@ -352,6 +358,10 @@ class BaseManager( object ):
                 possiblesvaluestype[db][info[columna]["type"]] + " " +
                 possiblesvaluesprimary[info[columna]["primary"]] +
                 possiblevaluesnull[info[columna]["null"]] + ",\n" )
+            tipo = possiblesvaluestype[db][info[columna]["type"]]
+            if (db == 'mysql') and (name == 'id') and (tipo == possiblesvaluestype[db]['str']):
+                elemento = elemento.replace('AUTO_INCREMENT', '')
+                elemento = elemento.replace('TEXT', 'VARCHAR(10)')
             tablestring += elemento
         tablestring = tablestring[:-2] + ")"
         return tablestring
