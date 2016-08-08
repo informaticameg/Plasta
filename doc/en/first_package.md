@@ -99,9 +99,10 @@ class ClientsGUI(BaseGUI):
 	def __init__(self, manager, managers = []):
 		# calls the base class constructor
 		BaseGUI.__init__(self, manager, managers)
-
 		# class display to add and edit dialogs
 		self.DialogAddClass = AddClient
+        # read and get up ui file information
+        self.loadUI()
 
 		# attributes used as filters
         self.addFiler(u'Names', Client.names)
@@ -125,9 +126,7 @@ class ClientsGUI(BaseGUI):
 Finally create the add.py file, and its contents would be this:
 
 ```python
-from os.path import join, abspath, dirname
-from PyQt4 import uic
-from plasta.gui.add_window import BaseAdd
+from plasta.gui.add import BaseAdd
 from client import Client
 
 class AddClient(BaseAdd):
@@ -136,7 +135,7 @@ class AddClient(BaseAdd):
 		# base class constructor
 		BaseAdd.__init__(self, manager, itemToEdit)
 		# read and get up ui file information
-		self.loadUI(join(abspath(dirname(__file__)),'add.ui'))
+		self.loadUI('client/add.ui')
 
     # here indicate what interface widget
     # it corresponds to an attribute of the class

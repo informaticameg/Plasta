@@ -41,7 +41,7 @@ class Cliente (object):
 	__storm_table__ = "cliente"
 
 	# atributos de la clase
-	ide = Int(primary = True)
+	id = Int(primary = True)
 	nombres = Unicode(allow_none = False)
 	telefono = Unicode()
 	domicilio = Unicode()
@@ -109,18 +109,20 @@ class ClientesGUI(BaseGUI):
 		# clase que mostrará a los diálogos de agregar y editar
 		self.DialogAddClass = AddCliente
 
-		# atributos usados como filtros
-    self.addFilter(u'Nombres', Cliente.nombres)
-    self.addFilter(u'Telefono', Cliente.telefono)
-    self.addFilter(u'Dirección', Cliente.direccion)
-    self.addFilter(u'Zona', Cliente.zona)
+        self.loadUI()
 
-    # columnas/atributos mostrados en la lista
-    self.addTableColumn(u'#', Cliente.ide, alignment='C')
-    self.addTableColumn(u'Nombres', Cliente.nombres)
-    self.addTableColumn(u'Telefono', Cliente.telefono)
-    self.addTableColumn(u'Dirección', Cliente.direccion)
-    self.addTableColumn(u'Zona', Cliente.zona, alignment='C')
+		# atributos usados como filtros
+        self.addFilter(u'Nombres', Cliente.nombres)
+        self.addFilter(u'Telefono', Cliente.telefono)
+        self.addFilter(u'Dirección', Cliente.direccion)
+        self.addFilter(u'Zona', Cliente.zona)
+
+        # columnas/atributos mostrados en la lista
+        self.addTableColumn(u'#', Cliente.id, alignment='C')
+        self.addTableColumn(u'Nombres', Cliente.nombres)
+        self.addTableColumn(u'Telefono', Cliente.telefono)
+        self.addTableColumn(u'Dirección', Cliente.direccion)
+        self.addTableColumn(u'Zona', Cliente.zona, alignment='C')
 
 		# realiza las operaciones de inicio para levantar la ventana
 		self._start_operations()
@@ -131,9 +133,7 @@ class ClientesGUI(BaseGUI):
 Por último crearemos el archivo add.py, y su contenido sería este:
 
 ```python
-from os.path import join, abspath, dirname
-from PyQt4 import uic
-from plasta.gui.add_window import BaseAdd
+from plasta.gui.add import BaseAdd
 from cliente import Cliente
 
 class AddCliente(BaseAdd):
@@ -143,7 +143,7 @@ class AddCliente(BaseAdd):
 		BaseAdd.__init__(self, manager, itemToEdit)
 
 		# lee y levanta la información del archivo ui
-		self.loadUI(join(abspath(dirname(__file__)),'add.ui'))
+		self.loadUI('cliente/add.ui')
 
 		# aquí indicaremos qué widget de la interfaz
 		# se corresponde con un atributo de la clase
@@ -178,7 +178,7 @@ from cliente.manager import ClientesManager
 from cliente.gui import ClientesGUI
 
 # objeto Store de Storm
-DATABASE = create_database('sqlite: prueba.db')
+DATABASE = create_database('sqlite:prueba.db')
 store = Store(DATABASE)
 
 # instancia del manager de ClientesGUI
@@ -194,4 +194,4 @@ sys.exit(app.exec_())
 
 
 
-[Ir a > Inicio](https://github.com/informaticameg/Plasta/blob/master/doc/es/index.md) | [Ir a > Instalación](https://github.com/informaticameg/Plasta/blob/master/doc/es/install.md) | [Ir a > Como empezar](https://github.com/informaticameg/Plasta/blob/master/doc/es/getting_started.md) | [Ir a > Casos de uso](https://github.com/informaticameg/plasta/blob/master/doc/es/uses_case.md) | [Ir a > Aplicaciones de ejemplo](https://github.com/informaticameg/plasta/blob/master/doc/es/example_apps.md)
+[Ir a > Inicio](https://github.com/informaticameg/Plasta/blob/master/doc/es/index.md) | [Ir a > Instalación](https://github.com/informaticameg/Plasta/blob/master/doc/es/install.md) | [Ir a > Como empezar](https://github.com/informaticameg/Plasta/blob/master/doc/es/getting_started.md) | [Ir a > Casos de uso](https://github.com/informaticameg/plasta/blob/master/doc/es/uses_cases.md) | [Ir a > Aplicaciones de ejemplo](https://github.com/informaticameg/plasta/blob/master/doc/es/example_apps.md)

@@ -11,21 +11,21 @@ Plasta está publicado bajo la licencia [MIT](http://www.opensource.org/licenses
 
 Plasta se compone de 4 componentes principales que son las 4 clases base de un paquete Plasta.
 
-De estas 4 clases, 3 son puramente heredables: BaseManager, GUIManager y BaseAddWindow. En cualquier momento se pueden reimplementar cualquiera de sus operaciones para lograr el fin deseado.
+De estas 4 clases, 3 son puramente heredables: BaseManager, BaseGUI y BaseAdd. En cualquier momento se pueden reimplementar cualquiera de sus operaciones para lograr el fin deseado.
 
 ### La clase Storm
 
 Aquí es donde se definen los atributos para un modelo, según lo estipulado en la documentación de Storm [aquí](https://storm.canonical.com/Tutorial#The_Storm_base_class). Es la definición de un objeto/tabla para la persistencia en la base de datos.
 
-### La clase BaseManager 
+### La clase BaseManager
 
 Ésta será la encargada de controlar los objetos del modelo con el que se esté trabajando, y donde están definidas las operaciones base del lado de la lógica.
 
 ### La clase BaseGUI
 
-Aquí están definidas todas las operaciones que controlarán la interfaz gráfica principal de un modelo. 
+Aquí están definidas todas las operaciones que controlarán la interfaz gráfica principal de un modelo.
 
-### La clase BaseAddWindow
+### La clase BaseAdd
 
 Esta clase posee las operaciones para manejar las operaciones del formulario  agregar/editar.
 
@@ -48,7 +48,7 @@ Para el correcto funcionamiento de Plasta, se deberán respetar estas convencion
 |------------|---------|
 | BaseManager     | ClienteManager |
 | BaseGUI         | ClienteGUI |
-| BaseAddWindow   | AddCliente |
+| BaseAdd         | AddCliente |
 
 #### Nombres widgets en la pantalla principal de un modelo
 
@@ -68,7 +68,7 @@ Para el correcto funcionamiento de Plasta, se deberán respetar estas convencion
 | Nombre widget | Tipo widget |
 |---------------|-------------|
 | btSave        | QPushButton |
-| btCancel      | QPushButton |
+| btExit      | QPushButton |
 
 
 #### Prefijos de los widgets
@@ -90,4 +90,4 @@ Plasta ha adoptado estos prefijos para nombrar a los widgets de la GUI:
 
 
 
-[Ir a > Inicio](https://github.com/informaticameg/Plasta/blob/master/doc/es/index.md) | [Ir a > Instalación](https://github.com/informaticameg/Plasta/blob/master/doc/es/install.md) | [Ir a > Como empezar](https://github.com/informaticameg/Plasta/blob/master/doc/es/getting_started.md) | [Ir a > Casos de uso](https://github.com/informaticameg/plasta/blob/master/doc/es/uses_case.md) | [Ir a > Aplicaciones de ejemplo](https://github.com/informaticameg/plasta/blob/master/doc/es/example_apps.md)
+[Ir a > Inicio](https://github.com/informaticameg/Plasta/blob/master/doc/es/index.md) | [Ir a > Instalación](https://github.com/informaticameg/Plasta/blob/master/doc/es/install.md) | [Ir a > Como empezar](https://github.com/informaticameg/Plasta/blob/master/doc/es/getting_started.md) | [Ir a > Casos de uso](https://github.com/informaticameg/plasta/blob/master/doc/es/uses_cases.md) | [Ir a > Aplicaciones de ejemplo](https://github.com/informaticameg/plasta/blob/master/doc/es/example_apps.md)

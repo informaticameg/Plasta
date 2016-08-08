@@ -2,7 +2,7 @@
 
 ## Eligiendo la estructura de la aplicación
 
-Plasta no está sujeto a una estructura definida, mientras se respete la estructura del objeto Plasta, lo demás queda a tu criterio. 
+Plasta no está sujeto a una estructura definida, mientras se respete la estructura del objeto Plasta, lo demás queda a tu criterio.
 De todas maneras te mostramos dos posibles estructuras que puedes usar:
 
 ### Estructura simple
@@ -61,11 +61,11 @@ Para indicar el tipo de los atributos, sigue las indicaciones de la siguiente ta
 | Tipo atributo | Widget relacionado |
 |---------------|--------------------|
 | unicode (por defecto) | QLineEdit |
-| int | QSpinBox | 
-| float | QDoubleSpinBox | 
-| date | QDateEdit | 
-| datetime| QDateTimeEdit | 
-| bool | QCheckBox | 
+| int | QSpinBox |
+| float | QDoubleSpinBox |
+| date | QDateEdit |
+| datetime| QDateTimeEdit |
+| bool | QCheckBox |
 
 Formato a usar: `atributo:tipo` e.g: `nombre cumpleanios:date estaActivado:bool`
 
@@ -88,4 +88,4 @@ Formato a usar: `atributo:tipo` e.g: `nombre cumpleanios:date estaActivado:bool`
 `> python plastagen g ui nombre apellido email`
 
 
-[Ir a > Inicio](https://github.com/informaticameg/Plasta/blob/master/doc/es/index.md) | [Ir a > Instalación](https://github.com/informaticameg/Plasta/blob/master/doc/es/install.md) | [Ir a > Como empezar](https://github.com/informaticameg/Plasta/blob/master/doc/es/getting_started.md) | [Ir a > Casos de uso](https://github.com/informaticameg/plasta/blob/master/doc/es/uses_case.md) | [Ir a > Aplicaciones de ejemplo](https://github.com/informaticameg/plasta/blob/master/doc/es/example_apps.md)
+[Ir a > Inicio](https://github.com/informaticameg/Plasta/blob/master/doc/es/index.md) | [Ir a > Instalación](https://github.com/informaticameg/Plasta/blob/master/doc/es/install.md) | [Ir a > Como empezar](https://github.com/informaticameg/Plasta/blob/master/doc/es/getting_started.md) | [Ir a > Casos de uso](https://github.com/informaticameg/plasta/blob/master/doc/es/uses_cases.md) | [Ir a > Aplicaciones de ejemplo](https://github.com/informaticameg/plasta/blob/master/doc/es/example_apps.md)

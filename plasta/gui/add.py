@@ -230,7 +230,7 @@ class BaseAdd(QtGui.QDialog):
 
             attributesNames = []
             for item in self.ITEMLIST:
-                attrName = self.manager._getPropertyName(item.values()[0])
+                attrName = self.manager.getPropertyName(item.values()[0])
                 attributesNames.append(attrName)
 
             for attr in self.validators.keys():
@@ -261,7 +261,7 @@ class BaseAdd(QtGui.QDialog):
         result = []
         for item in self.ITEMLIST:
             classAttr = item.values()[0]
-            result.append(self.manager._getPropertyName(classAttr))
+            result.append(self.manager.getPropertyName(classAttr))
         return result
 
     def getKeyDictionary(self, dic, val):
@@ -310,7 +310,7 @@ class BaseAdd(QtGui.QDialog):
         for v in self.ITEMLIST:
             if type(v.values()[0]) == storm.references.Reference:
                 self.dict_referencias[v.keys()[0]] = self.itemToEdit.__getattribute__(
-                    self.manager._getReferenceName(v.values()[0]))
+                    self.manager.getReferenceName(v.values()[0]))
             listcolumns.append(v.values()[0])
         return self.manager.getDataObject(self.itemToEdit, listcolumns, rformat='list')
 
@@ -340,7 +340,7 @@ class BaseAdd(QtGui.QDialog):
         if len(self.parsers.keys()) > 0:
             attrs = self.getListAttributesNames()
             for class_attr, fnParser in self.parsers.iteritems():
-                stName = self.manager._getPropertyName(class_attr)
+                stName = self.manager.getPropertyName(class_attr)
                 idx = attrs.index(stName)
                 if idx >= 0:
                     listData[idx] = fnParser(listData[idx])
@@ -539,7 +539,7 @@ class BaseAdd(QtGui.QDialog):
         widget = None
         # get the widget
         for item in self.ITEMLIST:
-            if self.manager._getPropertyName(item.values()[0]) == field:
+            if self.manager.getPropertyName(item.values()[0]) == field:
                 widget = item.keys()[0]
 
         value = self.getDataOfWidgets([widget])[0]

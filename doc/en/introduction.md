@@ -11,7 +11,7 @@ Plasta is released under the [MIT License](http://www.opensource.org/licenses/MI
 
 Plasta consists of 4 main components are the 4 base classes of a Plasta package.
 
-Of these 4 classes, 3 are purely heritable: BaseManager, GUIManager y BaseAddWindow. At any time you can implement any of its operations to achieve the desired end.
+Of these 4 classes, 3 are purely heritable: BaseManager, BaseGUI y BaseAdd. At any time you can implement any of its operations to achieve the desired end.
 
 ### The Storm class
 
@@ -23,7 +23,7 @@ This will be in charge of controlling model objects with which you are working, 
 
 ### The BaseGUI class
 
-Here they are defined all operations that control the main GUI of a model. 
+Here they are defined all operations that control the main GUI of a model.
 
 ### The BaseAdd class
 
@@ -33,7 +33,7 @@ This class has operations to handle the operations of the form add / edit.
 
 | Term | Definition |
 |------|------------|
-| Manager | controlling class of a model | 
+| Manager | controlling class of a model |
 | Package | Plasta package composed of four classes |
 | UI | xml file from a Qt window |
 | Widget | Qt visual component |
@@ -48,7 +48,7 @@ For the correctly work of Plasta, must respect these conventions:
 |------------|---------|
 | BaseManager     | ClientManager |
 | BaseGUI         | ClientGUI |
-| BaseAddWindow   | AddClient |
+| BaseAdd         | AddClient |
 
 #### Widgets names in the main screen of a model
 
@@ -68,7 +68,7 @@ For the correctly work of Plasta, must respect these conventions:
 | Widget name | Widget type |
 |-------------|-------------|
 | btSave      | QPushButton |
-| btCancel    | QPushButton |
+| btExit    | QPushButton |
 
 
 #### Widget prefixes

@@ -4,6 +4,13 @@
 from PyQt4 import QtGui
 
 def loadUI(self, pathToFile=None):
+    '''
+    Read and load the screen indicate by <pathToFile>
+
+    @param {str} pathToFile = path to .ui file
+        If is None, look the ui in the location
+        relative to the current folder
+    '''
     from plasta.config import config
     from PyQt4 import uic
     from plasta.utils import pathtools

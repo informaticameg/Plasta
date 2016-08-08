@@ -15,6 +15,8 @@
 * [Plasta generator](https://github.com/informaticameg/Plasta/blob/master/doc/en/getting_started.md#plasta-generator)
 * [Creating the first package Plasta](https://github.com/informaticameg/plasta/blob/master/doc/en/first_package.md#creating-the-first-package-plasta)
 
+## [API](https://github.com/informaticameg/plasta/blob/master/doc/en/api.md)
+
 ## [Use cases](https://github.com/informaticameg/plasta/blob/master/doc/en/uses_cases.md)
 
 * Create an object containing references
