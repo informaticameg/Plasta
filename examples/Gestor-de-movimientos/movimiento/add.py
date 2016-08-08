@@ -1,32 +1,31 @@
 from plasta.gui.add import BaseAdd
-from PyQt4 import uic, QtCore
-from os.path import join,abspath,dirname
+from PyQt4 import QtCore
 from movimiento import Movimiento
 from datetime import datetime
 from balance import Balance
+from plasta.utils.qt import centerOnScreen
+
 
 class AddMovimiento(BaseAdd):
 
     def __init__(self,manager, itemToEdit = False, managers = []):
         BaseAdd.__init__(self, manager, itemToEdit, managers)
-        FILENAME = 'uis/add.ui'
-        uic.loadUi(join(abspath(dirname(__file__)),FILENAME), self)
+        self.loadUI('movimiento/uis/add.ui')
 
-        self.ITEMLIST = [
-            {self.cbCuentas:Movimiento.cuenta},
-            {self.dsbMonto:Movimiento.monto},
-            {self.leNroComprobante:Movimiento.nroComprobante},
-            {self.teDescripcion:Movimiento.descripcion},
-            {self.deFecha:Movimiento.fecha},
-            {self.leRazonSocial:Movimiento.razon_social}
-        ]
+        self.linkToAttribute(self.cbCuentas, Movimiento.cuenta)
+        self.linkToAttribute(self.dsbMonto, Movimiento.monto)
+        self.linkToAttribute(self.leNroComprobante, Movimiento.nroComprobante)
+        self.linkToAttribute(self.teDescripcion, Movimiento.descripcion)
+        self.linkToAttribute(self.deFecha, Movimiento.fecha)
+        self.linkToAttribute(self.leRazonSocial, Movimiento.razon_social)
+
         self.cuentasManager = managers[0].manager
         self.balance = Balance()
         self._start_operations()
 
     # REIMPLEMENTED
     def _start_operations(self):
-        self._centerOnScreen()
+        centerOnScreen(self)
         self.setValidators()
         self.btSave.setDefault(True)
         if self.itemToEdit:

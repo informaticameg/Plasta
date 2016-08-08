@@ -5,7 +5,7 @@ from plasta.gui import BaseGUI
 from PyQt4 import QtCore, uic , QtGui
 from os.path import join,abspath,dirname
 from plasta.gui.mytablewidget import MyTableWidget
-# from plasta.gui.uis import images_rc
+from plasta.utils.qt import centerOnScreen
 
 from GUI.TreeView import TreeView
 
@@ -14,7 +14,7 @@ class SeccionesCategoriasGUI(BaseGUI):
 
     def __init__(self,manager, managers = []):
         BaseGUI.__init__(self, manager, managers)
-        self.FILENAME = join(abspath(dirname(__file__)),'secciones.ui')
+        self.FILENAME = 'seccion/secciones.ui'
 
         self.managerSecciones = managers[0].manager
         self.managerCuentas = managers[1].manager
@@ -23,11 +23,11 @@ class SeccionesCategoriasGUI(BaseGUI):
         self._start_operations()
 
     def _start_operations(self):
-        uic.loadUi(self.FILENAME, self)
+        self.loadUI(self.FILENAME)
         self.setWindowTitle(u"Categorías")
         self.loadShortcuts()
         self.fullScreen = False
-        self.centerOnScreen()
+        centerOnScreen(self)
 
         self.SeccionesGUI.DialogAddClass.postSaveMethod = self.recargarListaSecciones
 

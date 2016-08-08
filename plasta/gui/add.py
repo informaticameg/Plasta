@@ -24,6 +24,7 @@ class BaseAdd(QtGui.QDialog):
         self.postSaveMethod = None # metodo que BaseGUI que se ejecuta luego de save()
         self._dictWidgetReferencias = {} # dictionary that contain the buttons widgets and the reference to wich belong
         self.develop = config.DEVELOP
+        self.processEvents = QtGui.QApplication.processEvents
 
         # add here the validators to execute before save/edit
         # available validators: unique | presence

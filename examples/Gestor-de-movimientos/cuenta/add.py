@@ -7,7 +7,7 @@ class AddCuenta(BaseAdd):
 
     def __init__(self, manager, itemToEdit = False, managers = []):
         BaseAdd.__init__(self, manager, itemToEdit)
-        self.loadUI(join(abspath(dirname(__file__)),'add.ui'))
+        self.loadUI('cuenta/add.ui')
 
         self.linkToAttribute(self.leNombre, Cuenta.nombre)
         self.linkToAttribute(self.teDescripcion, Cuenta.descripcion)

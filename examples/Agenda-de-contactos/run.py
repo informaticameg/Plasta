@@ -7,7 +7,7 @@ from plasta.config import config
 
 config().LANG = 'es'
 # object Store de Storm
-DATABASE = create_database('sqlite: contactos.db')
+DATABASE = create_database('sqlite:contactos.db')
 almacen = Store(DATABASE)
 
 # manager instance

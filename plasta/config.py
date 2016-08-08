@@ -40,3 +40,4 @@ class config(object):
     LANG = 'en'
     STYLE = ''
     DB_ENGINE = 'sqlite' # sqlite | mysql | postgres
+    DEVELOP = True

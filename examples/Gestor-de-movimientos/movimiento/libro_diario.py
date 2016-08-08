@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from plasta.gui import BaseGUI
+from plasta.utils.qt import centerOnScreen
 from movimiento import Movimiento
-from os.path import join,abspath,dirname
-from PyQt4 import uic, QtCore, QtGui
+from PyQt4 import QtCore, QtGui
 from datetime import datetime
 from movimiento.add import AddMovimiento
 from balance import Balance
@@ -14,9 +14,8 @@ class LibroDiarioGUI(BaseGUI):
 
     def __init__(self,manager, managers = []):
         BaseGUI.__init__(self, manager, managers)
-        self.FILENAME = join(abspath(dirname(__file__)),'uis/libro_diario.ui')
         self.DialogAddClass  = AddMovimiento
-        self.loadUI()
+        self.loadUI('movimiento/uis/libro_diario.ui')
 
         self.addTableColumn(u'Fecha', Movimiento.fecha, alignment='C', fnParse=self.parseFecha)
         self.addTableColumn(u'Razon Social', Movimiento.razon_social)
@@ -42,15 +41,13 @@ class LibroDiarioGUI(BaseGUI):
         u'''
         operaciones necesarias para levantar las ventanas
         '''
-        uic.loadUi(self.FILENAME, self)
         self.setWindowTitle(self.pluralTitle)
         self.makeTable()
         self.loadTable()
         self.loadShortcuts()
         self.fullScreen = False
 
-        self.centerOnScreen()
-
+        centerOnScreen(self)
         self.deFechaMostradaDesde.setDate( datetime.today() )
         self.deFechaMostradaHasta.setDate( datetime.today() )
         self.cbTipoMovimiento.setCurrentIndex(1)
@@ -73,7 +70,7 @@ class LibroDiarioGUI(BaseGUI):
         if listadeobj == None:
             listadeobj = self.manager.getall()
         listadefilas = [self._getAttributesValues(obj) for obj in listadeobj]
-        self.MyTabla.addItems(listadefilas)
+        self.tableItems.addItems(listadefilas)
 
     def obtenerTipoMovimientoSeleccionado(self):
         return unicode(self.cbTipoMovimiento.itemText(self.cbTipoMovimiento.currentIndex()).toUtf8(), 'utf-8')
