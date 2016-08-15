@@ -67,23 +67,6 @@ Plasta requires:
 * Storm 0.19. Download [here](https://launchpad.net/storm/+download).
 * PyQt 4.7. Download [here](http://www.riverbankcomputing.co.uk/software/pyqt/download).
 
-## Install
-
-
-### From pip (TODO)
-```sh
-$ pip install plasta
-```
-
-### From Github
-
-```sh
-$ wget https://github.com/informaticameg/Plasta/archive/master.zip
-$ tar master.zip
-$ cd plasta/
-$ python setup.py install
-```
-
 ## Wiki
 
 Check the Plasta wiki in [English](https://github.com/informaticameg/Plasta/blob/master/doc/en/index.md) or [Spanish](https://github.com/informaticameg/Plasta/blob/master/doc/es/index.md) version.

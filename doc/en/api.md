@@ -3,15 +3,19 @@
 The following functions are described base containing each Plasta base class.
 You know them will allow you to extend its functionality as needed.
 
+* [BaseManager](#basemanager-api)
+* [BaseGUI](#basegui-api)
+* [BaseAdd](#baseadd-api)
+
 ## BaseManager API
 
 ```python
 # Import this class
 from plasta.logic.manager import BaseManager
 ```
-### Base Methods
+## *Base Methods*
 
-#### add(values, commit=True)
+### add(values, commit=True)
 
 Create and add an object to the database
 
@@ -35,27 +39,27 @@ for name in ['name1', 'name2', 'name3']:
 self.store.commit()
 ```
 
-#### delete(obj)
+### delete(obj)
 
 Delete and object of db
 
-#### count()
+### count()
 
 Gets the number of objects of this manager
 
-#### getall()
+### getall()
 
 Gets all objects of this manager
 
-#### get(value)
+### get(value)
 
 Obtain the objects where "value" matches with `self.searchattr`
 
-#### getById(id)
+### getById(id)
 
 Returns the object according to the `id` indicated
 
-#### searchBy(column, value)
+### searchBy(column, value)
 
 Perform a search for the name value according column
 
@@ -71,7 +75,7 @@ print self.searchBy(client.names, u'Smith')
 >> [<object>, <object>, ...]
 ```
 
-#### checkIfExists(obj)
+### checkIfExists(obj)
 
 Check that the indicated object exist in the database
 
@@ -84,26 +88,26 @@ print self.checkIfExists(some_obj)
 
 ```
 
-### Exclusive methods
+## *Exclusive methods*
 
 
-#### _start_operations()
+### _start_operations()
 
 Required operations to get up the manager
 
-#### _reset()
+### _reset()
 
 Drop and recreate the model table
 
-### Inspection Methods
+## *Inspection Methods*
 
 Methods used for object introspection
 
-#### getClassName()
+### getClassName()
 
 Returns the name of the class that handles
 
-#### getDataObject(obj, columns, rformat='dict')
+### getDataObject(obj, columns, rformat='dict')
 
 Returns the data of an object according to the indicated columns
 
@@ -123,11 +127,11 @@ print self.getDataObject(obj_client, [Client.names, Client.address], rformat='li
 >> [{'names':u'John Smith'}, {'address':u'Some address'}]
 ```
 
-#### getClassAttributes()
+### getClassAttributes()
 
 Get the attributes of the class that handles
 
-#### getClassAttributesValues(obj, rformat='list')
+### getClassAttributesValues(obj, rformat='list')
 
 Returns all the attributes of the object with its respective value
 
@@ -141,7 +145,7 @@ print self.getClassAttributesValues(obj_client, [Client.names, Client.address], 
 >> {'names':u'John Smith', 'address':u'Some address'}
 ```
 
-#### getClassAttributesInfo()
+### getClassAttributesInfo()
 
 Returns a dictionary with the data types of the class
 
@@ -151,7 +155,7 @@ print self.getClassAttributesInfo()
 >> {<storm.properties.Unicode object at 0x9e87b0c>: {'name':'names','default': None, 'null': True, 'type': 'str', 'primary': False,'reference':False}}
 ```
 
-#### getPropertyName(property)
+### getPropertyName(property)
 
 Return the name of Property object
 
@@ -159,19 +163,19 @@ Return the name of Property object
 print self.getPropertyName(Client.names)
 >> 'names'
 ```
-#### getReferenceName(reference)
+### getReferenceName(reference)
 
 Return the name of Reference object
 
-#### getAttributeName(property_or_reference)
+### getAttributeName(property_or_reference)
 
 Return the name of Property/Reference object
 
-#### propertyToColumn(property)
+### propertyToColumn(property)
 
 From a property returns the corresponding column
 
-#### getSqlTable(engine)
+### getSqlTable(engine)
 
 Get the SQL to create the table corresponding to the current model
 
@@ -179,8 +183,8 @@ Engines: `sqlite`, `mysql`, `postgres`.
 
 ## BaseGUI API
 
-### Logic functions
+### *Logic functions*
 
-### GUI functions
+## *GUI functions*
 
 ## BaseAdd API
