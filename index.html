@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Plasta : Framework in Python for rapid deployment of CRUD operations">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Plasta</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/informaticameg/Plasta">View on GitHub</a>
+
+          <h1 id="project_title">Plasta</h1>
+          <h2 id="project_tagline">Framework in Python for rapid deployment of CRUD operations</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/informaticameg/Plasta/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/informaticameg/Plasta/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p><img src="https://raw.github.com/informaticameg/plasta/master/resources/plasta.png"></p>
+
+<p>Plasta is a framework written in Python for rapid deployment of <a href="http://en.wikipedia.org/wiki/Create,_read,_update_and_delete">CRUDs</a> in a simple way, in a few steps and in few lines of code.</p>
+
+<p>Is designed with the MVC pattern and the DRY (Don't Repeat Yourself) development technique.</p>
+
+<h2>
+<a id="sinopsis" class="anchor" href="#sinopsis" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Sinopsis</h2>
+
+<p>In software engineering we often find the task of performing various CRUD (Create, read, update and delete) in the development of a typical management system or application. This leads to the repetitive task of writing the same operations over and over again for each CRUD being performed, increasing deployment time, lines of code, risk of errors and increased maintenance.
+Plasta born to cover the task of automating these processes.</p>
+
+<p>It focuses on both deployment and maintenanceof an aplication is minimized, for this the core of Plasta is designed so that at any time, if necessary, you can reimplement any method that does not meet our interests. Leaving it open to the possibility of a more comfortable development.</p>
+
+<h2>
+<a id="technical-features" class="anchor" href="#technical-features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Technical features</h2>
+
+<ul>
+<li><p><a href="https://storm.canonical.com/">Storm</a> ORM in the persistence.</p></li>
+<li><p><a href="https://www.riverbankcomputing.com/software/pyqt/download">PyQt4</a> in GUIs.</p></li>
+</ul>
+
+<h2>
+<a id="structure-of-a-crud" class="anchor" href="#structure-of-a-crud" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://github.com/informaticameg/plasta/blob/master/doc/en/first_package.md#creating-the-first-package-plasta">Structure of a CRUD</a>
+</h2>
+
+<p>Each CRUD is made up of a Python package, that contains the follow structure:</p>
+
+<ul>
+<li>Object Class (e.g.: People).</li>
+<li>Manager Class (e.g.: PeopleManager)</li>
+<li>Main Class of the CRUD (e.g.: PeopleGUI)</li>
+<li>Adding a Record Class (e.g.: AddPeople)</li>
+<li>Qt's .ui File for  screen.</li>
+</ul>
+
+<p>Then the resulting package would be something like this:</p>
+
+<pre><code>/people
+|--- __init__.py
+|--- manager.py
+|--- gui.py
+|--- add.py
+|--- add.ui
+</code></pre>
+
+<p><strong>1. Creating the <strong>init</strong>.py file</strong></p>
+
+<p>Here define your class attributes</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">from</span> storm.locals <span class="pl-k">import</span> <span class="pl-k">*</span>
+
+<span class="pl-k">class</span> <span class="pl-en">People</span> (<span class="pl-c1">object</span>):
+
+    <span class="pl-c"># table name in the database for this object</span>
+    __storm_table__ <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>peoples<span class="pl-pds">"</span></span>
+
+    <span class="pl-c"># attributes of the class</span>
+    ide <span class="pl-k">=</span> Int(<span class="pl-v">primary</span> <span class="pl-k">=</span> <span class="pl-c1">True</span>)
+    names <span class="pl-k">=</span> Unicode(<span class="pl-v">allow_none</span> <span class="pl-k">=</span> <span class="pl-c1">False</span>)
+    phone <span class="pl-k">=</span> Unicode()
+    address <span class="pl-k">=</span> Unicode()
+    zone <span class="pl-k">=</span> Int()
+
+    <span class="pl-k">def</span> <span class="pl-c1">__init__</span>(<span class="pl-smi"><span class="pl-smi">self</span></span>, <span class="pl-smi">names</span>, <span class="pl-smi">phone</span>, <span class="pl-smi">address</span>, <span class="pl-smi">zone</span>):
+      <span class="pl-v">self</span>.names <span class="pl-k">=</span> names
+      <span class="pl-v">self</span>.phone <span class="pl-k">=</span> phone
+      <span class="pl-v">self</span>.address <span class="pl-k">=</span> address
+      <span class="pl-v">self</span>.zone <span class="pl-k">=</span> zone
+
+    <span class="pl-c"># value to be displayed when you invoke this function</span>
+    <span class="pl-k">def</span> <span class="pl-c1">__str__</span>(<span class="pl-smi"><span class="pl-smi">self</span></span>):
+        <span class="pl-k">return</span> <span class="pl-v">self</span>.names</pre></div>
+
+<p><strong>2. Creating the manager.py file</strong></p>
+
+<p>Once the Person object made, we create the controller class
+for this object.</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">from</span> plasta.logic.manager <span class="pl-k">import</span> BaseManager
+<span class="pl-k">from</span> people <span class="pl-k">import</span> People
+
+<span class="pl-k">class</span> <span class="pl-en">PeopleManager</span>( <span class="pl-e">BaseManager</span> ):
+
+    <span class="pl-k">def</span> <span class="pl-c1">__init__</span>( <span class="pl-smi"><span class="pl-smi">self</span></span>, <span class="pl-smi">store</span>, <span class="pl-smi">reset</span> <span class="pl-k">=</span> <span class="pl-c1">False</span> ):
+        BaseManager.<span class="pl-c1">__init__</span>( <span class="pl-v">self</span>, store, reset )
+        <span class="pl-c"># object to be handled by this controller</span>
+        <span class="pl-v">self</span>.<span class="pl-c1">CLASS</span> <span class="pl-k">=</span> People
+        <span class="pl-v">self</span>._start_operations()
+</pre></div>
+
+<p><strong>3. Creating the gui.py file</strong></p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">from</span> plasta.gui <span class="pl-k">import</span> BaseGUI
+<span class="pl-k">from</span> people <span class="pl-k">import</span> People
+<span class="pl-k">from</span> people.add <span class="pl-k">import</span> AddPeople
+
+<span class="pl-k">class</span> <span class="pl-en">PeopleGUI</span>(<span class="pl-e">BaseGUI</span>):
+
+    <span class="pl-k">def</span> <span class="pl-c1">__init__</span>(<span class="pl-smi"><span class="pl-smi">self</span></span>, <span class="pl-smi">manager</span>, <span class="pl-smi">managers</span> <span class="pl-k">=</span> []):
+        <span class="pl-c"># calls the base class constructor</span>
+        BaseGUI.<span class="pl-c1">__init__</span>(<span class="pl-v">self</span>, manager, managers)
+
+        <span class="pl-c"># class display to add and edit dialogs</span>
+        <span class="pl-v">self</span>.DialogAddClass <span class="pl-k">=</span> AddPeople
+
+        <span class="pl-c"># attributes used as filters</span>
+        <span class="pl-v">self</span>.addFiler(<span class="pl-s"><span class="pl-k">u</span><span class="pl-pds">'</span>Names<span class="pl-pds">'</span></span>, People.names)
+        <span class="pl-v">self</span>.addFiler(<span class="pl-s"><span class="pl-k">u</span><span class="pl-pds">'</span>Phone<span class="pl-pds">'</span></span>, People.phone)
+        <span class="pl-v">self</span>.addFiler(<span class="pl-s"><span class="pl-k">u</span><span class="pl-pds">'</span>Address<span class="pl-pds">'</span></span>, People.address)
+        <span class="pl-v">self</span>.addFiler(<span class="pl-s"><span class="pl-k">u</span><span class="pl-pds">'</span>Zone<span class="pl-pds">'</span></span>, People.zone)
+
+        <span class="pl-c"># columns / attributes shown in the list</span>
+        <span class="pl-v">self</span>.addTableColumn(<span class="pl-s"><span class="pl-k">u</span><span class="pl-pds">'</span>Names<span class="pl-pds">'</span></span>, People.names)
+        <span class="pl-v">self</span>.addTableColumn(<span class="pl-s"><span class="pl-k">u</span><span class="pl-pds">'</span>Phone<span class="pl-pds">'</span></span>, People.phone)
+        <span class="pl-v">self</span>.addTableColumn(<span class="pl-s"><span class="pl-k">u</span><span class="pl-pds">'</span>Address<span class="pl-pds">'</span></span>, People.address)
+        <span class="pl-v">self</span>.addTableColumn(<span class="pl-s"><span class="pl-k">u</span><span class="pl-pds">'</span>Zone<span class="pl-pds">'</span></span>, People.zone, <span class="pl-v">alignment</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">'</span>C<span class="pl-pds">'</span></span>)
+
+        <span class="pl-c"># performs operations start to lift the window</span>
+        <span class="pl-v">self</span>._start_operations()</pre></div>
+
+<p><strong>4. Creating the add.py file</strong></p>
+
+<p>Finally create the add.py file, and its contents would be this:</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-k">from</span> os.path <span class="pl-k">import</span> join, abspath, dirname
+<span class="pl-k">from</span> plasta.gui.add_window <span class="pl-k">import</span> BaseAdd
+<span class="pl-k">from</span> people <span class="pl-k">import</span> People
+
+<span class="pl-k">class</span> <span class="pl-en">AddPeople</span>(<span class="pl-e">BaseAdd</span>):
+
+    <span class="pl-k">def</span> <span class="pl-c1">__init__</span>(<span class="pl-smi"><span class="pl-smi">self</span></span>, <span class="pl-smi">manager</span>, <span class="pl-smi">itemToEdit</span> <span class="pl-k">=</span> <span class="pl-c1">False</span>, <span class="pl-smi">managers</span> <span class="pl-k">=</span> []):
+        <span class="pl-c"># base class constructor</span>
+        BaseAdd.<span class="pl-c1">__init__</span>(<span class="pl-v">self</span>, manager, itemToEdit)
+        <span class="pl-c"># read and get up ui file information</span>
+        <span class="pl-v">self</span>.loadUI(join(abspath(dirname(<span class="pl-c1">__file__</span>)),<span class="pl-s"><span class="pl-pds">'</span>add.ui<span class="pl-pds">'</span></span>))
+
+        <span class="pl-c"># here indicate what interface widget</span>
+        <span class="pl-c"># it corresponds to an attribute of the class</span>
+        <span class="pl-v">self</span>.linkToAttribute(<span class="pl-v">self</span>.leNames, People.names)
+        <span class="pl-v">self</span>.linkToAttribute(<span class="pl-v">self</span>.lePhone, People.phone)
+        <span class="pl-v">self</span>.linkToAttribute(<span class="pl-v">self</span>.leAddress, People.address)
+        <span class="pl-v">self</span>.linkToAttribute(<span class="pl-v">self</span>.leZone, People.zone)
+
+        <span class="pl-v">self</span>._start_operations()</pre></div>
+
+<p>Wooyla, the resulting crud would look like:</p>
+
+<p><img src="https://raw.github.com/informaticameg/plasta/master/resources/peoples_crud.png"></p>
+
+<p>Using the Plasta generator to create this package, the command would be:</p>
+
+<p><code>$ python plastagen g crud -u people names phone address zone</code></p>
+
+<p>For more details see <a href="https://github.com/informaticameg/plasta/blob/master/doc/en/first_package.md#creating-the-first-package-plasta">Creating the first package Plasta</a></p>
+
+<h2>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://github.com/informaticameg/Plasta/blob/master/doc/en/introduction.md">Introduction</a>
+</h2>
+
+<ul>
+<li><a href="https://github.com/informaticameg/Plasta/blob/master/doc/en/introduction.md#licence">Licence</a></li>
+<li><a href="https://github.com/informaticameg/Plasta/blob/master/doc/en/introduction.md#components">Components</a></li>
+<li><a href="https://github.com/informaticameg/Plasta/blob/master/doc/en/introduction.md#terminologies">Terminologies</a></li>
+<li><a href="https://github.com/informaticameg/Plasta/blob/master/doc/en/introduction.md#conventions">Conventions</a></li>
+</ul>
+
+<h2>
+<a id="getting-started" class="anchor" href="#getting-started" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://github.com/informaticameg/Plasta/blob/master/doc/en/getting_started.md">Getting started</a>
+</h2>
+
+<ul>
+<li><p><a href="https://github.com/informaticameg/Plasta/blob/master/doc/en/install.md">Install</a></p></li>
+<li><p><a href="https://github.com/informaticameg/Plasta/blob/master/doc/en/getting_started.md#choosing-the-structure-of-the-application">Choosing the structure of the application</a></p></li>
+<li><a href="https://github.com/informaticameg/Plasta/blob/master/doc/en/getting_started.md#plasta-generator">Plasta generator</a></li>
+<li><a href="https://github.com/informaticameg/plasta/blob/master/doc/en/first_package.md#creating-the-first-package-plasta">Creating the first package Plasta</a></li>
+</ul>
+
+<h2>
+<a id="api" class="anchor" href="#api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://github.com/informaticameg/plasta/blob/master/doc/en/api.md">API</a>
+</h2>
+
+<h2>
+<a id="use-cases" class="anchor" href="#use-cases" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://github.com/informaticameg/plasta/blob/master/doc/en/uses_cases.md">Use cases</a>
+</h2>
+
+<ul>
+<li>Create an object containing references</li>
+<li>Passing reference from one model to another</li>
+<li>Change the order of attributes displayed in the list</li>
+<li>Rename the attributes displayed in the list</li>
+<li>Change the main attribute of the class 'ide' by other</li>
+<li>Formatting attributes in the list</li>
+</ul>
+
+<h2>
+<a id="example-apps" class="anchor" href="#example-apps" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a href="https://github.com/informaticameg/plasta/blob/master/doc/en/example_apps.md">Example Apps</a>
+</h2>
+
+<ul>
+<li>Contact list</li>
+<li>Movements manager</li>
+</ul>
+
+<p>Documentation available in Spanish <a href="https://github.com/informaticameg/plasta/blob/master/doc/es/index.md">here</a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Plasta maintained by <a href="https://github.com/informaticameg">informaticameg</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-75819764-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
+  </body>
+</html>
