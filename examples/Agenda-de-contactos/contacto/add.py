@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from plasta.gui.add import BaseAdd
 from contacto import Contacto
 

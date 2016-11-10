@@ -1,17 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from plasta.gui.add_window import BaseAddWindow
-from PyQt4 import uic
-from os.path import join, abspath, dirname
+from plasta.gui.add import BaseAdd
 from person import Person
 
-class AddPerson( BaseAddWindow ):
+class AddPerson(BaseAdd):
 
     def __init__(self, manager, itemToEdit = False, managers = []):
-        BaseAddWindow.__init__(self, manager, itemToEdit, managers)
-        uic.loadUi(join(abspath(dirname(__file__)), 'add.ui'), self)
+        BaseAdd.__init__(self, manager, itemToEdit, managers)
+        self.loadUI('/person/add.ui')
 
         self.linkToAttribute(self.leName, Person.name)
+        self.linkToAttribute(self.cbCountry, Person.country)
 
         self._start_operations()
+        self.loadReferenceCombo(self.cbCountry, Person.country, sortAttr='name')
+
+        if itemToEdit:
+            # set the country in combobox
+            idx = self.references[Person.country]['objs'].index(itemToEdit.country)
+            self.cbCountry.setCurrentIndex(idx)
+

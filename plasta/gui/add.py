@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt4 import QtCore, QtGui, uic
-from plasta.utils.qt import centerOnScreen, setStyle
+from plasta.utils.qt import centerOnScreen, setStyle, sortListOfListObjs
 from plasta.config import config
 
 class BaseAdd(QtGui.QDialog):
@@ -417,7 +417,7 @@ class BaseAdd(QtGui.QDialog):
         Load specified combo with reference items
         '''
         cls = self.references[refAttr]['cls']
-        objs = [obj for obj in self.manager.almacen.find( cls )]
+        objs = [obj for obj in self.manager.store.find( cls )]
         if sort:
             self.references[refAttr]['objs'] = sortListOfListObjs(objs, sortAttr)
         else:

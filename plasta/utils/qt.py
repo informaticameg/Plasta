@@ -109,3 +109,32 @@ def getDataOfWidgets(widgets):
         valor = funcionwidget[type(widget)](widget)
         values.append(valor)
     return values
+
+def sortListOfListObjs(lista, campo='name', index=0, fnParse = None):
+    """Ordena la lista por el metodo burbuja mejorado.
+    Recibe una lista de listas y un numero de campo,
+    ordenando por el campo indicado.
+
+    AVISO: solo soporta objetos storm
+    """
+    intercambios = 1
+    pasada = 1
+    while pasada < len(lista) and intercambios == 1:
+        intercambios = 0
+        for i in range(0, len(lista) - pasada):
+            itemA = lista[i]
+            itemB = lista[i + 1]
+            if fnParse:
+                itemA = fnParse(itemA)
+                itemB = fnParse(itemB)
+            if type(itemA) is dict:
+                conditional = itemA[campo] > itemB[campo]
+            elif type(itemA) in [list, tuple]:
+                conditional = itemA[index] > itemB[index]
+            else:
+                conditional = itemA.__getattribute__(campo) > itemB.__getattribute__(campo)
+            if conditional:
+                lista[i], lista[i + 1] = lista[i + 1], lista[i]
+                intercambios = 1
+        pasada += 1
+    return lista

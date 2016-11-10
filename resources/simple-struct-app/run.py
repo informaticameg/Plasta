@@ -7,15 +7,19 @@ from PyQt4 import QtGui
 from mainwindow import MainWindow
 
 from person.manager import PersonManager
+from country.manager import CountryManager
 
 # configure and instance database
-DATABASE = create_database('sqlite: mydata.db')
+DATABASE = create_database('sqlite:data.db')
 store = Store(DATABASE)
 
 # instances of managers classess
 managers = {
-  'persons': PersonManager(store, reset = True)
+  'persons': PersonManager(store, reset = True),
+  'countries': CountryManager(store, reset = True)
 }
+
+managers['countries'].insertCountries()
 
 # running the app
 app = QtGui.QApplication(sys.argv)

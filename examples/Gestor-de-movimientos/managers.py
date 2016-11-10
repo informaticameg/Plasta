@@ -13,12 +13,12 @@ class Managers :
         almacen = Store(DATABASE)
 
         #RESET: True for reset table of database
-        reset_cm = False
+        reset_value = False
         reset_movimientos = True
 
-        self.cuentas = CuentasManager(almacen, reset = reset_cm)
+        self.cuentas = CuentasManager(almacen, reset = reset_value)
         self.movimientos = MovimientosManager(almacen, reset = reset_movimientos)
-        self.secciones = SeccionesManager(almacen, reset = False, managers = [self.cuentas])
+        self.secciones = SeccionesManager(almacen, reset = reset_value, managers = self)
 
         if reset_movimientos:
             balance = open("movimiento/data.db",'w')

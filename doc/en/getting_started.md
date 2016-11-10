@@ -18,7 +18,7 @@ Anyway we show two possible structures that you can use:
 ```
 
 
-You can download this structure from [here]().
+You can download this structure from [here](https://github.com/informaticameg/Plasta/releases/download/v0.1.8/simple-struct-app.zip).
 
 ### MVC structure type
 
@@ -42,7 +42,7 @@ You can download this structure from [here]().
   .  views.py       # instances of GUI classes
   run.py            # running the application
 ```
-You can download this structure from [here]().
+You can download this structure from [here](https://github.com/informaticameg/Plasta/releases/download/v0.1.8/mvc-struct-app.zip).
 
 ## Plasta generator
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from storm.locals import * #@UnusedWildImport
 import storm
+from storm.locals import *
 from storm.exceptions import OperationalError
 from plasta.config import config
 
@@ -131,25 +131,25 @@ class BaseManager( object ):
         '''
         return self.store.find(self.CLASS, self.CLASS.id == ide).one()
 
-    def searchBy( self, column, nombre ):
+    def searchBy( self, column, value ):
         '''
-        Realiza una busqueda por column segun el valor nombre
+        Realiza una busqueda por column segun el valor value
         @param column:a storm column
-        @param nombre:str o int
+        @param value:str o int
         @return: lista de objetos
         '''
         if type( column ) == storm.references.Reference:
             objs = self.getall()
             value = self.getReferenceName( column )
             return [obj for obj in objs if obj.__getattribute__(value).__str__().lower().find(value) != -1]
-        if nombre != "":
+        if value != "":
             import datetime
-            if (type( nombre ) is unicode) or (type( nombre ) is str):
-                return [obj for obj in self.store.find( self.CLASS, column.like( unicode( u"%" + nombre + u"%" ) ) )]
-            elif type( nombre ) in [int, datetime.datetime, datetime.date] :
-                return [obj for obj in self.store.find( self.CLASS, column == nombre )]
+            if (type( value ) is unicode) or (type( value ) is str):
+                return [obj for obj in self.store.find( self.CLASS, column.like( unicode( u"%" + value + u"%" ) ) )]
+            elif type( value ) in [int, datetime.datetime, datetime.date] :
+                return [obj for obj in self.store.find( self.CLASS, column == value )]
             else:
-                raise Exception, u"Exception:No se busco adecuadamente debido a que el tipo de criterio es: " + unicode( type( nombre ) )
+                raise Exception, u"Exception:No se busco adecuadamente debido a que el tipo de criterio es: " + unicode( type( value ) )
         else:
             return self.getall()
 
