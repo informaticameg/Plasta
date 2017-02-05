@@ -15,7 +15,7 @@ class Controller :
         self.DATABASE = None
         self.store = None
 
-        self.DATABASE = create_database('sqlite: mydata.db')
+        self.DATABASE = create_database('sqlite:data.db')
         self.store = Store(self.DATABASE)
 
     def closeConnection(self):

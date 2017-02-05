@@ -2,15 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from plasta.gui.add import BaseAdd
-from PyQt4 import uic
-from os.path import join, abspath, dirname
 from %object_name% import %Object_name%
 
 class Add%Object_name%( BaseAdd ):
 
     def __init__(self, manager, itemToEdit = False, managers = []):
         BaseAdd.__init__(self, manager, itemToEdit, managers)
-        self.loadUI(join(abspath(dirname(__file__)), 'add.ui'))
+        self.loadUI('/%object_name%/add.ui')
 
 {attributes}
         self._start_operations()

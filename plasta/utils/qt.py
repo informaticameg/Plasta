@@ -11,6 +11,7 @@ def loadUI(self, pathToFile=None):
         If is None, look the ui in the location
         relative to the current folder
     '''
+    import cStringIO, os
     from plasta.config import config
     from PyQt4 import uic
     from plasta.utils import pathtools
@@ -20,8 +21,10 @@ def loadUI(self, pathToFile=None):
         mainFolder = pathtools.getPathProgramFolder()
         uic.loadUi(pathtools.convertPath(mainFolder + pathToFile), self)
     else:
-        import cStringIO, uis
-        uic.loadUi(cStringIO.StringIO(uis[pathToFile]), self)
+        pathToFile = pathtools.convertPath(pathToFile)
+        if os.name == 'nt':
+            pathToFile = '\\' + pathToFile
+        uic.loadUi(cStringIO.StringIO(ui[pathToFile]), self)
 
 def centerOnScreen(self):
     resolution = QtGui.QDesktopWidget().screenGeometry()

@@ -10,9 +10,9 @@ class PersonGUI( BaseGUI ):
 
     def __init__(self, manager, managers = [], parent = None):
         BaseGUI.__init__(self, manager, managers, parent)
-        self.loadUI()
         # establece cual sera la ventana formulario para el agregar/editar
         self.DialogAddClass = AddPerson
+        self.loadUI()
 
         # attributtes wich load in combo of filters
         self.addFilter(u'Name', Person.name)

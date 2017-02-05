@@ -10,8 +10,8 @@ class %Object_name%GUI( BaseGUI ):
 
     def __init__(self, manager, managers = [], parent = None):
         BaseGUI.__init__(self, manager, managers, parent)
-        self.loadUI()
         self.DialogAddClass = Add%Object_name%
+        self.loadUI()
 
 {filters}
 {attributes}

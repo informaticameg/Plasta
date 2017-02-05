@@ -57,7 +57,7 @@ def _generateContentFiles(objInfo):
     # generate attrs
     attrs = ''
     if objInfo['addIdeAttr']:
-      attrs += 'ide = Int(primary = True)\n'
+      attrs += 'id = Int(primary = True)\n'
     for attr in objInfo['attributes']:
       attrs += '    %s = %s()\n' % (attr['name'], attr['type'])
 

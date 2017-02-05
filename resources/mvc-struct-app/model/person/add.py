@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from plasta.gui.add import BaseAdd
-from PyQt4 import uic
-from os.path import join, abspath, dirname
 from model.person import Person
 from datetime import datetime as dt
 
@@ -11,7 +9,7 @@ class AddPerson( BaseAdd ):
 
     def __init__(self, manager, itemToEdit = False, managers = [], parent=None):
         BaseAdd.__init__(self, manager, itemToEdit, managers, parent)
-        self.loadUI(join(abspath(dirname(__file__)), 'add.ui'))
+        self.loadUI('/model/person/add.ui')
 
         self.linkToAttribute(self.leName, Person.name)
         self.linkToAttribute(self.leAddress, Person.address)

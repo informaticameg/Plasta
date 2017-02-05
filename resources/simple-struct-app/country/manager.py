@@ -11,7 +11,6 @@ class CountryManager( BaseManager ):
         BaseManager.__init__(self, store, reset)
         # set the class model wich controlling
         self.CLASS = Country
-
         self._start_operations()
 
     def insertCountries(self):

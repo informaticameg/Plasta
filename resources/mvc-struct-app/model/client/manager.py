@@ -8,7 +8,5 @@ class ClientManager( BaseManager ):
 
     def __init__(self, store, reset = False ):
         BaseManager.__init__(self, store, reset)
-
         self.CLASS = Client
-
         self._start_operations()

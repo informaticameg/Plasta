@@ -31,7 +31,7 @@ import os, sys, optparse
 from plasta.utils import pathtools
 
 # generator version
-__version__ = '0.0.6'
+__version__ = '0.0.7'
 
 def pprint(to_show):
   import pprint
@@ -111,7 +111,6 @@ def generate_ui(args, model_name=''):
 
     checkDir = pathtools.convertPath(
       pathtools.getPathProgramFolder() + '%s/add.ui' % model_name)
-    print checkDir
     gen_ui.generateUI(
       destino = checkDir,
       campos = fields,

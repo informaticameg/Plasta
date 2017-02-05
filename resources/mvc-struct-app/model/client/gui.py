@@ -10,8 +10,8 @@ class ClientGUI( BaseGUI ):
 
     def __init__(self, manager, managers = [], parent = None):
         BaseGUI.__init__(self, manager, managers, parent)
-        self.loadUI()
         self.DialogAddClass = AddClient
+        self.loadUI()
 
         self.addFilter(u'Name', Client.name)
 

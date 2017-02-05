@@ -14,7 +14,7 @@ class BaseManager( object ):
     @param reset: si es true limpia y crea la bd
     '''
 
-    def __init__( self, store, reset = False ):
+    def __init__( self, store, reset=False, managers=None):
         ''''''
         #@param CLASS: la clase que va a manipular ej:Cliente
         self.CLASS = None
@@ -32,6 +32,8 @@ class BaseManager( object ):
         # ej: [{'model':'Client', 'attr':'client', 'type':'id'}, ...]
         # types = id, json
         self.references = []
+        # reference to model managers
+        self.managers = managers
 
 #=======================================================================
 # Methods exclusive Plasta
@@ -43,7 +45,7 @@ class BaseManager( object ):
         '''
         if self.reset:
             self._reset()
-        print "Manager de %s levantado correctamente" % self.CLASS
+        print "Manager %s started ok" % self.CLASS
         #@param CLASSid: la clave primaria de la clase ej:"ide"
         self.CLASSid = self.getClassIdString()
 
