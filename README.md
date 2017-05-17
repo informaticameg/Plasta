@@ -71,6 +71,19 @@ Plasta requires:
 
 Check the Plasta wiki in [English](https://github.com/informaticameg/Plasta/blob/master/doc/en/index.md) or [Spanish](https://github.com/informaticameg/Plasta/blob/master/doc/es/index.md) version.
 
+
+* [Introduction](https://github.com/informaticameg/Plasta/blob/master/doc/en/introduction.md)
+
+* [Install](https://github.com/informaticameg/Plasta/blob/master/doc/en/install.md)
+
+* [Getting started](https://github.com/informaticameg/Plasta/blob/master/doc/en/getting_started.md)
+
+* [API](https://github.com/informaticameg/plasta/blob/master/doc/en/api.md)
+
+* [Use cases](https://github.com/informaticameg/plasta/blob/master/doc/en/uses_cases.md)
+
+* [Example Apps](https://github.com/informaticameg/plasta/blob/master/doc/en/example_apps.md)
+
 ## Plasta Social
 
 * Follow us on [Twitter](https://twitter.com/PlastaFramework)
