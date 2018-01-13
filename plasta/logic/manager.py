@@ -4,28 +4,28 @@
 import storm
 from storm.locals import *
 from storm.exceptions import OperationalError
-from plasta.config import config
+from plasta.utils.qt import processEvents
+from PyQt4 import QtGui
 
-
-class BaseManager( object ):
+class BaseManager(object):
     '''
     Clase base para manager de una clase storm
     @param seachname: atributo por el cual buscara el metodo get()
     @param reset: si es true limpia y crea la bd
     '''
 
-    def __init__( self, store, reset=False, managers=None):
+    def __init__(self, store, reset=False, managers=None):
         ''''''
-        #@param CLASS: la clase que va a manipular ej:Cliente
+        # @param CLASS: la clase que va a manipular ej:Cliente
         self.CLASS = None
-        #@param CLASSATTRIBUTES: las columnas que va usar (DONTTOUCH)
+        # @param CLASSATTRIBUTES: las columnas que va usar (DONTTOUCH)
         self.CLASSATTRIBUTES = []
-        #@param searchattr: lacolumna por la cual el metodo get hace la busqueda ej=Cliente.nombres
+        # @param searchattr: lacolumna por la cual el metodo get hace la busqueda ej=Cliente.nombres
         self.searchattr = None
 
-        #@param store: el objeto STORE de storm
+        # @param store: el objeto STORE de storm
         self.store = store
-        #@param reset: variable que determina si se va a resetear
+        # @param reset: variable que determina si se va a resetear
         self.reset = reset
         # definir aqui referencias hacia otros modelos
         # será usado para la eliminacion por referencia
@@ -39,29 +39,31 @@ class BaseManager( object ):
 # Methods exclusive Plasta
 #=======================================================================
 
-    def _start_operations( self ):
+    def _start_operations(self):
         '''
         Required operations to get up the manager
         '''
         if self.reset:
             self._reset()
-        print "Manager %s started ok" % self.CLASS
-        #@param CLASSid: la clave primaria de la clase ej:"ide"
+        # @param CLASSid: la clave primaria de la clase ej:"ide"
         self.CLASSid = self.getClassIdString()
+        QtGui.QApplication.processEvents()
 
+    def startOperations(self):
+        self._start_operations()
 
-    def _reset( self ):
+    def _reset(self):
         '''
         Drop and recreate the model table
         '''
         SQL = self.getSqlTable()
         nombredetabla = self.CLASS.__storm_table__
-        #ELIMINO LA TABLA
+        # DROP THE TABLE
         try:
             self.store.execute('DROP TABLE IF EXISTS %s;' % nombredetabla, noresult=True)
         except OperationalError, e:
             print e
-        #CREO NUEVAMENTE LA TABLA
+        # CREATE IS CREATED AGAIN
         self.store.execute('CREATE TABLE ' + nombredetabla + ' ' + SQL )
         self.store.commit()
 
@@ -70,7 +72,7 @@ class BaseManager( object ):
 # Generic Methods
 #=======================================================================
 
-    def add( self, params, commit=True):
+    def add(self, params, commit=True):
         '''
         Create and add an object to the database
         @param *params: Receiving init parameters of self.CLASS
@@ -85,24 +87,26 @@ class BaseManager( object ):
             if commit:
                 self.store.flush()
                 self.store.commit()
+            processEvents()
             return obj
         except Exception, e:
             print e
             return False
 
-    def delete( self, obj ):
+    def delete(self, obj):
         '''
         Delete and object of db
         @param obj:un objeto del tipo self.CLASS
         '''
-        if isinstance( obj, self.CLASS ):
+        if isinstance( obj, self.CLASS):
             self.store.remove( obj )#where o is the object representing the row you want to remove
             del obj#lo sacamos de la ram
             self.store.commit()
+            processEvents()
             return True
         return False
 
-    def count( self ):
+    def count(self):
         '''
         Gets the number of objects of this manager
         @return: int
@@ -110,14 +114,14 @@ class BaseManager( object ):
         query = 'select count(*) from %s' % self.CLASS.__storm_table__
         return [o for o in self.store.execute(query)][0][0]
 
-    def getall( self ):
+    def getall(self, params=[]):
         '''
         Gets all objects of this manager
         @return: lista de objs
         '''
-        return [obj for obj in self.store.find( self.CLASS )]
+        return [obj for obj in self.store.find(self.CLASS, *params)]
 
-    def get( self, value ):
+    def get(self, value):
         '''
         Obtain the objects where "value" matches self.searchattr
         @param nombre:str o int
@@ -125,7 +129,7 @@ class BaseManager( object ):
         '''
         if not self.searchattr:
             self.searchattr = self.CLASS.nombre
-        return self.searchBy( self.searchattr, value )
+        return self.searchBy(self.searchattr, value )
 
     def getById(self, ide):
         '''
@@ -133,47 +137,78 @@ class BaseManager( object ):
         '''
         return self.store.find(self.CLASS, self.CLASS.id == ide).one()
 
-    def searchBy( self, column, value ):
+    def searchBy(self, column, value):
         '''
-        Realiza una busqueda por column segun el valor value
-        @param column:a storm column
-        @param value:str o int
-        @return: lista de objetos
+        Perform a search by <column> according to the value <value>
+        @param column: a storm column
+        @param value: str or int
+        @return: object lists
         '''
-        if type( column ) == storm.references.Reference:
+        if type(column) == storm.references.Reference:
             objs = self.getall()
-            value = self.getReferenceName( column )
-            return [obj for obj in objs if obj.__getattribute__(value).__str__().lower().find(value) != -1]
-        if value != "":
-            import datetime
-            if (type( value ) is unicode) or (type( value ) is str):
-                return [obj for obj in self.store.find( self.CLASS, column.like( unicode( u"%" + value + u"%" ) ) )]
-            elif type( value ) in [int, datetime.datetime, datetime.date] :
-                return [obj for obj in self.store.find( self.CLASS, column == value )]
+            attr = self._getReferenceName(column)
+            value = value.lower()
+            return [obj for obj in objs if obj.__getattribute__(attr).__str__().lower().find(value) != -1]
+        if value :
+            info = self.getClassAttributesInfo()
+            column_type = info[self.propertyToColumn(column)]['type']
+            if column_type == 'str':
+                return [obj for obj in self.store.find(self.CLASS, column.like(unicode(u"%" + value + u"%")))]
+            elif column_type == 'date':
+                return [obj for obj in self.store.find(self.CLASS, column.strftime('%d/%m/%Y') == value )]
+            elif column_type in ['int', 'float']:
+
+                if column_type == 'int' and type(value) is not int:
+                    value = int(value)
+                elif column_type == 'float' and type(value) is not float:
+                    value = float(value)
+
+                return [obj for obj in self.store.find(self.CLASS, column==value)]
             else:
-                raise Exception, u"Exception:No se busco adecuadamente debido a que el tipo de criterio es: " + unicode( type( value ) )
+                return [obj for obj in self.store.find(self.CLASS, column==value)]
         else:
             return self.getall()
 
     def checkIfExists(self, obj):
         '''
-        Comprueba que el objeto indicado exista en la base de datos
+        Check that the indicated object exists in the database
         '''
         result = self.getById(obj.id)
         return result is not None, result
+
+    def checkReferences(self, obj):
+        u'''
+        Check that the object does not have references to other
+        objects that depend on it to avoid data inconsistency.
+
+        @param {obj} obj
+        '''
+        result = {'have_refs':False, 'data':{'count':0}}
+        if len(self.references) > 0:
+            for info in self.references:
+                model = info['model']
+                attr = info['attr']
+                _type = info['type']
+                # if _type == 'id':
+                objs = self.store.find(model, attr == obj.id)
+                result['data'][model] = [obj for obj in objs]
+                result['data']['count'] += len(result['data'][model])
+        if result['data']['count'] > 0:
+            result['have_refs'] = True
+        return result
 
 #=======================================================================
 # Inspection Methods
 #=======================================================================
 
-    def getClassName( self ):
+    def getClassName(self):
         '''
         Returns the name of the class that handles
         @return: str
         '''
         return self.CLASS.__name__
 
-    def getDataObject( self, obj, columns, rformat='dict'):
+    def getDataObject(self, obj, columns, rformat='dict'):
         '''
         Returns the data of an object according to the indicated columns
 
@@ -182,7 +217,7 @@ class BaseManager( object ):
         @param format: dict | list
         @return: lista de dic: [{"ide":1},{"nombres":nombrecliente}]
         '''
-        if isinstance( obj, self.CLASS ):
+        if isinstance( obj, self.CLASS):
             values = {} if rformat == 'dict' else []
             for propiedad in columns:
                 nombreatributo = self.getAttributeName( propiedad )
@@ -194,7 +229,7 @@ class BaseManager( object ):
         else:
             raise Exception( "No se pudo obtener los valores debido a que no es una instancia correcta" )
 
-    def getClassAttributes( self ):
+    def getClassAttributes(self):
         '''
         Get the attributes of the class that handles self.manager
         @return: una lista con los atributos de la clase en string
@@ -212,14 +247,14 @@ class BaseManager( object ):
                     self.CLASSATTRIBUTES.append( key )
         return self.CLASSATTRIBUTES
 
-    def getClassAttributesValues( self, obj, rformat='list'):
+    def getClassAttributesValues(self, obj, rformat='list'):
         '''
-        obtiene los valores del obj
+        Get the values of the object
         @param obj:a obj de type
         @param rformat: formato a retornar el valor > list | dict
         @return: list o dict
         '''
-        if isinstance( obj, self.CLASS ):
+        if isinstance(obj, self.CLASS):
             if rformat == 'list':
                 return [obj.__getattribute__( p ) for p in self.getClassAttributes()]
             elif rformat == 'dict':
@@ -228,30 +263,34 @@ class BaseManager( object ):
                     result[p] = obj.__getattribute__( p )
                 return result
         else:
-            raise Exception( "no se pudo obtener los valores" )
+            raise Exception("The values could not be obtained")
 
-    def getClassAttributesInfo( self ):
+    def getClassAttributesInfo(self):
         '''
         Returns a dictionary with the data types of the class
         @requires: storm
         @return:un diccionario clave:la columna, valor otro diccionario:
-        ex:{<storm.properties.Unicode object at 0x9e87b0c>: {'name':'un_atributo','default': None, 'null': True, 'type': 'str', 'primary': False,'reference':False}}
+        ex:{<storm.properties.Unicode object at 0x9e87b0c>: {'name':'un_atributo','default': None, 'null': True,
+        'type': 'str', 'primary': False,'reference':False}}
         '''
         resultado = {}
         todelete = []
-        for name in self.getClassAttributes(): #obtengo los nombe de atributos validos
+        for name in self.getClassAttributes():
             objcolumn = self.CLASS.__dict__[name]
+            if str(type(objcolumn)) == "<type 'function'>":
+                continue
+
             objcolumn_dict = objcolumn.__dict__
             unainfo = {}
             if type( objcolumn ) == storm.references.Reference:
                 unainfo["type"] = 'reference'
-                todelete.append( objcolumn )#eliminar _id
-                try:#Fix para cuando sale una tupla en vez de un column (no tengo idea por que es)
+                todelete.append( objcolumn )
+                try:
                     unainfo["reference"] = {"remote_key":objcolumn_dict["_remote_key"][0], "reference_instance":objcolumn}
-                    objcolumn = self.propertyToColumn( objcolumn_dict["_local_key"][0] )#dar los demas datos de ID
+                    objcolumn = self.propertyToColumn( objcolumn_dict["_local_key"][0] )
                 except:
                     unainfo["reference"] = {"remote_key":objcolumn_dict["_remote_key"], "reference_instance":objcolumn}
-                    objcolumn = objcolumn_dict["_local_key"]#dar los demas datos de ID
+                    objcolumn = objcolumn_dict["_local_key"]
 
             else:
                 unainfo["reference"] = False
@@ -271,9 +310,9 @@ class BaseManager( object ):
             resultado[objcolumn] = unainfo
         return resultado
 
-    def getPropertyName( self, propiedad ):
+    def getPropertyName(self, propiedad):
         '''
-        Devuelve el nombre de on objeto Property o false si no se encuentra
+        Returns the name of on Property object or false if it is not found
         @param aproperty:el objeto Property de storm
         '''
         #obtiene las columnas storm del dict de la clase
@@ -295,14 +334,14 @@ class BaseManager( object ):
                     return nombre
         return False
 
-    def getClassIdString( self ):
+    def getClassIdString(self):
         '''
         @return: valor del id(ex:ide) en string
         '''
         atributes_info = self.getClassAttributesInfo().values()
         return [ atributo['name'] for atributo in atributes_info if atributo['primary'] == True][0]
 
-    def getReferenceName( self, reference ):
+    def getReferenceName(self, reference):
         '''
         devuelve el nombre de on objeto Reference o false si no se encuentra
         @param reference:el objeto Reference de storm
@@ -312,7 +351,7 @@ class BaseManager( object ):
                 return elem
         return False
 
-    def getAttributeName( self, property_or_reference ):
+    def getAttributeName(self, property_or_reference):
         """
         Return the name of Property/Reference object
         """
@@ -322,7 +361,7 @@ class BaseManager( object ):
             return self.getPropertyName( property_or_reference )
 
 
-    def propertyToColumn( self, propiedad ):
+    def propertyToColumn(self, propiedad):
         '''
         a partir de un propierty devuelve el column correspondiente
         @param propiedad:la propyerty
@@ -330,14 +369,14 @@ class BaseManager( object ):
         nombreatributo = self.getPropertyName( propiedad )
         return self.CLASS.__dict__[nombreatributo]
 
-    def getSqlTable( self, engine=None):
+    def getSqlTable(self, engine=None):
         '''
         Get the SQL to create the table corresponding to the current model
         '''
 
         # for more info of database types see:
         # https://storm.canonical.com/Manual#Table_of_properties_vs._python_vs._database_types
-        from plasta.config import config
+        from plasta import config
         db = config.DB_ENGINE
         if engine:
             db = engine
@@ -345,7 +384,7 @@ class BaseManager( object ):
             'sqlite':{
                 "str":"VARCHAR",
                 "int":"INTEGER",
-                "reference":"INTEGER",
+                "reference":"INT",
                 "date":"VARCHAR",
                 "datetime":"VARCHAR",
                 "bool":"INTEGER",
@@ -378,7 +417,6 @@ class BaseManager( object ):
         possiblevaluesnull = {False:"NOT NULL", True:""}
 
         info = self.getClassAttributesInfo()
-        #CREA EL SQL DINAMICAMENTE
         tablestring = "("
         for columna in info:
             name = info[columna]["name"] if info[columna]["reference"] is False else info[columna]["name"] + "_id"
@@ -389,7 +427,7 @@ class BaseManager( object ):
             tipo = possiblesvaluestype[db][info[columna]["type"]]
             if (db == 'mysql') and (name == 'id') and (tipo == possiblesvaluestype[db]['str']):
                 elemento = elemento.replace('AUTO_INCREMENT', '')
-                elemento = elemento.replace('TEXT', 'VARCHAR(10)')
+                elemento = elemento.replace('TEXT', 'VARCHAR(12)')
             tablestring += elemento
         tablestring = tablestring[:-2] + ")"
         return tablestring

@@ -5,7 +5,7 @@ import sys
 from PyQt4 import QtGui
 from GUI.mainwindow import MainWindow
 from managers import Managers
-from plasta.config import config
+from plasta import config
 
 config.LANG = 'es'
 

@@ -32,72 +32,80 @@ from PyQt4 import QtCore, QtGui
 
 class MyTableWidget():
 
-    def __init__(self, TW, listadecolumnas, listadealineaciones = [], fnParseItem=None):
+    def __init__(self, TW, listadecolumnas, listadealineaciones=[], fnParseItem=None):
         self.__widget = TW
-        #self.__widget.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
-        #quitAction = QtGui.QAction("Quit", self.__widget)
-        #self.__widget.addAction(quitAction)
         self.__widget.horizontalHeader().setDefaultSectionSize(150)
-        #NEXT:que divida los campos en la tabla y que ponga bien los numeros
-        self.__widget.horizontalHeader().setResizeMode(0)#maximiza los campos en la tabla
-        self.__widget.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+        # NEXT:que divida los campos en la tabla y que ponga bien los numeros
+        self.__widget.horizontalHeader().setResizeMode(
+            0)  # maximiza los campos en la tabla
+        self.__widget.setSelectionMode(
+            QtGui.QAbstractItemView.ExtendedSelection)
         self.__widget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-
-        #self.__widget.setContextMenuPolicy( QtCore.Qt.CustomContextMenu )
-
+        # self.__widget.horizontalHeader().setStretchLastSection(True)
         self.__columns = listadecolumnas
         self.fnParseItem = fnParseItem
 
-        if listadealineaciones :
+        if listadealineaciones:
             alineaciones = {
-                'L':QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter,
-                'C':QtCore.Qt.AlignCenter,
-                'R':QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
+                'L': QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter,
+                'C': QtCore.Qt.AlignCenter,
+                'R': QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
             }
-            self.__columns_align = [alineaciones[ali] for ali in listadealineaciones]
+            self.__columns_align = [alineaciones[ali]
+                                    for ali in listadealineaciones]
         else:
-            self.__columns_align = [QtCore.Qt.AlignCenter] * len(listadecolumnas)
+            self.__columns_align = [
+                QtCore.Qt.AlignCenter] * len(listadecolumnas)
 
         self.__widget.setColumnCount(len(self.__columns))
         for i in xrange(self.__widget.columnCount()):  # set horizontal headers
-            item = QtGui.QTableWidgetItem(self.__columns[i].capitalize())# the text
-            item.setTextAlignment(QtCore.Qt.AlignCenter)# the alignment
+            item = QtGui.QTableWidgetItem(self.__columns[i])  # the text
+            item.setTextAlignment(QtCore.Qt.AlignCenter)  # the alignment
             self.__widget.setHorizontalHeaderItem(i, item)
 
-    def appendItem(self,listadedatos):
+    def appendItem(self, listadedatos, color=None):
         alineaciones = self.__columns_align
+
         def aux(x, cell):
-            item = QtGui.QTableWidgetItem(unicode(cell))# the text
+            item = QtGui.QTableWidgetItem(unicode(cell))  # the text
             if self.fnParseItem:
                 item = self.fnParseItem(y, x, item, cell)
-            item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable )
-            item.setTextAlignment( alineaciones[x] )# the alignment
+            item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable)
+            item.setTextAlignment(alineaciones[x])  # the alignment
+            if color:
+                item.setBackgroundColor(QtGui.QColor(color))
             widget.setItem(y, x, item)
         widget = self.__widget
         y = widget.rowCount()
         if listadedatos != None:
-            listadedatos = map(lambda valor : '' if valor is None else valor, listadedatos)
-            widget.setRowCount(y+1)
-            [ aux(x, cell) for x,cell in enumerate(listadedatos)]
+            listadedatos = map(
+                lambda valor: '' if valor is None else valor, listadedatos)
+            widget.setRowCount(y + 1)
+            [aux(x, cell) for x, cell in enumerate(listadedatos)]
 
     def addItems(self, DATA):
         """
         DATA debe ser una lista de listas
         """
         alineaciones = self.__columns_align
+
         def addOneItem(listadedatos, y):
             def aux(x, cell):
-                item = QtGui.QTableWidgetItem(unicode(cell))# the text
+                item = QtGui.QTableWidgetItem(unicode(cell))  # the text
                 if self.fnParseItem:
                     item = self.fnParseItem(y, x, item, cell)
-                item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable )
+                item.setFlags(QtCore.Qt.ItemIsEnabled |
+                              QtCore.Qt.ItemIsSelectable)
                 try:
-                    item.setTextAlignment( alineaciones[x] ) # the alignment
+                    item.setTextAlignment(alineaciones[x])  # the alignment
                 except Exception, e:
-                    raise Exception('The alignment for the %sth column is not defined' % (x+1))
+                    raise Exception(
+                        'The alignment for the %sth column is not defined' % (x + 1))
                 widget.setItem(y, x, item)
-            listadedatos = ['' if dato is None else dato for dato in listadedatos ]
-            [ aux(x, cell) for x,cell in enumerate(listadedatos)]
+                QtGui.QApplication.processEvents()
+            listadedatos = [
+                '' if dato is None else dato for dato in listadedatos]
+            [aux(x, cell) for x, cell in enumerate(listadedatos)]
 
         if DATA != None:
             widget = self.__widget
@@ -107,7 +115,7 @@ class MyTableWidget():
             [addOneItem(data, indice) for indice, data in enumerate(DATA)]
             self.widget.setUpdatesEnabled(True)
 
-    def getRowString(self, item = 'null'):
+    def getRowString(self, item='null'):
         """Devuelve una tupla con los datos de el tablewidget en la fila seleccionada
         devuelve los datos en unicode"""
         tablewidget = self.__widget
@@ -117,17 +125,29 @@ class MyTableWidget():
                 x = item
             else:
                 x = tablewidget.currentItem().row()
-            datos=[]
+            datos = []
             for num in range(tamano):
-                qs = tablewidget.item(x,num).text()
-                datos.append(unicode(qs.toUtf8(),'utf-8'))
+                qs = tablewidget.item(x, num).text()
+                datos.append(unicode(qs.toUtf8(), 'utf-8'))
             return tuple(datos)
-        except Exception :
+        except Exception:
             return None
+
+    def setRowBackgroundColor(self, rowIndex, color):
+        columnCount = self.__widget.columnCount()
+        [self.__widget.item(rowIndex, col).setBackgroundColor(QtGui.QColor(color))
+            for col in xrange(columnCount)]
+
+    def currentIndex(self):
+        index = -1
+        item = self.__widget.currentItem()
+        if item:
+            index = item.row()
+        return index
 
     def getListSelectedRows(self):
         seleccionados = self.__widget.selectionModel().selectedRows()
-        rows = [self.getRowString(idx.row()) for idx in  seleccionados]
+        rows = [self.getRowString(idx.row()) for idx in seleccionados]
         return rows
 
     def getAllItems(self):
@@ -137,7 +157,6 @@ class MyTableWidget():
 
     def fullClear(self):
         self.widget.setRowCount(0)
-#        [self.__widget.removeRow(i) for i in range( self.__widget.rowCount() )[::-1]]
 
     def __get_widget(self):
         return self.__widget
@@ -148,12 +167,10 @@ class MyTableWidget():
     widget = property(__get_widget, __set_widget, "widget's docstring")
 
 
-
-
 def main():
 
     return 0
 
+
 if __name__ == '__main__':
     main()
-

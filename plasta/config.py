@@ -27,17 +27,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-class Singleton(type):
-    _instances = {}
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
 
-class config(object):
-    __metaclass__ = Singleton
+LANG = 'es'
 
-    LANG = 'en'
-    STYLE = ''
-    DB_ENGINE = 'sqlite' # sqlite | mysql | postgres
-    DEVELOP = True
+STYLE = ''
+
+DB_ENGINE = 'sqlite'
+
+DEVELOP = True

@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import cStringIO
 from os.path import join, abspath, dirname
 from PyQt4 import QtCore, QtGui, uic
 from plasta.gui.mytablewidget import MyTableWidget
 from plasta.utils import pathtools
-from plasta.utils.qt import centerOnScreen, setStyle
-from plasta.config import config
+from plasta.utils.qt import centerOnScreen, loadUI
+from plasta import config
 
-class BaseGUI( QtGui.QMainWindow ):
+
+class BaseGUI(QtGui.QMainWindow):
     '''Base class to handle operations of CRUD screen'''
 
     def __init__(self, manager, managers = None, parent = None):
@@ -61,10 +63,10 @@ class BaseGUI( QtGui.QMainWindow ):
         self.items = []
 
         self.widgets = {
-            'btNew':True, 'btEdit':True, 'btDelete':True,
-            'leSearch':True, 'cbFilters':True,
-            'twItems':True, 'lbItemsCount':True,
-            'lbTitle':True
+            'btNew': True, 'btEdit': True, 'btDelete': True,
+            'leSearch': True, 'cbFilters': True,
+            'twItems': True, 'lbItemsCount': True,
+            'lbTitle': True, 'btSeeDetails': False
         }
         # DialogAddClass: reference to the class to instantiate to
         # handle dialog window add / edit
@@ -75,13 +77,13 @@ class BaseGUI( QtGui.QMainWindow ):
         # Plural title to show in gui
         self.pluralTitle = self.manager.getClassName()
 
-        self.lang = config().LANG
+        self.lang = config.LANG
         self.messages = {
             'es':{
                 'new':'Nuevo',
                 'edit':'Editar',
                 'delete':'Eliminar',
-                'deleteConfirm':u"¿Está seguro que desea eliminar?.\n\n",
+                'deleteConfirm':u"¿Está seguro que desea eliminar?\n\n",
                 'itemsCount':' item(s) listado(s)',
                 'search':'Buscar',
                 'filters':'Filtros'
@@ -90,18 +92,17 @@ class BaseGUI( QtGui.QMainWindow ):
                 'new':'New',
                 'edit':'Edit',
                 'delete':'Delete',
-                'deleteConfirm':u"¿Are you sure?.\n\n",
+                'deleteConfirm':u"¿Are you sure?\n\n",
                 'itemsCount':' item(s) listed',
                 'search':'Search',
                 'filters':'Filters'
             }
         }
 
-    def _start_operations( self ):
+    def _start_operations(self):
         '''Operations necessary to display the window'''
         self.processEvents = QtGui.QApplication.processEvents
         self.fullScreen = False
-        self.lang = config().LANG
         self.translateWidgets()
         self.makeTable()
         self.processEvents()
@@ -110,20 +111,27 @@ class BaseGUI( QtGui.QMainWindow ):
         self.processEvents()
         self.loadShortcuts()
         centerOnScreen(self)
-        setStyle(self)
         self.processEvents()
+        if not self.widgets['btNew']:
+            self.btNew.setVisible(False)
         if self.widgets['btEdit']:
             self.btEdit.setVisible(False)
         if self.widgets['btDelete']:
             self.btDelete.setVisible(False)
+        if self.widgets['btSeeDetails']:
+            self.btSeeDetails.setVisible(False)
 
-        # self.setWindowIcon( QtGui.QIcon( QtGui.QPixmap( join( abspath( dirname( __file__ ) ), self.ICONFILE ) ) ) )
         if self.widgets['lbTitle']:
             self.lbTitle.setText(self.pluralTitle)
         self.setWindowTitle(self.pluralTitle)
 
+    def startOperations(self):
+        self._start_operations()
+
     def loadUI(self, pathToFile = None):
-        from plasta.utils.qt import loadUI
+        if pathToFile is None:
+            pathToFile = self.FILENAME
+
         loadUI(self, pathToFile)
 
     def getMsgByLang(self, msg):
@@ -141,7 +149,7 @@ class BaseGUI( QtGui.QMainWindow ):
         if self.widgets['cbFilters']:
             self.lbFilters.setText(self.getMsgByLang('filters'))
 
-    def toogleFullScreen( self ):
+    def toogleFullScreen(self):
         ''' '''
         if not self.fullScreen :
             self.showFullScreen()
@@ -149,7 +157,7 @@ class BaseGUI( QtGui.QMainWindow ):
             self.showNormal()
         self.fullScreen = not self.fullScreen
 
-    def loadShortcuts( self ):
+    def loadShortcuts(self):
         u""" Load shortcuts used in the application. """
         self._atajo_salir = QtGui.QShortcut( QtGui.QKeySequence( "Ctrl+Q" ), self, self.close )
         self._atajo_fullscreen = QtGui.QShortcut( QtGui.QKeySequence( "F11" ), self, self.toogleFullScreen )
@@ -162,7 +170,7 @@ class BaseGUI( QtGui.QMainWindow ):
         if self.widgets['btDelete']:
             QtGui.QShortcut( QtGui.QKeySequence( "Del" ), self, self.on_btDelete_clicked )
 
-    def makeTable( self ):
+    def makeTable(self):
         '''Create the structure of table (columns)'''
         if not self.ATRIBUTOSLISTA :
             tableColumns = [p.capitalize() for p in self._get_attributes_names()]
@@ -173,9 +181,9 @@ class BaseGUI( QtGui.QMainWindow ):
         self.tableItems = MyTableWidget(
             self.twItems, tableColumns, self.alignmentColumns, fnParseItem=self.fnParseTableItem)
         # conecta el menu contextual a la tabla
-        #self.connect( self.tableItems.widget, QtCore.SIGNAL( 'customContextMenuRequested(const QPoint&)' ), self.on_context_menu )
+        #self.connect(self.tableItems.widget, QtCore.SIGNAL( 'customContextMenuRequested(const QPoint&)' ), self.on_context_menu )
 
-    def reloadList( self ):
+    def reloadList(self):
         '''
         Vuelve a cargar la lista a partir de los valores actuales en
         la barra de busqueda y el filtro seleccionado.
@@ -183,9 +191,9 @@ class BaseGUI( QtGui.QMainWindow ):
         valor = u''
         campo = u''
         if self.widgets['leSearch']:
-            valor = unicode( self.leSearch.text().toUtf8(), 'utf-8' )
+            valor = unicode(self.leSearch.text().toUtf8(), 'utf-8' )
         if self.widgets['cbFilters']:
-            campo = unicode( self.cbFilters.itemText(
+            campo = unicode(self.cbFilters.itemText(
                     self.cbFilters.currentIndex() ).toUtf8() )
         if self.ATRI_COMBO_BUSQUEDA :
             campo = [p[campo] for p in self.ATRI_COMBO_BUSQUEDA if campo in p ][0]
@@ -197,9 +205,9 @@ class BaseGUI( QtGui.QMainWindow ):
         self.items = resultado
         self.loadTable( resultado )
         if self.widgets['leSearch']:
-            self._setSearchColor( self.leSearch, resultado )
+            self._setSearchColor(self.leSearch, resultado )
 
-    def loadTable( self, listadeobj = None ):
+    def loadTable(self, listadeobj = None):
         '''
         Carga la lista de objetos en la tabla
         @param listadeobj:if none carga todos, sino lo de la lista
@@ -212,8 +220,10 @@ class BaseGUI( QtGui.QMainWindow ):
         listadefilas = [self._getAttributesValues( obj ) for obj in listadeobj]
         self.tableItems.addItems( listadefilas )
         self.setItemsCount( len( listadeobj ) )
+        if self.widgets['leSearch']:
+            self._setSearchColor(self.leSearch, listadeobj )
 
-    def loadCombobox( self ):
+    def loadCombobox(self):
         '''
         Carga el combobox de campos
         '''
@@ -223,9 +233,9 @@ class BaseGUI( QtGui.QMainWindow ):
                 atributos = self.manager.getClassAttributes()
                 for atributo in atributos:
                     self.ATRI_COMBO_BUSQUEDA.append( {atributo:self._obtainColumnForName( atributo )} )
-            map( self.cbFilters.addItem, [p.keys()[0] for p in self.ATRI_COMBO_BUSQUEDA] )
+            map(self.cbFilters.addItem, [p.keys()[0] for p in self.ATRI_COMBO_BUSQUEDA] )
 
-    def find( self ):
+    def find(self):
         '''
         Reliza la busqueda y carga la tabla
         '''
@@ -236,7 +246,7 @@ class BaseGUI( QtGui.QMainWindow ):
         # carga la lista segun el estado de la barra de busqueda
         self.reloadList() if valor != u'' else self.loadTable()
 
-    def actualRowsToObjects( self ):
+    def actualRowsToObjects(self):
         '''
         Obtiene los objetos seleccionados en la tabla
         @return: un objeto del tipo que maneja self.manager
@@ -251,7 +261,7 @@ class BaseGUI( QtGui.QMainWindow ):
             print 'error:actualRowsToObjects:', e
             return None
 
-    def setItemsCount( self, valor ):
+    def setItemsCount(self, valor):
         'Set the count items in the label of list'
         if self.widgets['lbItemsCount']:
             self.lbItemsCount.setText( str( valor ) + self.getMsgByLang('itemsCount'))
@@ -286,11 +296,16 @@ class BaseGUI( QtGui.QMainWindow ):
                 print 'ERROR:disableWidgets() > "%s" not is a valid widget' % w
                 print '> possibles widgets: ', self.widgets.keys()
 
+    def enableWidgets(self, widgets):
+        for w in widgets:
+            if w in self.widgets.keys():
+                self.widgets[w] = True
+
 #################
 # AUX FUNCTIONS #
 #################
 
-    def _getAttributesValues( self, obj ):
+    def _getAttributesValues(self, obj):
         '''
         Devuelve en una lista los atributos de un objetos, ordenados
         segun lo indicado en self.ATRIBUTOSLISTA
@@ -309,7 +324,10 @@ class BaseGUI( QtGui.QMainWindow ):
                 for item in self.fnsParseListAttrs:
                     idx = item[0]
                     fn = item[1]
-                    resultado[idx] = fn(resultado, resultado[idx])
+                    try:
+                        resultado[idx] = fn(resultado, resultado[idx], obj)
+                    except TypeError as e:
+                        resultado[idx] = fn(resultado, resultado[idx])
             return resultado
 
     def _obtainColumnForName(self, columnname):
@@ -333,61 +351,53 @@ class BaseGUI( QtGui.QMainWindow ):
 
     def _setSearchColor(self, widget, resultados_busqueda):
         color_rojo = 'background-color: rgb(255, 178, 178);'
-        try:
-            if self.myStyleSheetBlanco == '' :
-                if not widget.styleSheet().isEmpty() :
-                    style = widget.styleSheet()
-                    self.myStyleSheetBlanco = widget.styleSheet()
 
-                    pos1 = style.indexOf( 'QLineEdit' )
-                    pos2 = style.indexOf( '}', pos1 )
-                    style = style.replace( pos2, 1, color_rojo + '}' )
-                    self.myStyleSheetRojo = style
-                else:
-                    self.myStyleSheetRojo = color_rojo
+        widget.setStyleSheet('')
+        if not widget.text().isEmpty() :
+            if len( resultados_busqueda ) == 0 :
+                widget.setStyleSheet(color_rojo)
 
-            if not widget.text().isEmpty() :
-                if len( resultados_busqueda ) == 0 :
-                    widget.setStyleSheet( self.myStyleSheetRojo )
-                else:
-                    widget.setStyleSheet('')
-            else:
-                widget.setStyleSheet('')
-        except:
-            self.myStyleSheetBlanco = ''
-            self.myStyleSheetRojo = ''
-            self._setSearchColor( widget, resultados_busqueda )
-
-    def _get_attributes_names( self ):
+    def _get_attributes_names(self):
         '''
         Obtiene los atributos de la clase que maneja self.manager
         '''
         return self.ATRIBUTOSLISTA_CLASSNAMES if self.ATRIBUTOSLISTA else self.manager.getClassAttributes()
 
-    def on_context_menu( self, point ):
+    def on_context_menu(self, point):
         mypoint = QtCore.QPoint( point.x() + 10, point.y() + 30 )
-        self.popMenu = QtGui.QMenu( self )
+        self.popMenu = QtGui.QMenu(self )
         self.popMenu.addAction(self.getMsgByLang('new'), self.on_btNew_clicked ,QtGui.QKeySequence("Ctrl+N"))
         self.popMenu.addAction(self.getMsgByLang('edit'), self.on_btEdit_clicked ,QtGui.QKeySequence("Ctrl+M"))
         self.popMenu.addAction(self.getMsgByLang('delete'), self.on_btDelete_clicked ,QtGui.QKeySequence("Del"))
 
         self.popMenu.exec_(self.tableItems.widget.mapToGlobal(mypoint) )
 
+    def showProcessingDialog(self, title=None):
+        if title is None:
+            title = "Comprobando usos de este elemento..."
+        self.progdialog = QtGui.QProgressDialog(title, "Aceptar", 0, 100)
+        self.progdialog.setWindowTitle("Eliminar")
+        self.progdialog.setWindowModality(QtCore.Qt.WindowModal)
+        self.progdialog.setMinimum(0)
+        self.progdialog.setMaximum(0)
+        self.progdialog.show()
+        self.processEvents()
+
 ##########################
 # METHODS TO REIMPLEMENT #
 ##########################
 
-    def add( self ):
+    def add(self):
         'Call the add dialog window'
         #REIMPLEMENT
-        return self.DialogAddClass( self.manager, itemToEdit = False, managers = self.managers )
+        return self.DialogAddClass(self.manager, itemToEdit = False, managers = self.managers )
 
-    def edit( self, obj ):
+    def edit(self, obj):
         'Call the edit dialog window'
         #REIMPLEMENT
-        return self.DialogAddClass( self.manager, itemToEdit = obj, managers = self.managers )
+        return self.DialogAddClass(self.manager, itemToEdit = obj, managers = self.managers )
 
-    def delete( self, obj ):
+    def delete(self, obj):
         'Delete a determinated object'
         #REIMPLEMENT
         self.manager.delete( obj )
@@ -396,24 +406,24 @@ class BaseGUI( QtGui.QMainWindow ):
 # EVENT FUNCTIONS #
 ###################
 
-    def on_leSearch_textChanged( self, cadena ):
+    def on_leSearch_textChanged(self, cadena):
         self.find()
 
     @QtCore.pyqtSlot( int )
-    def on_cbFilters_currentIndexChanged ( self, entero ):
+    def on_cbFilters_currentIndexChanged (self, entero):
         if self.widgets['leSearch']:
             if not self.leSearch.text().isEmpty() :
                 self.find()
 
     @QtCore.pyqtSlot()
-    def on_btNew_clicked( self ):
+    def on_btNew_clicked(self):
         wAgregar = self.add()
         wAgregar.setWindowIcon(self.windowIcon())
         wAgregar.postSaveMethod = self.reloadList
         wAgregar.exec_()
 
     @QtCore.pyqtSlot()
-    def on_btEdit_clicked( self ):
+    def on_btEdit_clicked(self):
         listadeobjetosseleccionados = self.actualRowsToObjects()
         if listadeobjetosseleccionados:
             for obj in listadeobjetosseleccionados:
@@ -423,26 +433,48 @@ class BaseGUI( QtGui.QMainWindow ):
                 wEditar.exec_()
 
     @QtCore.pyqtSlot()
-    def on_btDelete_clicked( self ):
-        listadeobjetosseleccionados = self.actualRowsToObjects()
-        if listadeobjetosseleccionados:
-            for obj in listadeobjetosseleccionados:
-                result = QtGui.QMessageBox.warning(self,
-                    self.getMsgByLang('delete'),
-                    self.getMsgByLang('deleteConfirm'),
-                    QtGui.QMessageBox.Yes, QtGui.QMessageBox.No )
-                if result == QtGui.QMessageBox.Yes:
-                    self.delete( obj )
-                    self.find()
+    def on_btDelete_clicked(self):
+        try:
+            objs = self.actualRowsToObjects()
+            if objs:
+                obj = objs[0]
+                self.showProcessingDialog()
+                info = self.manager.checkReferences(obj)
+                self.progdialog.close()
+                if info['have_refs']:
+                    QtGui.QMessageBox.critical(self,
+                        self.getMsgByLang('delete'),
+                        u"Este elemento no puede ser eliminado, debido a que " +\
+                        u"su eliminación provocaría inconsistencia en los datos.")
+                else:
+                    result = QtGui.QMessageBox.warning(self,
+                        self.getMsgByLang('delete'),
+                        self.getMsgByLang('deleteConfirm'),
+                        QtGui.QMessageBox.Yes, QtGui.QMessageBox.No )
+                    if result == QtGui.QMessageBox.Yes:
+                        self.delete( obj )
+                        self.find()
+        except Exception, msg:
+            print msg
+            QtGui.QMessageBox.critical(self, self.getMsgByLang('delete'),
+                "Ha ocurrido un error al intentar eliminar")
 
     def on_twItems_itemSelectionChanged(self):
         if self.widgets['btEdit']:
             self.btEdit.setVisible(False)
         if self.widgets['btDelete']:
             self.btDelete.setVisible(False)
+        if self.widgets['btSeeDetails']:
+            self.btSeeDetails.setVisible(False)
         items = self.tableItems.getListSelectedRows()
         if items  :
             if self.widgets['btEdit']:
                 self.btEdit.setVisible(True)
             if self.widgets['btDelete']:
                 self.btDelete.setVisible(True)
+            if self.widgets['btSeeDetails']:
+                self.btSeeDetails.setVisible(True)
+
+    def on_twItems_itemDoubleClicked(self, item):
+        if self.widgets['btEdit']:
+            self.btEdit.click()

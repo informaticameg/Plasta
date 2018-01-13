@@ -30,32 +30,42 @@
 import os
 from sys import argv
 
-def getPathProgramFolder():
+
+def getPathProgramFolder(filename=None):
     ''' Obtiene la ruta de la carpeta del programa. '''
-    program_folder = convertPath(os.path.abspath(os.path.dirname(argv[0])) + "/")
-    return program_folder
+    program_folder = convertPath(
+        os.path.abspath(os.path.dirname(argv[0])) + "/")
+    if not filename:
+        return program_folder
+    else:
+        return convertPath(program_folder + filename)
+
 
 def getPathDataFolder():
     ''' Obtiene la ruta del directorio data. '''
-    program_folder = convertPath(os.path.abspath(os.path.dirname(argv[0])) + "/")
-    data_folder = convertPath(os.path.dirname(program_folder[:-4])+'/data/')
+    program_folder = convertPath(
+        os.path.abspath(os.path.dirname(argv[0])) + "/")
+    data_folder = convertPath(os.path.dirname(program_folder[:-4]) + '/data/')
     return data_folder
+
 
 def getPathRootFolder():
     ''' Obtiene la ruta del directorio de la aplicacion. '''
-    program_folder = convertPath(os.path.abspath(os.path.dirname(argv[0])) + "/")
-    root_folder = convertPath(os.path.dirname(program_folder[:-4])+'/')
+    program_folder = convertPath(
+        os.path.abspath(os.path.dirname(argv[0])) + "/")
+    root_folder = convertPath(os.path.dirname(program_folder[:-4]) + '/')
     return root_folder
+
 
 def convertPath(path):
     """Convierte el path a el específico de la plataforma (separador)"""
     if os.name == 'posix':
-        return "/"+apply( os.path.join, tuple(path.split('/')))
+        return "/" + apply(os.path.join, tuple(path.split('/')))
     elif os.name == 'nt':
-        return apply( os.path.join, tuple(path.split('/')))
+        return apply(os.path.join, tuple(path.split('/')))
+
 
 if __name__ == '__main__':
-
 
     data = getPathDataFolder()
     print data

@@ -6,7 +6,8 @@ from %object_name% import %Object_name%
 
 class %Object_name%Manager( BaseManager ):
 
-    def __init__(self, store, reset = False ):
+    def __init__(self, store, reset=False, managers=None):
         BaseManager.__init__(self, store, reset)
         self.CLASS = %Object_name%
+        self.managers = managers
         self._start_operations()

@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from PyQt4 import QtCore, QtGui, uic
-from plasta.utils.qt import centerOnScreen, setStyle, sortListOfListObjs
-from plasta.config import config
+from plasta import config
+from plasta.utils.qt import sortListOfListObjs, centerOnScreen, loadUI
+
 
 class BaseAdd(QtGui.QDialog):
     '''Base class to handle add/edit windows'''
@@ -24,7 +25,6 @@ class BaseAdd(QtGui.QDialog):
         self.postSaveMethod = None # metodo que BaseGUI que se ejecuta luego de save()
         self._dictWidgetReferencias = {} # dictionary that contain the buttons widgets and the reference to wich belong
         self.develop = config.DEVELOP
-        self.processEvents = QtGui.QApplication.processEvents
 
         # add here the validators to execute before save/edit
         # available validators: unique | presence
@@ -45,7 +45,7 @@ class BaseAdd(QtGui.QDialog):
         self.references = {}
 
         self.singleTitle = self.manager.getClassName()
-        self.lang = config().LANG
+        self.lang = config.LANG
         self.messages = {
             'es':{
                 'newTitle':'Nuevo ',
@@ -70,6 +70,41 @@ class BaseAdd(QtGui.QDialog):
                 'validatePresence':u"{field} can't be empty value"
             }
         }
+
+    def _start_operations(self):
+        '''
+        operaciones que se requieren para iniciar la ventana
+        '''
+        self.processEvents = QtGui.QApplication.processEvents
+        centerOnScreen(self)
+        self.setValidators()
+        self.btSave.setDefault(True)
+        self.processEvents()
+        if self.itemToEdit:
+            self.btSave.setText(self.getMsgByLang('editTitle'))
+            self.setWindowTitle(self.getMsgByLang('editTitle') + ' ' + self.singleTitle.lower())
+            self._loadDataInWidgets()
+            self.processEvents()
+        else:
+            self.setWindowTitle(self.getMsgByLang('newTitle') + ' ' + self.singleTitle.lower())
+
+        QtGui.QShortcut( QtGui.QKeySequence( "F9" ), self, self.on_btSave_clicked )
+        QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.Key_Escape ), self, self.close )
+
+        for item in self.ITEMLIST:
+            widget = item.keys()[0]
+            value = item.values()[0]
+            if str(type(value)) == "<class 'storm.references.Reference'>" and\
+                str(type(widget)) == "<class 'PyQt4.QtGui.QComboBox'>":
+                try:
+                    cls = value.__dict__['_remote_key'][0].__dict__['cls']
+                except TypeError, e:
+                    cls = value.__dict__['_remote_key'].__dict__['cls']
+                self.references[value] = {'cls':cls, 'fnParser':None,
+                    'objs':None, 'useEmptyOption':False}
+
+    def startOperations(self):
+        self._start_operations()
 
 ###################
 # EVENT FUNCTIONS #
@@ -100,7 +135,8 @@ class BaseAdd(QtGui.QDialog):
 #################
 
     def loadUI(self, pathToFile = None):
-        from plasta.utils.qt import loadUI
+        if pathToFile is None:
+            pathToFile = self.FILENAME
         loadUI(self, pathToFile)
 
     def isEditing(self):
@@ -158,7 +194,7 @@ class BaseAdd(QtGui.QDialog):
                 if infoclase[columnastorm]["null"] == False:
                     try:
                         label = self.__dict__[nombrecolumnalabel]
-                        label.setText(label.text()+u'*')
+                        label.setText(label.text() + u' *')
                         # setea el color de fondo indicando que es una campo obligatorio
                         widget.setStyleSheet('background-color: rgb(223, 221, 255);')
                     except KeyError, msg:
@@ -293,7 +329,14 @@ class BaseAdd(QtGui.QDialog):
                     valor = self.dict_referencias[widget]
             else:
                 idx = widget.currentIndex()
-                valor = self.references[attribute]['objs'][idx]
+                if self.references[attribute]['useEmptyOption']:
+                    idx = idx - 1
+
+                try:
+                    valor = self.references[attribute]['objs'][idx] if idx >= 0 else None
+                except TypeError, e:
+                    print e
+                    valor = None
             values.append(valor) if valor != u'' else values.append(None) #@NoEffect
         return values
 
@@ -370,37 +413,23 @@ class BaseAdd(QtGui.QDialog):
             print e
             return False
 
-    def _start_operations(self):
+    def getReferenceObject(self, referenceCombo):
         '''
-        operaciones que se requieren para iniciar la ventana
+        Return the current selected object in the combo
         '''
-        self.processEvents = QtGui.QApplication.processEvents
-        centerOnScreen(self)
-        setStyle(self)
-        self.setValidators()
-        self.btSave.setDefault(True)
-        self.processEvents()
-        if self.itemToEdit:
-            self.btSave.setText(self.getMsgByLang('editTitle'))
-            self.setWindowTitle(self.getMsgByLang('editTitle') + ' ' + self.singleTitle.lower())
-            self._loadDataInWidgets()
-            self.processEvents()
-        else:
-            self.setWindowTitle(self.getMsgByLang('newTitle') + ' ' + self.singleTitle.lower())
-
-        QtGui.QShortcut( QtGui.QKeySequence( "F9" ), self, self.on_btSave_clicked )
-        QtGui.QShortcut( QtGui.QKeySequence( QtCore.Qt.Key_Escape ), self, self.close )
-
+        referenceAttr = None
         for item in self.ITEMLIST:
             widget = item.keys()[0]
             value = item.values()[0]
-            if str(type(value)) == "<class 'storm.references.Reference'>" and\
-                str(type(widget)) == "<class 'PyQt4.QtGui.QComboBox'>":
-                try:
-                    cls = value.__dict__['_remote_key'][0].__dict__['cls']
-                except TypeError, e:
-                    cls = value.__dict__['_remote_key'].__dict__['cls']
-                self.references[value] = {'cls':cls, 'fnParser':None, 'objs':None}
+            if widget is referenceCombo:
+                referenceAttr = value
+
+        index = referenceCombo.currentIndex()
+        if index >= 0:
+            if self.references[referenceAttr]['useEmptyOption']:
+                index = index - 1
+            return self.references[referenceAttr]['objs'][index]
+        return None
 
     def loadReferencesCombos(self, sort=True, sortAttr='nombre'):
         '''
@@ -412,16 +441,32 @@ class BaseAdd(QtGui.QDialog):
                     widget = attr.keys()[0]
             self.loadReferenceCombo(widget, refAttr, sort, sortAttr)
 
-    def loadReferenceCombo(self, widget, refAttr, sort=True, sortAttr='nombre'):
+    def loadReferenceCombo(self,
+            widget, refAttr, sort=True, sortAttr='nombre',
+            objs=None, findParams=[],
+            emptyOption=False, emptyOptionTxt='[Seleccionar]'):
         '''
         Load specified combo with reference items
+
+        @param {QComboBox} widget = combo widget to load items
+        @param {Storm.property} refAttr =
+        @param {list} objs = items to be loaded
+        @param {list} findParams = params to be pased to orm find
+        @param {bool} emptyOption = if true, add a blank first item
+        @param {bool} emptyOptionTxt = text caption to show
         '''
+
         cls = self.references[refAttr]['cls']
-        objs = [obj for obj in self.manager.store.find( cls )]
-        if sort:
-            self.references[refAttr]['objs'] = sortListOfListObjs(objs, sortAttr)
-        else:
-            self.references[refAttr]['objs'] = objs
+        if not objs:
+            objs = [obj for obj in self.manager.almacen.find( cls, *findParams)]
+
+        self.references[refAttr]['objs'] = sortListOfListObjs(objs, sortAttr) if sort else objs
+
+        widget.clear()
+        if emptyOption:
+            widget.addItem(emptyOptionTxt)
+            self.references[refAttr]['useEmptyOption'] = True
+
         items = []
         for obj in objs:
             fnParser = self.references[refAttr]['fnParser']
@@ -430,6 +475,16 @@ class BaseAdd(QtGui.QDialog):
             else:
                 items.append(obj.__str__())
         [widget.addItem(item) for item in items]
+
+    def chainReferencesCombos(self, comboIn, refAttrIn, comboOut, refAttrOut, emptyOption=False, emptyOptionTxt='[Seleccionar]'):
+        '''
+        '''
+        #TODO
+        # def loadComboOut():
+        #     self.loadReferenceCombo(comboOut, refAttrOut)
+        # self.connect(comboIn, QtCore.SIGNAL('currentIndexChanged (int)'), loadComboOut)
+        pass
+
 
     def _loadDataInWidgets(self):
         '''
@@ -461,6 +516,8 @@ class BaseAdd(QtGui.QDialog):
                     widget.setText(dato)
                 elif tipo is PyQt4.QtGui.QSpinBox:
                     widget.setValue(int(dato))
+                elif tipo is PyQt4.QtGui.QDoubleSpinBox:
+                    widget.setValue(float(dato))
                 elif tipo is PyQt4.QtGui.QDateEdit:
                     widget.setDate(QtCore.QDate(dato.year, dato.month, dato.day))
         return True
